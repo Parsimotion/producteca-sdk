@@ -1,28 +1,26 @@
 (function() {
-  var ParsimotionClient, Producto, Promise, azure, restify, _,
+  var ProductecaApi, Promise, Restify, azure, _,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
   Promise = require("bluebird");
 
-  restify = require("restify");
+  Restify = require("restify");
 
   _ = require("lodash");
 
   azure = require("azure-storage");
 
-  Producto = require("./producto");
-
-  module.exports = ParsimotionClient = (function() {
-    ParsimotionClient.prototype.initializeClient = function(accessToken) {
+  module.exports = ProductecaApi = (function() {
+    ProductecaApi.prototype.initializeClient = function(endpoint) {
       var client, queue;
-      client = Promise.promisifyAll(restify.createJSONClient({
-        url: config.parsimotion.uri,
+      client = Promise.promisifyAll(Restify.createJSONClient({
+        url: endpoint.url || "http://api.producteca.com",
         agent: false,
         headers: {
-          Authorization: "Bearer " + accessToken
+          Authorization: "Bearer " + endpoint.accessToken
         }
       }));
-      queue = azure.createQueueService(process.env.PRODUCTECA_QUEUE_NAME, process.env.PRODUCTECA_QUEUE_KEY);
+      queue = azure.createQueueService(endpoint.queueName, endpoint.queueKey);
       client.enqueue = (function(_this) {
         return function(message) {
           return queue.createMessage("requests", message, function() {});
@@ -32,23 +30,21 @@
       return client;
     };
 
-    function ParsimotionClient(accessToken, client) {
-      this.client = client != null ? client : this.initializeClient(accessToken);
+    function ProductecaApi(endpoint, client) {
+      this.client = client != null ? client : this.initializeClient(endpoint);
       this._sendUpdateToQueue = __bind(this._sendUpdateToQueue, this);
       this.updatePrice = __bind(this.updatePrice, this);
       this.updateStocks = __bind(this.updateStocks, this);
-      this.getProductos = __bind(this.getProductos, this);
+      this.getProducts = __bind(this.getProducts, this);
     }
 
-    ParsimotionClient.prototype.getProductos = function() {
+    ProductecaApi.prototype.getProducts = function() {
       return this.client.getAsync("/products").spread(function(req, res, obj) {
         return obj.results;
-      }).map(function(json) {
-        return new Producto(json);
       });
     };
 
-    ParsimotionClient.prototype.updateStocks = function(adjustment) {
+    ProductecaApi.prototype.updateStocks = function(adjustment) {
       var body;
       body = _.map(adjustment.stocks, function(it) {
         return {
@@ -64,7 +60,7 @@
       return this._sendUpdateToQueue("products/" + adjustment.id + "/stocks", body);
     };
 
-    ParsimotionClient.prototype.updatePrice = function(product, priceList, amount) {
+    ProductecaApi.prototype.updatePrice = function(product, priceList, amount) {
       var body;
       body = {
         prices: _(product.prices).reject({
@@ -77,7 +73,7 @@
       return this._sendUpdateToQueue("products/" + product.id, body);
     };
 
-    ParsimotionClient.prototype._sendUpdateToQueue = function(resource, body) {
+    ProductecaApi.prototype._sendUpdateToQueue = function(resource, body) {
       return this.client.user.spread((function(_this) {
         return function(_, __, user) {
           var message;
@@ -92,7 +88,7 @@
       })(this));
     };
 
-    return ParsimotionClient;
+    return ProductecaApi;
 
   })();
 

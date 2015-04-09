@@ -1,5 +1,8 @@
 "use strict"
 
+require("coffee-script/register")
+#[^] last version of coffee
+
 module.exports = (grunt) ->
   #-------
   #Plugins
