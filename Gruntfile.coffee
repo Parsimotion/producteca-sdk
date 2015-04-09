@@ -16,23 +16,26 @@ module.exports = (grunt) ->
   #-----
   grunt.registerTask "default", "test" 
   grunt.registerTask "test", "mochaTest"
-  grunt.registerTask "build", ["clean", "coffee"]
+  grunt.registerTask "build", ["clean:build", "coffee", "clean:specs"]
 
   #------
   #Config
   #------
   grunt.initConfig
     #Clean build directory
-    clean: ["build"]
+    clean:
+      build: src: "build"
+      specs: src: "build/*.spec.js"
 
     #Compile coffee
     coffee:
       compile:
         expand: true
         cwd: "#{__dirname}/src"
-        src: ["**/*.coffee"]
+        src: ["**/{,*/}*.coffee"]
         dest: "build/"
-        ext: ".js"
+        rename: (dest, src) ->
+          dest + "/" + src.replace(/\.coffee$/, ".js")
 
     # Run tests
     mochaTest:
