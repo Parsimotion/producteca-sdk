@@ -7,23 +7,25 @@ chai.Should()
 chai.use require("sinon-chai")
 
 ProductecaApi = require("./productecaApi")
-ProductecaApi::initializeClient = => {}
 
 describe "Producteca API", ->
-  client = null
+  client = null ; asyncClient = null
   productecaApi = null
 
   beforeEach ->
-    fastPromise = (value) -> new Promise (resolve) -> resolve [null, null, value]
+    dummyPromise = (value) -> new Promise (resolve) -> resolve [null, null, value]
 
     client =
-      getAsync: sinon.stub().returns fastPromise()
-      user: fastPromise(company: id: 2)
-      enqueue: sinon.stub()
+      getAsync: sinon.stub().returns dummyPromise()
+    asyncClient =
+      putAsync: sinon.stub().returns dummyPromise()
 
-    productecaApi = new ProductecaApi "", client
+    ProductecaApi::initializeClients = ->
+      @client = client ; @asyncClient = asyncClient
 
-  it "puede hacer update de los stocks", (done) ->
+    productecaApi = new ProductecaApi ""
+
+  it "puede hacer update de los stocks", ->
     productecaApi.updateStocks
       id: 23
       warehouse: "Almagro"
@@ -32,21 +34,15 @@ describe "Producteca API", ->
         quantity: 8
       ]
 
-    client.getAsync().then =>
-      client.enqueue.should.have.been.calledWith JSON.stringify
-        method: "PUT"
-        companyId: 2
-        resource: "products/23/stocks"
-        body: [
-          variation: 24
-          stocks: [
-            warehouse: "Almagro"
-            quantity: 8
-          ]
-        ]
-      done()
+    asyncClient.putAsync.should.have.been.calledWith "products/23/stocks", [
+      variation: 24
+      stocks: [
+        warehouse: "Almagro"
+        quantity: 8
+      ]
+    ]
 
-  it "puede hacer update del precio especificado", (done) ->
+  it "puede hacer update del precio especificado", ->
     productecaApi.updatePrice
       id: 25
       prices: [
@@ -59,17 +55,11 @@ describe "Producteca API", ->
       "Meli",
       270
 
-    client.getAsync().then =>
-      client.enqueue.should.have.been.calledWith JSON.stringify
-        method: "PUT"
-        companyId: 2
-        resource: "products/25"
-        body:
-          prices: [
-            priceList: "Default"
-            amount: 180
-          ,
-            priceList: "Meli"
-            amount: 270
-          ]
-      done()
+    asyncClient.putAsync.should.have.been.calledWith "products/25",
+      prices: [
+        amount: 180
+        priceList: "Default"
+      ,
+        amount: 270
+        priceList: "Meli"
+      ]

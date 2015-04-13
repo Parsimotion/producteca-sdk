@@ -6,26 +6,26 @@ azure = require("azure-storage")
 module.exports =
 
 class ProductecaApi
-  initializeClient: (endpoint) ->
-    client = Promise.promisifyAll Restify.createJSONClient
-      url: endpoint.url || "http://api.producteca.com"
-      agent: false
-      headers:
-        Authorization: "Bearer #{endpoint.accessToken}"
+  initializeClients: (endpoint) =>
+    endpoint.url = endpoint.url || "http://api.producteca.com"
 
-    queue = azure.createQueueService endpoint.queueName, endpoint.queueKey
-    client.enqueue = (message) => queue.createMessage "requests", message, =>
-    client.user = client.getAsync "/user/me"
-    client
+    createClient = (url) =>
+      Promise.promisifyAll Restify.createJSONClient
+        url: url
+        agent: false
+        headers:
+          Authorization: "Bearer #{endpoint.accessToken}"
+
+    @client = createClient endpoint.url
+    @asyncClient = createClient @_makeUrlAsync endpoint.url
 
   # Producteca API
   #  endpoint = {
   #    accessToken: User's token
-  #    queueName: Queue for async requests
-  #    queueKey: Access key for the queue
   #    [url]: "Url of the api"
   #  }
-  constructor: (endpoint, @client = @initializeClient endpoint) ->
+  constructor: (endpoint) ->
+    @initializeClients endpoint
 
   #Returns all the products
   getProducts: =>
@@ -50,8 +50,9 @@ class ProductecaApi
         quantity: it.quantity
       ]
 
-    @_sendUpdateToQueue "products/#{adjustment.id}/stocks", body
-
+    @asyncClient
+      .putAsync "products/#{adjustment.id}/stocks", body
+      .spread (req, res, obj) -> obj
 
   #Updates the price of a product:
   #  product = The product obtained in *getProducts*
@@ -67,14 +68,9 @@ class ProductecaApi
             amount: amount
         .value()
 
-    @_sendUpdateToQueue "products/#{product.id}", body
+    @asyncClient
+      .putAsync "/products/#{product.id}", body
+      .spread (req, res, obj) -> obj
 
-  _sendUpdateToQueue: (resource, body) =>
-    @client.user.spread (_, __, user) =>
-      message = JSON.stringify
-        method: "PUT"
-        companyId: user.company.id
-        resource: resource
-        body: body
-
-      @client.enqueue message
+  _makeUrlAsync: (url) =>
+    parts = url.split "." ; parts[0] += "-async" ; parts.join "."
