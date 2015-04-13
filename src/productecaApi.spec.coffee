@@ -34,7 +34,7 @@ describe "Producteca API", ->
         quantity: 8
       ]
 
-    asyncClient.putAsync.should.have.been.calledWith "products/23/stocks", [
+    asyncClient.putAsync.should.have.been.calledWith "/products/23/stocks", [
       variation: 24
       stocks: [
         warehouse: "Almagro"
@@ -55,7 +55,7 @@ describe "Producteca API", ->
       "Meli",
       270
 
-    asyncClient.putAsync.should.have.been.calledWith "products/25",
+    asyncClient.putAsync.should.have.been.calledWith "/products/25",
       prices: [
         amount: 180
         priceList: "Default"

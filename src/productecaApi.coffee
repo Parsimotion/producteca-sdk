@@ -51,7 +51,7 @@ class ProductecaApi
       ]
 
     @asyncClient
-      .putAsync "products/#{adjustment.id}/stocks", body
+      .putAsync "/products/#{adjustment.id}/stocks", body
       .spread (req, res, obj) -> obj
 
   #Updates the price of a product:
