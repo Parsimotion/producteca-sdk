@@ -1,7 +1,6 @@
 Promise = require("bluebird")
 Restify = require("restify")
 _ = require("lodash")
-azure = require("azure-storage")
 
 module.exports =
 
