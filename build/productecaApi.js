@@ -1,5 +1,5 @@
 (function() {
-  var ProductecaApi, Promise, Restify, azure, _,
+  var ProductecaApi, Promise, Restify, _,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
   Promise = require("bluebird");
@@ -8,34 +8,32 @@
 
   _ = require("lodash");
 
-  azure = require("azure-storage");
-
   module.exports = ProductecaApi = (function() {
-    ProductecaApi.prototype.initializeClient = function(endpoint) {
-      var client, queue;
-      client = Promise.promisifyAll(Restify.createJSONClient({
-        url: endpoint.url || "http://api.producteca.com",
-        agent: false,
-        headers: {
-          Authorization: "Bearer " + endpoint.accessToken
-        }
-      }));
-      queue = azure.createQueueService(endpoint.queueName, endpoint.queueKey);
-      client.enqueue = (function(_this) {
-        return function(message) {
-          return queue.createMessage("requests", message, function() {});
+    ProductecaApi.prototype.initializeClients = function(endpoint) {
+      var createClient;
+      endpoint.url = endpoint.url || "http://api.producteca.com";
+      createClient = (function(_this) {
+        return function(url) {
+          return Promise.promisifyAll(Restify.createJSONClient({
+            url: url,
+            agent: false,
+            headers: {
+              Authorization: "Bearer " + endpoint.accessToken
+            }
+          }));
         };
       })(this);
-      client.user = client.getAsync("/user/me");
-      return client;
+      this.client = createClient(endpoint.url);
+      return this.asyncClient = createClient(this._makeUrlAsync(endpoint.url));
     };
 
-    function ProductecaApi(endpoint, client) {
-      this.client = client != null ? client : this.initializeClient(endpoint);
-      this._sendUpdateToQueue = __bind(this._sendUpdateToQueue, this);
+    function ProductecaApi(endpoint) {
+      this._makeUrlAsync = __bind(this._makeUrlAsync, this);
       this.updatePrice = __bind(this.updatePrice, this);
       this.updateStocks = __bind(this.updateStocks, this);
       this.getProducts = __bind(this.getProducts, this);
+      this.initializeClients = __bind(this.initializeClients, this);
+      this.initializeClients(endpoint);
     }
 
     ProductecaApi.prototype.getProducts = function() {
@@ -57,7 +55,9 @@
           ]
         };
       });
-      return this._sendUpdateToQueue("products/" + adjustment.id + "/stocks", body);
+      return this.asyncClient.putAsync("/products/" + adjustment.id + "/stocks", body).spread(function(req, res, obj) {
+        return obj;
+      });
     };
 
     ProductecaApi.prototype.updatePrice = function(product, priceList, amount) {
@@ -70,22 +70,16 @@
           amount: amount
         }).value()
       };
-      return this._sendUpdateToQueue("products/" + product.id, body);
+      return this.asyncClient.putAsync("/products/" + product.id, body).spread(function(req, res, obj) {
+        return obj;
+      });
     };
 
-    ProductecaApi.prototype._sendUpdateToQueue = function(resource, body) {
-      return this.client.user.spread((function(_this) {
-        return function(_, __, user) {
-          var message;
-          message = JSON.stringify({
-            method: "PUT",
-            companyId: user.company.id,
-            resource: resource,
-            body: body
-          });
-          return _this.client.enqueue(message);
-        };
-      })(this));
+    ProductecaApi.prototype._makeUrlAsync = function(url) {
+      var parts;
+      parts = url.split(".");
+      parts[0] += "-async";
+      return parts.join(".");
     };
 
     return ProductecaApi;

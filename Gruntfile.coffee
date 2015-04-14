@@ -14,7 +14,7 @@ module.exports = (grunt) ->
   #-----
   #Tasks
   #-----
-  grunt.registerTask "default", "test" 
+  grunt.registerTask "default", "build" 
   grunt.registerTask "test", "mochaTest"
   grunt.registerTask "build", ["clean:build", "coffee", "clean:specs"]
 
