@@ -30,9 +30,9 @@ class ProductecaApi
   getProducts: =>
     @return @client.getAsync "/products"
 
-  #Returns all the orders
-  getOrders: =>
-    @return @client.getAsync "/orders"
+  #Returns all the sales orders
+  getSalesOrders: =>
+    @return @client.getAsync "/salesorders"
 
   #Updates the stocks with an *adjustment*.
   #  adjustment = {

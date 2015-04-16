@@ -32,7 +32,7 @@
       this["return"] = __bind(this["return"], this);
       this.updatePrice = __bind(this.updatePrice, this);
       this.updateStocks = __bind(this.updateStocks, this);
-      this.getOrders = __bind(this.getOrders, this);
+      this.getSalesOrders = __bind(this.getSalesOrders, this);
       this.getProducts = __bind(this.getProducts, this);
       this.initializeClients = __bind(this.initializeClients, this);
       this.initializeClients(endpoint);
@@ -42,8 +42,8 @@
       return this["return"](this.client.getAsync("/products"));
     };
 
-    ProductecaApi.prototype.getOrders = function() {
-      return this["return"](this.client.getAsync("/orders"));
+    ProductecaApi.prototype.getSalesOrders = function() {
+      return this["return"](this.client.getAsync("/salesorders"));
     };
 
     ProductecaApi.prototype.updateStocks = function(adjustment) {
