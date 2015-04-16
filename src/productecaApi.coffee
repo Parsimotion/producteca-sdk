@@ -28,9 +28,11 @@ class ProductecaApi
 
   #Returns all the products
   getProducts: =>
-    @client
-      .getAsync "/products"
-      .spread (req, res, obj) -> obj.results
+    @return @client.getAsync "/products"
+
+  #Returns all the orders
+  getOrders: =>
+    @return @client.getAsync "/orders"
 
   #Updates the stocks with an *adjustment*.
   #  adjustment = {
@@ -70,6 +72,11 @@ class ProductecaApi
     @asyncClient
       .putAsync "/products/#{product.id}", body
       .spread (req, res, obj) -> obj
+
+  #---
+
+  return: (promise) =>
+    promise.spread (req, res, obj) -> obj.results
 
   _makeUrlAsync: (url) =>
     parts = url.split "." ; parts[0] += "-async" ; parts.join "."

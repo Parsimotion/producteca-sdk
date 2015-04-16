@@ -29,17 +29,21 @@
 
     function ProductecaApi(endpoint) {
       this._makeUrlAsync = __bind(this._makeUrlAsync, this);
+      this["return"] = __bind(this["return"], this);
       this.updatePrice = __bind(this.updatePrice, this);
       this.updateStocks = __bind(this.updateStocks, this);
+      this.getOrders = __bind(this.getOrders, this);
       this.getProducts = __bind(this.getProducts, this);
       this.initializeClients = __bind(this.initializeClients, this);
       this.initializeClients(endpoint);
     }
 
     ProductecaApi.prototype.getProducts = function() {
-      return this.client.getAsync("/products").spread(function(req, res, obj) {
-        return obj.results;
-      });
+      return this["return"](this.client.getAsync("/products"));
+    };
+
+    ProductecaApi.prototype.getOrders = function() {
+      return this["return"](this.client.getAsync("/orders"));
     };
 
     ProductecaApi.prototype.updateStocks = function(adjustment) {
@@ -72,6 +76,12 @@
       };
       return this.asyncClient.putAsync("/products/" + product.id, body).spread(function(req, res, obj) {
         return obj;
+      });
+    };
+
+    ProductecaApi.prototype["return"] = function(promise) {
+      return promise.spread(function(req, res, obj) {
+        return obj.results;
       });
     };
 
