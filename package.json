@@ -18,6 +18,7 @@
     "grunt-contrib-clean": "~0.5.0",
     "grunt-contrib-coffee": "^0.10.1",
     "grunt-mocha-test": "~0.10.2",
+    "q": "~1.0.1",
     "sinon": "^1.10.3",
     "sinon-chai": "^2.5.0"
   },

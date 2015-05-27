@@ -25,7 +25,7 @@ describe "Producteca API", ->
 
     productecaApi = new ProductecaApi ""
 
-  it "puede hacer update de los stocks", ->
+  it "can update stocks", ->
     productecaApi.updateStocks
       id: 23
       warehouse: "Almagro"
@@ -42,7 +42,7 @@ describe "Producteca API", ->
       ]
     ]
 
-  it "puede hacer update del precio especificado", ->
+  it "can update the price", ->
     productecaApi.updatePrice
       id: 25
       prices: [

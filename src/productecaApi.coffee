@@ -1,9 +1,14 @@
 Promise = require("bluebird")
 Restify = require("restify")
 _ = require("lodash")
-
+Product = require("./product")
 module.exports =
 
+# Producteca API
+#  endpoint = {
+#    accessToken: User's token
+#    [url]: "Url of the api"
+#  }
 class ProductecaApi
   initializeClients: (endpoint) =>
     endpoint.url = endpoint.url || "http://api.producteca.com"
@@ -18,11 +23,6 @@ class ProductecaApi
     @client = createClient endpoint.url
     @asyncClient = createClient @_makeUrlAsync endpoint.url
 
-  # Producteca API
-  #  endpoint = {
-  #    accessToken: User's token
-  #    [url]: "Url of the api"
-  #  }
   constructor: (endpoint) ->
     @initializeClients endpoint
 
@@ -31,6 +31,7 @@ class ProductecaApi
     @client
       .getAsync "/products"
       .spread (req, res, obj) -> obj.results
+      .map (json) -> new Product json
 
   #Updates the stocks with an *adjustment*.
   #  adjustment = {
