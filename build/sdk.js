@@ -1,10 +1,10 @@
 (function() {
-  var ProductecaApi;
-
-  ProductecaApi = require("./productecaApi");
-
   module.exports = {
-    Api: ProductecaApi
+    Api: require("./productecaApi"),
+    Sync: {
+      Adjustment: require("./syncer/adjustment"),
+      Syncer: require("./syncer/syncer")
+    }
   };
 
 }).call(this);

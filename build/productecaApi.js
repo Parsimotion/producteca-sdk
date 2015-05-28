@@ -1,5 +1,5 @@
 (function() {
-  var ProductecaApi, Promise, Restify, _,
+  var Product, ProductecaApi, Promise, Restify, _,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
   Promise = require("bluebird");
@@ -7,6 +7,8 @@
   Restify = require("restify");
 
   _ = require("lodash");
+
+  Product = require("./product");
 
   module.exports = ProductecaApi = (function() {
     ProductecaApi.prototype.initializeClients = function(endpoint) {
@@ -29,21 +31,33 @@
 
     function ProductecaApi(endpoint) {
       this._makeUrlAsync = __bind(this._makeUrlAsync, this);
+      this.returnMany = __bind(this.returnMany, this);
+      this["return"] = __bind(this["return"], this);
       this.updatePrice = __bind(this.updatePrice, this);
       this.updateStocks = __bind(this.updateStocks, this);
+      this.getSalesOrder = __bind(this.getSalesOrder, this);
+      this.getSalesOrders = __bind(this.getSalesOrders, this);
       this.getProducts = __bind(this.getProducts, this);
       this.initializeClients = __bind(this.initializeClients, this);
       this.initializeClients(endpoint);
     }
 
     ProductecaApi.prototype.getProducts = function() {
-      return this.client.getAsync("/products").spread(function(req, res, obj) {
-        return obj.results;
+      return this.returnMany(this.client.getAsync("/products")).map(function(json) {
+        return new Product(json);
       });
     };
 
+    ProductecaApi.prototype.getSalesOrders = function() {
+      return this.returnMany(this.client.getAsync("/salesorders"));
+    };
+
+    ProductecaApi.prototype.getSalesOrder = function(id) {
+      return this["return"](this.client.getAsync("/salesorders/" + id));
+    };
+
     ProductecaApi.prototype.updateStocks = function(adjustment) {
-      var body;
+      var body, url;
       body = _.map(adjustment.stocks, function(it) {
         return {
           variation: it.variation,
@@ -55,13 +69,12 @@
           ]
         };
       });
-      return this.asyncClient.putAsync("/products/" + adjustment.id + "/stocks", body).spread(function(req, res, obj) {
-        return obj;
-      });
+      url = "/products/" + adjustment.id + "/stocks";
+      return this["return"](this.asyncClient.putAsync(url, body));
     };
 
     ProductecaApi.prototype.updatePrice = function(product, priceList, amount) {
-      var body;
+      var body, url;
       body = {
         prices: _(product.prices).reject({
           priceList: priceList
@@ -70,8 +83,19 @@
           amount: amount
         }).value()
       };
-      return this.asyncClient.putAsync("/products/" + product.id, body).spread(function(req, res, obj) {
+      url = "/products/" + product.id;
+      return this["return"](this.asyncClient.putAsync(url, body));
+    };
+
+    ProductecaApi.prototype["return"] = function(promise) {
+      return promise.spread(function(req, res, obj) {
         return obj;
+      });
+    };
+
+    ProductecaApi.prototype.returnMany = function(promise) {
+      return promise.spread(function(req, res, obj) {
+        return obj.results;
       });
     };
 
