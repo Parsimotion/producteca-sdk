@@ -28,10 +28,16 @@ class ProductecaApi
 
   #Returns all the products
   getProducts: =>
-    @client
-      .getAsync "/products"
-      .spread (req, res, obj) -> obj.results
+    @returnMany(@client.getAsync "/products")
       .map (json) -> new Product json
+
+  #Returns all the sales orders
+  getSalesOrders: =>
+    @returnMany @client.getAsync "/salesorders"
+
+  #Return a sales order by id
+  getSalesOrder: (id) =>
+    @return @client.getAsync "/salesorders/#{id}"
 
   #Updates the stocks with an *adjustment*.
   #  adjustment = {
@@ -50,9 +56,8 @@ class ProductecaApi
         quantity: it.quantity
       ]
 
-    @asyncClient
-      .putAsync "/products/#{adjustment.id}/stocks", body
-      .spread (req, res, obj) -> obj
+    url = "/products/#{adjustment.id}/stocks"
+    @return @asyncClient.putAsync url, body
 
   #Updates the price of a product:
   #  product = The product obtained in *getProducts*
@@ -68,9 +73,16 @@ class ProductecaApi
             amount: amount
         .value()
 
-    @asyncClient
-      .putAsync "/products/#{product.id}", body
-      .spread (req, res, obj) -> obj
+    url = "/products/#{product.id}"
+    @return @asyncClient.putAsync url, body
+
+  #---
+
+  return: (promise) =>
+    promise.spread (req, res, obj) -> obj
+
+  returnMany: (promise) =>
+    promise.spread (req, res, obj) -> obj.results
 
   _makeUrlAsync: (url) =>
     parts = url.split "." ; parts[0] += "-async" ; parts.join "."
