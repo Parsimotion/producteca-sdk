@@ -43,9 +43,13 @@
     }
 
     ProductecaApi.prototype.getProducts = function() {
-      return this.returnMany(this.client.getAsync("/products")).map(function(json) {
-        return new Product(json);
-      });
+      return this.returnMany(this.client.getAsync("/products")).then((function(_this) {
+        return function(products) {
+          return products.map(function(it) {
+            return new Product(it);
+          });
+        };
+      })(this));
     };
 
     ProductecaApi.prototype.getSalesOrders = function() {

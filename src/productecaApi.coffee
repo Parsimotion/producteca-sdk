@@ -28,8 +28,8 @@ class ProductecaApi
 
   #Returns all the products
   getProducts: =>
-    @returnMany(@client.getAsync "/products")
-      .map (json) -> new Product json
+    @returnMany(@client.getAsync "/products").then (products) =>
+      products.map (it) -> new Product it
 
   #Returns all the sales orders
   getSalesOrders: =>
