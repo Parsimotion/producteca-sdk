@@ -31,9 +31,9 @@ class ProductecaApi
     @returnMany(@client.getAsync "/products").then (products) =>
       products.map (it) -> new Product it
 
-  #Returns all the sales orders
+  #Returns all the opened the sales orders
   getSalesOrders: =>
-    @returnMany @client.getAsync "/salesorders"
+    @returnMany @client.getAsync "/salesorders?$filter=(IsOpen%20eq%20true)%20and%20(IsCanceled%20eq%20false)"
 
   #Return a sales order by id
   getSalesOrder: (id) =>
