@@ -32,8 +32,12 @@ class ProductecaApi
       products.map (it) -> new Product it
 
   #Returns all the opened the sales orders
-  getSalesOrders: =>
-    @returnMany @client.getAsync "/salesorders?$filter=(IsOpen%20eq%20true)%20and%20(IsCanceled%20eq%20false)"
+  # filters = { paid: true or false }
+  getSalesOrders: (filters = {}) =>
+    querystring =
+      if filters.paid? then "%20and%20(PaymentStatus%20eq%20%27Done%27)"
+      else ""
+    @returnMany @client.getAsync "/salesorders?$filter=(IsOpen%20eq%20true)%20and%20(IsCanceled%20eq%20false)#{querystring}"
 
   #Return a sales order by id
   getSalesOrder: (id) =>
