@@ -39,6 +39,10 @@ class ProductecaApi
   getSalesOrder: (id) =>
     @return @client.getAsync "/salesorders/#{id}"
 
+  #Updates a sales order by id
+  updateSalesOrder: (id, update) =>
+    @return @client.putAsync "/salesorders/#{id}", update
+
   #Updates the stocks with an *adjustment*.
   #  adjustment = {
   #    id: Id of the product
