@@ -35,6 +35,7 @@
       this["return"] = __bind(this["return"], this);
       this.updatePrice = __bind(this.updatePrice, this);
       this.updateStocks = __bind(this.updateStocks, this);
+      this.updateSalesOrder = __bind(this.updateSalesOrder, this);
       this.getSalesOrder = __bind(this.getSalesOrder, this);
       this.getSalesOrders = __bind(this.getSalesOrders, this);
       this.getProducts = __bind(this.getProducts, this);
@@ -52,12 +53,21 @@
       })(this));
     };
 
-    ProductecaApi.prototype.getSalesOrders = function() {
-      return this.returnMany(this.client.getAsync("/salesorders"));
+    ProductecaApi.prototype.getSalesOrders = function(filters) {
+      var querystring;
+      if (filters == null) {
+        filters = {};
+      }
+      querystring = filters.paid != null ? "%20and%20(PaymentStatus%20eq%20%27Done%27)" : "";
+      return this.returnMany(this.client.getAsync("/salesorders?$filter=(IsOpen%20eq%20true)%20and%20(IsCanceled%20eq%20false)" + querystring));
     };
 
     ProductecaApi.prototype.getSalesOrder = function(id) {
       return this["return"](this.client.getAsync("/salesorders/" + id));
+    };
+
+    ProductecaApi.prototype.updateSalesOrder = function(id, update) {
+      return this["return"](this.client.putAsync("/salesorders/" + id, update));
     };
 
     ProductecaApi.prototype.updateStocks = function(adjustment) {
