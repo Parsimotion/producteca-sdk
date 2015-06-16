@@ -31,6 +31,7 @@
 
     function ProductecaApi(endpoint) {
       this._makeUrlAsync = __bind(this._makeUrlAsync, this);
+      this._buildSalesOrdersFilters = __bind(this._buildSalesOrdersFilters, this);
       this.returnMany = __bind(this.returnMany, this);
       this["return"] = __bind(this["return"], this);
       this.updatePrice = __bind(this.updatePrice, this);
@@ -58,8 +59,8 @@
       if (filters == null) {
         filters = {};
       }
-      querystring = filters.paid != null ? "%20and%20(PaymentStatus%20eq%20%27Done%27)" : "";
-      return this.returnMany(this.client.getAsync("/salesorders?$filter=(IsOpen%20eq%20true)%20and%20(IsCanceled%20eq%20false)" + querystring));
+      querystring = this._buildSalesOrdersFilters(filters);
+      return this.returnMany(this.client.getAsync("/salesorders" + querystring));
     };
 
     ProductecaApi.prototype.getSalesOrder = function(id) {
@@ -111,6 +112,25 @@
       return promise.spread(function(req, res, obj) {
         return obj.results;
       });
+    };
+
+    ProductecaApi.prototype._buildSalesOrdersFilters = function(filters) {
+      var brandsFilter, querystring;
+      querystring = "?$filter=(IsOpen%20eq%20true)%20and%20(IsCanceled%20eq%20false)";
+      brandsFilter = (function(_this) {
+        return function(brandIds) {
+          return brandIds.map(function(id) {
+            return "(Lines/any(line:line/Variation/Definition/Brand/Id eq " + id + "))";
+          }).join(" or ");
+        };
+      })(this);
+      if (filters.paid != null) {
+        querystring += "%20and%20(PaymentStatus%20eq%20%27Done%27)";
+      }
+      if (filters.brands != null) {
+        querystring += "%20and%20(" + (brandsFilter(filters.brands)) + ")";
+      }
+      return querystring;
     };
 
     ProductecaApi.prototype._makeUrlAsync = function(url) {

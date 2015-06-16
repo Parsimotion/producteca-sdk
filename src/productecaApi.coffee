@@ -32,12 +32,13 @@ class ProductecaApi
       products.map (it) -> new Product it
 
   #Returns all the opened the sales orders
-  # filters = { paid: true or false }
+  # filters = {
+  #  paid: true or false,
+  #  brand: [id1, id2, id3]
+  # }
   getSalesOrders: (filters = {}) =>
-    querystring =
-      if filters.paid? then "%20and%20(PaymentStatus%20eq%20%27Done%27)"
-      else ""
-    @returnMany @client.getAsync "/salesorders?$filter=(IsOpen%20eq%20true)%20and%20(IsCanceled%20eq%20false)#{querystring}"
+    querystring = @_buildSalesOrdersFilters filters
+    @returnMany @client.getAsync "/salesorders#{querystring}"
 
   #Return a sales order by id
   getSalesOrder: (id) =>
@@ -91,6 +92,21 @@ class ProductecaApi
 
   returnMany: (promise) =>
     promise.spread (req, res, obj) -> obj.results
+
+  _buildSalesOrdersFilters: (filters) =>
+    querystring = "?$filter=(IsOpen%20eq%20true)%20and%20(IsCanceled%20eq%20false)"
+
+    brandsFilter = (brandIds) =>
+      brandIds
+        .map (id) => "(Lines/any(line:line/Variation/Definition/Brand/Id eq #{id}))"
+        .join " or "
+
+    if filters.paid?
+      querystring += "%20and%20(PaymentStatus%20eq%20%27Done%27)"
+    if filters.brands?
+      querystring += "%20and%20(#{brandsFilter(filters.brands)})"
+
+    querystring
 
   _makeUrlAsync: (url) =>
     parts = url.split "." ; parts[0] += "-async" ; parts.join "."
