@@ -115,8 +115,13 @@
     };
 
     ProductecaApi.prototype._buildSalesOrdersFilters = function(filters) {
-      var brandsFilter, querystring;
+      var addAnd, brandsFilter, querystring;
       querystring = "?$filter=(IsOpen%20eq%20true)%20and%20(IsCanceled%20eq%20false)";
+      addAnd = (function(_this) {
+        return function(condition) {
+          return querystring += "%20and%20(" + condition + ")";
+        };
+      })(this);
       brandsFilter = (function(_this) {
         return function(brandIds) {
           return brandIds.map(function(id) {
@@ -125,10 +130,13 @@
         };
       })(this);
       if (filters.paid != null) {
-        querystring += "%20and%20(PaymentStatus%20eq%20%27Done%27)";
+        addAnd("PaymentStatus%20eq%20%27Done%27");
       }
       if (filters.brands != null) {
-        querystring += "%20and%20(" + (brandsFilter(filters.brands)) + ")";
+        addAnd(brandsFilter(filters.brands));
+      }
+      if (filters.other != null) {
+        addAnd(filters.other);
       }
       return querystring;
     };

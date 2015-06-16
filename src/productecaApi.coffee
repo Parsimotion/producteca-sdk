@@ -35,6 +35,7 @@ class ProductecaApi
   # filters = {
   #  paid: true or false,
   #  brand: [id1, id2, id3]
+  #  other: "property/inner eq 'string'"
   # }
   getSalesOrders: (filters = {}) =>
     querystring = @_buildSalesOrdersFilters filters
@@ -95,6 +96,7 @@ class ProductecaApi
 
   _buildSalesOrdersFilters: (filters) =>
     querystring = "?$filter=(IsOpen%20eq%20true)%20and%20(IsCanceled%20eq%20false)"
+    addAnd = (condition) => querystring += "%20and%20(#{condition})"
 
     brandsFilter = (brandIds) =>
       brandIds
@@ -102,9 +104,11 @@ class ProductecaApi
         .join " or "
 
     if filters.paid?
-      querystring += "%20and%20(PaymentStatus%20eq%20%27Done%27)"
+      addAnd "PaymentStatus%20eq%20%27Done%27"
     if filters.brands?
-      querystring += "%20and%20(#{brandsFilter(filters.brands)})"
+      addAnd brandsFilter(filters.brands)
+    if filters.other?
+      addAnd filters.other
 
     querystring
 

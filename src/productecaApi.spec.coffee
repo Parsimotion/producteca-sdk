@@ -64,9 +64,16 @@ describe "Producteca API", ->
         priceList: "Meli"
       ]
 
-  it "builds a querystring with the sales orders filters", ->
-    querystring = productecaApi._buildSalesOrdersFilters
-      paid: true
-      brands: [2, 4, 9]
+  describe "builds a querystring with the sales orders filters", ->
+    it "with paid and brands", ->
+      querystring = productecaApi._buildSalesOrdersFilters
+        paid: true
+        brands: [2, 4, 9]
 
-    querystring.should.eql "?$filter=(IsOpen%20eq%20true)%20and%20(IsCanceled%20eq%20false)%20and%20(PaymentStatus%20eq%20%27Done%27)%20and%20((Lines/any(line:line/Variation/Definition/Brand/Id eq 2)) or (Lines/any(line:line/Variation/Definition/Brand/Id eq 4)) or (Lines/any(line:line/Variation/Definition/Brand/Id eq 9)))"
+      querystring.should.eql "?$filter=(IsOpen%20eq%20true)%20and%20(IsCanceled%20eq%20false)%20and%20(PaymentStatus%20eq%20%27Done%27)%20and%20((Lines/any(line:line/Variation/Definition/Brand/Id eq 2)) or (Lines/any(line:line/Variation/Definition/Brand/Id eq 4)) or (Lines/any(line:line/Variation/Definition/Brand/Id eq 9)))"
+
+    it "with custom filters", ->
+      querystring = productecaApi._buildSalesOrdersFilters
+        other: "CustomId ne 'exported'"
+
+      querystring.should.eql "?$filter=(IsOpen%20eq%20true)%20and%20(IsCanceled%20eq%20false)%20and%20(CustomId ne 'exported')"
