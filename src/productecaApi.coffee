@@ -100,8 +100,8 @@ class ProductecaApi
 
     brandsFilter = (brandIds) =>
       brandIds
-        .map (id) => "(Lines/any(line:line/Variation/Definition/Brand/Id eq #{id}))"
-        .join " or "
+        .map (id) => "(Lines%2Fany(line%3Aline%2FVariation%2FDefinition%2FBrand%2FId%20eq%20#{id}))"
+        .join "%20or%20"
 
     if filters.paid?
       addAnd "PaymentStatus%20eq%20%27Done%27"
