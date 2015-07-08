@@ -40,9 +40,14 @@
       this.getSalesOrder = __bind(this.getSalesOrder, this);
       this.getSalesOrders = __bind(this.getSalesOrders, this);
       this.getProducts = __bind(this.getProducts, this);
+      this.getProduct = __bind(this.getProduct, this);
       this.initializeClients = __bind(this.initializeClients, this);
       this.initializeClients(endpoint);
     }
+
+    ProductecaApi.prototype.getProduct = function(id) {
+      return this["return"](this.client.getAsync("/products/" + id));
+    };
 
     ProductecaApi.prototype.getProducts = function() {
       return this.returnMany(this.client.getAsync("/products")).then((function(_this) {
