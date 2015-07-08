@@ -26,6 +26,10 @@ class ProductecaApi
   constructor: (endpoint) ->
     @initializeClients endpoint
 
+  #Returns a product by id
+  getProduct: (id) =>
+    @return @client.getAsync "/products/#{id}"
+
   #Returns all the products
   getProducts: =>
     @returnMany(@client.getAsync "/products").then (products) =>
@@ -41,7 +45,7 @@ class ProductecaApi
     querystring = @_buildSalesOrdersFilters filters
     @returnMany @client.getAsync "/salesorders#{querystring}"
 
-  #Return a sales order by id
+  #Returns a sales order by id
   getSalesOrder: (id) =>
     @return @client.getAsync "/salesorders/#{id}"
 
