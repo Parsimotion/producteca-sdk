@@ -4,6 +4,7 @@ Q = require("q")
 
 Syncer = require("./syncer")
 Product = require("../product")
+Adjustment = require("./adjustment")
 
 chai = require("chai")
 chai.Should()
@@ -81,20 +82,18 @@ describe "Syncer", ->
     client.updateStocks.called.should.be.false
 
   describe "cuando los productos no tienen variantes...", ->
-    ajuste =
+    ajuste = new Adjustment
       identifier: "123456"
       price: 25
       stock: 40
 
     it "_joinAdjustmentsAndProducts linkea ajustes con productos de Producteca", ->
       ajustes = syncer._joinAdjustmentsAndProducts [ajuste]
+      clean = (o) => JSON.parse JSON.stringify o
 
-      ajustes.linked[0].should.eql
-          adjustment:
-            identifier: "123456"
-            price: 25
-            stock: 40
-          products: [campera, camperaVariable]
+      clean(ajustes.linked[0]).should.eql clean
+        adjustment: identifier: "123456", price: 25, stock: 40
+        products: [campera, camperaVariable]
 
     describe "al ejecutar dispara una request a Parsimotion matcheando el id segun sku", ->
       beforeEach ->
@@ -129,9 +128,9 @@ describe "Syncer", ->
 
     beforeEach ->
       resultado = syncer.execute([
-        identifier: "123456", stock: 28
+        new Adjustment(identifier: "123456", stock: 28)
       ,
-        identifier: "55555", stock: 70
+        new Adjustment(identifier: "55555", stock: 70)
       ])
 
       resultadoShouldHaveProperty = (name, value) ->
@@ -146,11 +145,11 @@ describe "Syncer", ->
   describe "cuando los productos sí tienen variantes...", ->
     it "cuando sincronizo por sku: no sincroniza las variantes", ->
       ajustes = [
-        identifier: "CamperaRompeNocheNegra", price: 11, stock: 23
+        new Adjustment(identifier: "CamperaRompeNocheNegra", price: 11, stock: 23)
       ,
-        identifier: "CamperaRompeNocheBlanca", price: 12, stock: 24
+        new Adjustment(identifier: "CamperaRompeNocheBlanca", price: 12, stock: 24)
       ,
-        identifier: "123456"
+        new Adjustment(identifier: "123456")
       ]
 
       syncer.execute(ajustes).then (result) =>
@@ -164,9 +163,9 @@ describe "Syncer", ->
       syncer.settings.identifier = "barcode"
 
       ajustes = [
-        { identifier: "CamperaRompeNocheNegra", price: 11, stock: 23 }
-        { identifier: "CamperaRompeNocheBlanca", price: 12, stock: 24 }
-        { identifier: "123456" }
+        new Adjustment(identifier: "CamperaRompeNocheNegra", price: 11, stock: 23)
+        new Adjustment(identifier: "CamperaRompeNocheBlanca", price: 12, stock: 24)
+        new Adjustment(identifier: "123456")
       ]
 
       syncer.execute(ajustes).then (result) =>

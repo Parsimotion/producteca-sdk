@@ -10,8 +10,8 @@ module.exports =
 #      prices: true or false
 #      stocks: true or false
 #    }
-#    priceList: Name of the price list
-#    warehouse: Name of the warehouse
+#    priceList: Name of the default price list (used when the adjustment doesn't have one)
+#    warehouse: Name of the default warehouse (used when the adjustment doesn't have one)
 #    identifier: "sku" or "barcode"
 #  }
 #  products = Array of *Product*
@@ -62,20 +62,22 @@ class Syncer
         identifier: it.adjustment.identifier
 
   _updatePrice: (adjustment, product) =>
-    console.log "Updating price of ~#{adjustment.identifier}(#{product.id}) with value $#{adjustment.price}..."
-    @productecaApi.updatePrice product, @settings.priceList, adjustment.price
+    adjustment.forEachPrice (price, priceList = @settings.priceList) =>
+      console.log "Updating price of ~#{adjustment.identifier}(#{product.id}) in priceList #{priceList} with value $#{price}..."
+      @productecaApi.updatePrice product, priceList, price
 
   _updateStock: (adjustment, product) =>
     variationId = @_getVariation(product, adjustment).id
 
-    console.log "Updating stock of ~#{adjustment.identifier}(#{product.id}, #{variationId}) with quantity #{adjustment.stock}..."
-    @productecaApi.updateStocks
-      id: product.id
-      warehouse: @settings.warehouse
-      stocks: [
-        variation: variationId
-        quantity: adjustment.stock
-      ]
+    adjustment.forEachStock (stock, warehouse = @settings.warehouse) =>
+      console.log "Updating stock of ~#{adjustment.identifier}(#{product.id}, #{variationId}) in warehouse #{warehouse} with quantity #{stock}..."
+      @productecaApi.updateStocks
+        id: product.id
+        warehouse: warehouse
+        stocks: [
+          variation: variationId
+          quantity: stock
+        ]
 
   _getStock: (product) =>
     stock = _.find (@_getVariation product).stocks, warehouse: @settings.warehouse

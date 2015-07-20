@@ -52,12 +52,24 @@ class Adjustment
     _.extend @, dto
 
     @prices?.forEach (it) =>
-      it.value = @adaptPrice it.value
+      it.value = @_adaptPrice it.value
     @stocks?.forEach (it) =>
-      it.quantity = @adaptStock it.quantity
+      it.quantity = @_adaptStock it.quantity
 
-    @price = @adaptPrice @price
-    @stock = @adaptStock @stock
+    @price = @_adaptPrice @price
+    @stock = @_adaptStock @stock
 
-  adaptPrice: (price) => smartParseFloat price
-  adaptStock: (stock) => _.max [0, smartParseInt stock]
+  # Executes a function(value, priceList) for each price in the adjustment
+  forEachPrice: (fn) =>
+    (@prices?.forEach ({ priceList, value }) =>
+      fn value, priceList
+    ) || fn @price
+
+  # Executes a function(quantity, warehouse) for each stock in the adjustment
+  forEachStock: (fn) =>
+    (@stocks?.forEach ({ warehouse, quantity }) =>
+      fn quantity, warehouse
+    ) || fn @stock
+
+  _adaptPrice: (price) => smartParseFloat price
+  _adaptStock: (stock) => _.max [0, smartParseInt stock]
