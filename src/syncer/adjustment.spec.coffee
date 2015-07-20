@@ -19,8 +19,15 @@ describe "Ajustment", ->
     it "without thousands and decimals separator", ->
       new AjusteStock(price: "4160").price.should.equal 4160
 
-  it "parses the stock to int", ->
-    new AjusteStock(stock: "2.00").stock.should.equal 2
+    it "don't try to parse the price if it's a Number", ->
+      new AjusteStock(price: 4160).price.should.equal 4160
+
+  describe "parsing stock to int...", ->
+    it "parses the stock to int if it's a string", ->
+      new AjusteStock(stock: "2.00").stock.should.equal 2
+
+    it "don't try to parse the stock if it's a Number", ->
+      new AjusteStock(stock: 2).stock.should.equal 2
 
   it "intializes the stock in 0 when the provided is lower", ->
     new AjusteStock(stock: "-4.00").stock.should.equal 0
