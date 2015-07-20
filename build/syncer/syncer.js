@@ -90,24 +90,38 @@
     };
 
     Syncer.prototype._updatePrice = function(adjustment, product) {
-      console.log("Updating price of ~" + adjustment.identifier + "(" + product.id + ") with value $" + adjustment.price + "...");
-      return this.productecaApi.updatePrice(product, this.settings.priceList, adjustment.price);
+      return adjustment.forEachPrice((function(_this) {
+        return function(price, priceList) {
+          if (priceList == null) {
+            priceList = _this.settings.priceList;
+          }
+          console.log("Updating price of ~" + adjustment.identifier + "(" + product.id + ") in priceList " + priceList + " with value $" + price + "...");
+          return _this.productecaApi.updatePrice(product, priceList, price);
+        };
+      })(this));
     };
 
     Syncer.prototype._updateStock = function(adjustment, product) {
       var variationId;
       variationId = this._getVariation(product, adjustment).id;
-      console.log("Updating stock of ~" + adjustment.identifier + "(" + product.id + ", " + variationId + ") with quantity " + adjustment.stock + "...");
-      return this.productecaApi.updateStocks({
-        id: product.id,
-        warehouse: this.settings.warehouse,
-        stocks: [
-          {
-            variation: variationId,
-            quantity: adjustment.stock
+      return adjustment.forEachStock((function(_this) {
+        return function(stock, warehouse) {
+          if (warehouse == null) {
+            warehouse = _this.settings.warehouse;
           }
-        ]
-      });
+          console.log("Updating stock of ~" + adjustment.identifier + "(" + product.id + ", " + variationId + ") in warehouse " + warehouse + " with quantity " + stock + "...");
+          return _this.productecaApi.updateStocks({
+            id: product.id,
+            warehouse: warehouse,
+            stocks: [
+              {
+                variation: variationId,
+                quantity: stock
+              }
+            ]
+          });
+        };
+      })(this));
     };
 
     Syncer.prototype._getStock = function(product) {

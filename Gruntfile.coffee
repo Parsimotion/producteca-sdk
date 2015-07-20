@@ -10,13 +10,15 @@ module.exports = (grunt) ->
   grunt.loadNpmTasks "grunt-contrib-clean"
   grunt.loadNpmTasks "grunt-contrib-coffee"
   grunt.loadNpmTasks "grunt-mocha-test"
+  grunt.loadNpmTasks "grunt-bump"
+
 
   #-----
   #Tasks
   #-----
-  grunt.registerTask "default", "build" 
+  grunt.registerTask "default", "build"
   grunt.registerTask "test", "mochaTest"
-  grunt.registerTask "build", ["clean:build", "coffee", "clean:specs"]
+  grunt.registerTask "build", ["clean:build", "coffee", "clean:specs", "bump"]
 
   #------
   #Config
@@ -42,3 +44,15 @@ module.exports = (grunt) ->
       options:
         reporter: "spec"
       src: ["src/**/*.spec.coffee"]
+
+    # Upgrade the version of the package
+    bump:
+      options:
+        files: ["package.json"]
+        commit: true
+        commitMessage: "Release v%VERSION%"
+        commitFiles: ["-a"]
+        createTag: true
+        tagName: "%VERSION%"
+        tagMessage: "Version %VERSION%"
+        push: false

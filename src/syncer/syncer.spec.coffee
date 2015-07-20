@@ -4,6 +4,7 @@ Q = require("q")
 
 Syncer = require("./syncer")
 Product = require("../product")
+Adjustment = require("./adjustment")
 
 chai = require("chai")
 chai.Should()
@@ -72,31 +73,80 @@ describe "Syncer", ->
         ]
     ]
 
-  it "se ignoran los productos cuyo sku es vacio", ->
-    syncer.execute [
-      identifier: ""
-      stock: 40
+# ----------
+
+  describe "en el caso más completo (variantes - multi listaDePrecios / depósito)...", ->
+    beforeEach ->
+      syncer.settings.identifier = "barcode"
+
+      syncer.execute [
+        new Adjustment(
+          identifier: "CamperaRompeNocheNegra",
+          prices: [
+            { priceList: "Precios Cuidados", value: "30" }
+            { priceList: "Con Tarjeta de Crédito", value: "90" }
+          ]
+          stocks: [
+            { warehouse: "Villa Lugano", quantity: 20 }
+          ]
+        )
+        new Adjustment(
+          identifier: "CamperaRompeNocheBlanca",
+          prices: [
+            { priceList: "Default", value: "99" }
+          ]
+          stocks: [
+            { warehouse: "Palermo", quantity: 38 }
+          ]
+        )
     ]
 
-    client.updateStocks.called.should.be.false
+    it "actualiza los precios", ->
+      client.updatePrice.should.have.callCount 3
+      client.updatePrice.should.have.been.calledWith camperaVariable, "Precios Cuidados", 30
+      client.updatePrice.should.have.been.calledWith camperaVariable, "Con Tarjeta de Crédito", 90
+      client.updatePrice.should.have.been.calledWith camperaVariable, "Default", 99
+
+    it "actualiza los stocks", ->
+      client.updateStocks.should.have.callCount 2
+      client.updateStocks.should.have.been.calledWith
+        id: 1
+        warehouse: "Villa Lugano"
+        stocks: [
+          variation: 2
+          quantity: 20
+        ]
+      client.updateStocks.should.have.been.calledWith
+        id: 1
+        warehouse: "Palermo"
+        stocks: [
+          variation: 4
+          quantity: 38
+        ]
 
   describe "cuando los productos no tienen variantes...", ->
-    ajuste =
+    ajuste = new Adjustment
       identifier: "123456"
       price: 25
       stock: 40
 
+    it "se ignoran los productos cuyo sku es vacio", ->
+      syncer.execute [
+        identifier: ""
+        stock: 40
+      ]
+
+      client.updateStocks.called.should.be.false
+
     it "_joinAdjustmentsAndProducts linkea ajustes con productos de Producteca", ->
       ajustes = syncer._joinAdjustmentsAndProducts [ajuste]
+      clean = (o) => JSON.parse JSON.stringify o
 
-      ajustes.linked[0].should.eql
-          adjustment:
-            identifier: "123456"
-            price: 25
-            stock: 40
-          products: [campera, camperaVariable]
+      clean(ajustes.linked[0]).should.eql clean
+        adjustment: identifier: "123456", price: 25, stock: 40
+        products: [campera, camperaVariable]
 
-    describe "al ejecutar dispara una request a Parsimotion matcheando el id segun sku", ->
+    describe "al ejecutar dispara una request a Producteca matcheando el id segun sku", ->
       beforeEach ->
         syncer.execute [ajuste]
 
@@ -124,33 +174,14 @@ describe "Syncer", ->
       client.updatePrice.called.should.be.true
       client.updateStocks.called.should.be.false
 
-  describe "ejecutar devuelve un objeto con el resultado de la sincronizacion:", ->
-    resultadoShouldHaveProperty = null
-
-    beforeEach ->
-      resultado = syncer.execute([
-        identifier: "123456", stock: 28
-      ,
-        identifier: "55555", stock: 70
-      ])
-
-      resultadoShouldHaveProperty = (name, value) ->
-        resultado.then (actualizados) -> actualizados[name].should.eql value
-
-    it "los unlinked", ->
-      resultadoShouldHaveProperty "unlinked", [ identifier: "55555" ]
-
-    it "los linked", ->
-      resultadoShouldHaveProperty "linked", [ identifier: "123456" ]
-
   describe "cuando los productos sí tienen variantes...", ->
     it "cuando sincronizo por sku: no sincroniza las variantes", ->
       ajustes = [
-        identifier: "CamperaRompeNocheNegra", price: 11, stock: 23
+        new Adjustment(identifier: "CamperaRompeNocheNegra", price: 11, stock: 23)
       ,
-        identifier: "CamperaRompeNocheBlanca", price: 12, stock: 24
+        new Adjustment(identifier: "CamperaRompeNocheBlanca", price: 12, stock: 24)
       ,
-        identifier: "123456"
+        new Adjustment(identifier: "123456")
       ]
 
       syncer.execute(ajustes).then (result) =>
@@ -164,9 +195,9 @@ describe "Syncer", ->
       syncer.settings.identifier = "barcode"
 
       ajustes = [
-        { identifier: "CamperaRompeNocheNegra", price: 11, stock: 23 }
-        { identifier: "CamperaRompeNocheBlanca", price: 12, stock: 24 }
-        { identifier: "123456" }
+        new Adjustment(identifier: "CamperaRompeNocheNegra", price: 11, stock: 23)
+        new Adjustment(identifier: "CamperaRompeNocheBlanca", price: 12, stock: 24)
+        new Adjustment(identifier: "123456")
       ]
 
       syncer.execute(ajustes).then (result) =>
@@ -177,3 +208,22 @@ describe "Syncer", ->
             { identifier: "CamperaRompeNocheBlanca" }
           ]
           unlinked: []
+
+  describe "resultado de la sincronización...", ->
+    resultadoShouldHaveProperty = null
+
+    beforeEach ->
+      resultado = syncer.execute([
+        new Adjustment(identifier: "123456", stock: 28)
+      ,
+        new Adjustment(identifier: "55555", stock: 70)
+      ])
+
+      resultadoShouldHaveProperty = (name, value) ->
+        resultado.then (actualizados) -> actualizados[name].should.eql value
+
+    it "los unlinked", ->
+      resultadoShouldHaveProperty "unlinked", [ identifier: "55555" ]
+
+    it "los linked", ->
+      resultadoShouldHaveProperty "linked", [ identifier: "123456" ]
