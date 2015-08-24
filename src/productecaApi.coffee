@@ -108,7 +108,7 @@ class ProductecaApi
         .join "%20or%20"
 
     if filters.paid?
-      addAnd "PaymentStatus%20eq%20%27Approved%27"
+      addAnd "PaymentStatus%20eq%20%27Done%27"
     if filters.brands?
       addAnd brandsFilter(filters.brands)
     if filters.other?
