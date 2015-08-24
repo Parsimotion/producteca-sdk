@@ -70,7 +70,7 @@ describe "Producteca API", ->
         paid: true
         brands: [2, 4, 9]
 
-      querystring.should.eql "?$filter=(IsOpen%20eq%20true)%20and%20(IsCanceled%20eq%20false)%20and%20(PaymentStatus%20eq%20%27Approved%27)%20and%20((Lines%2Fany(line%3Aline%2FVariation%2FDefinition%2FBrand%2FId%20eq%202))%20or%20(Lines%2Fany(line%3Aline%2FVariation%2FDefinition%2FBrand%2FId%20eq%204))%20or%20(Lines%2Fany(line%3Aline%2FVariation%2FDefinition%2FBrand%2FId%20eq%209)))"
+      querystring.should.eql "?$filter=(IsOpen%20eq%20true)%20and%20(IsCanceled%20eq%20false)%20and%20(PaymentStatus%20eq%20%27Done%27)%20and%20((Lines%2Fany(line%3Aline%2FVariation%2FDefinition%2FBrand%2FId%20eq%202))%20or%20(Lines%2Fany(line%3Aline%2FVariation%2FDefinition%2FBrand%2FId%20eq%204))%20or%20(Lines%2Fany(line%3Aline%2FVariation%2FDefinition%2FBrand%2FId%20eq%209)))"
 
     it "with custom filters", ->
       querystring = productecaApi._buildSalesOrdersFilters
