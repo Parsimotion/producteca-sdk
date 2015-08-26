@@ -135,7 +135,7 @@
         };
       })(this);
       if (filters.paid != null) {
-        addAnd("PaymentStatus%20eq%20%27Done%27");
+        addAnd("PaymentStatus%20eq%20%27Approved%27");
       }
       if (filters.brands != null) {
         addAnd(brandsFilter(filters.brands));
