@@ -34,6 +34,7 @@
       this._buildSalesOrdersFilters = __bind(this._buildSalesOrdersFilters, this);
       this.returnMany = __bind(this.returnMany, this);
       this["return"] = __bind(this["return"], this);
+      this.createShipment = __bind(this.createShipment, this);
       this.updatePrice = __bind(this.updatePrice, this);
       this.updateStocks = __bind(this.updateStocks, this);
       this.updateSalesOrder = __bind(this.updateSalesOrder, this);
@@ -105,6 +106,10 @@
       };
       url = "/products/" + product.id;
       return this["return"](this.asyncClient.putAsync(url, body));
+    };
+
+    ProductecaApi.prototype.createShipment = function(salesOrderId, shipment) {
+      return this["return"](this.asyncClient.postAsync("/salesorders/" + salesOrderId + "/shipments", shipment));
     };
 
     ProductecaApi.prototype["return"] = function(promise) {
