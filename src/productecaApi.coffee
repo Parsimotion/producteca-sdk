@@ -37,7 +37,7 @@ class ProductecaApi
 
   #Returns multiple products by their comma separated ids
   getMultipleProducts: (ids) =>
-    @returnMany(@client.getAsync "/products?ids=#{ids}").then (products) =>
+    @return(@client.getAsync "/products?ids=#{ids}").then (products) =>
       @_createProducts products
 
   _createProducts: (products) =>

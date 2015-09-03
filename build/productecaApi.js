@@ -61,7 +61,7 @@
     };
 
     ProductecaApi.prototype.getMultipleProducts = function(ids) {
-      return this.returnMany(this.client.getAsync("/products?ids=" + ids)).then((function(_this) {
+      return this["return"](this.client.getAsync("/products?ids=" + ids)).then((function(_this) {
         return function(products) {
           return _this._createProducts(products);
         };
