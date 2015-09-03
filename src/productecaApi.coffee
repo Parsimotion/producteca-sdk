@@ -33,7 +33,15 @@ class ProductecaApi
   #Returns all the products
   getProducts: =>
     @returnMany(@client.getAsync "/products").then (products) =>
-      products.map (it) -> new Product it
+      @_createProducts products
+
+  #Returns multiple products by their comma separated ids
+  getMultipleProducts: (ids) =>
+    @returnMany(@client.getAsync "/products?ids=#{ids}").then (products) =>
+      @_createProducts products
+
+  _createProducts: (products) =>
+    products.map (it) -> new Product it
 
   #Returns all the opened the sales orders
   # filters = {
@@ -91,7 +99,7 @@ class ProductecaApi
     @return @asyncClient.putAsync url, body
 
   createShipment: (salesOrderId, shipment) =>
-    @return @asyncClient.postAsync "/salesorders/#{salesOrderId}/shipments", shipment
+    @return @client.postAsync "/salesorders/#{salesOrderId}/shipments", shipment
 
   #---
 
