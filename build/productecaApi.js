@@ -34,11 +34,14 @@
       this._buildSalesOrdersFilters = __bind(this._buildSalesOrdersFilters, this);
       this.returnMany = __bind(this.returnMany, this);
       this["return"] = __bind(this["return"], this);
+      this.createShipment = __bind(this.createShipment, this);
       this.updatePrice = __bind(this.updatePrice, this);
       this.updateStocks = __bind(this.updateStocks, this);
       this.updateSalesOrder = __bind(this.updateSalesOrder, this);
       this.getSalesOrder = __bind(this.getSalesOrder, this);
       this.getSalesOrders = __bind(this.getSalesOrders, this);
+      this._createProducts = __bind(this._createProducts, this);
+      this.getMultipleProducts = __bind(this.getMultipleProducts, this);
       this.getProducts = __bind(this.getProducts, this);
       this.getProduct = __bind(this.getProduct, this);
       this.initializeClients = __bind(this.initializeClients, this);
@@ -52,11 +55,23 @@
     ProductecaApi.prototype.getProducts = function() {
       return this.returnMany(this.client.getAsync("/products")).then((function(_this) {
         return function(products) {
-          return products.map(function(it) {
-            return new Product(it);
-          });
+          return _this._createProducts(products);
         };
       })(this));
+    };
+
+    ProductecaApi.prototype.getMultipleProducts = function(ids) {
+      return this["return"](this.client.getAsync("/products?ids=" + ids)).then((function(_this) {
+        return function(products) {
+          return _this._createProducts(products);
+        };
+      })(this));
+    };
+
+    ProductecaApi.prototype._createProducts = function(products) {
+      return products.map(function(it) {
+        return new Product(it);
+      });
     };
 
     ProductecaApi.prototype.getSalesOrders = function(filters) {
@@ -105,6 +120,10 @@
       };
       url = "/products/" + product.id;
       return this["return"](this.asyncClient.putAsync(url, body));
+    };
+
+    ProductecaApi.prototype.createShipment = function(salesOrderId, shipment) {
+      return this["return"](this.client.postAsync("/salesorders/" + salesOrderId + "/shipments", shipment));
     };
 
     ProductecaApi.prototype["return"] = function(promise) {
