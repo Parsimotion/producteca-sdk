@@ -20,16 +20,18 @@
   chai.use(require("sinon-chai"));
 
   describe("Syncer", function() {
-    var campera, camperaVariable, client, syncer;
+    var adjustments, campera, camperaVariable, client, syncer;
     client = null;
     syncer = null;
     campera = null;
     camperaVariable = null;
+    adjustments = null;
     beforeEach(function() {
       var settings;
       client = {
         updateStocks: sinon.stub().returns(Q()),
-        updatePrice: sinon.stub().returns(Q())
+        updateProduct: sinon.stub().returns(Q()),
+        createProduct: sinon.stub().returns(Q())
       };
       campera = new Product({
         id: 1,
@@ -77,12 +79,13 @@
         identifier: "sku",
         synchro: {
           prices: true,
-          stocks: true
+          stocks: true,
+          data: true
         },
         warehouse: "Villa Crespo",
         priceList: "Meli"
       };
-      return syncer = new Syncer(client, settings, [
+      syncer = new Syncer(client, settings, [
         campera, camperaVariable, new Product({
           id: 2,
           sku: "",
@@ -98,50 +101,136 @@
           ]
         })
       ]);
+      return adjustments = [
+        new Adjustment({
+          identifier: "CamperaRompeNocheNegra",
+          prices: [
+            {
+              priceList: "Precios Cuidados",
+              value: "30"
+            }, {
+              priceList: "Con Tarjeta de Crédito",
+              value: "90"
+            }
+          ],
+          stocks: [
+            {
+              warehouse: "Villa Lugano",
+              quantity: 20
+            }
+          ],
+          description: "Saraza",
+          notes: "Lalala"
+        }), new Adjustment({
+          identifier: "CamperaRompeNocheBlanca",
+          prices: [
+            {
+              priceList: "Default",
+              value: "99"
+            }
+          ],
+          stocks: [
+            {
+              warehouse: "Palermo",
+              quantity: 38
+            }
+          ]
+        })
+      ];
     });
-    describe("en el caso más completo (variantes - multi listaDePrecios / depósito)...", function() {
-      beforeEach(function() {
+    describe("los precios y los datos son independientes,", function() {
+      it("cuando actualizo solo los datos los precios no se modifican", function() {
         syncer.settings.identifier = "barcode";
-        return syncer.execute([
+        syncer.settings.synchro = {
+          prices: false,
+          data: true
+        };
+        syncer.execute([
           new Adjustment({
             identifier: "CamperaRompeNocheNegra",
-            prices: [
-              {
-                priceList: "Precios Cuidados",
-                value: "30"
-              }, {
-                priceList: "Con Tarjeta de Crédito",
-                value: "90"
-              }
-            ],
-            stocks: [
-              {
-                warehouse: "Villa Lugano",
-                quantity: 20
-              }
-            ]
-          }), new Adjustment({
-            identifier: "CamperaRompeNocheBlanca",
+            prices: [],
+            notes: "Lalala"
+          })
+        ]);
+        client.updateProduct.getCall(0).args[0].toJSON().should.not.have.property('prices');
+        return client.updateProduct.getCall(0).args[0].toJSON().should.have.property('notes', 'Lalala');
+      });
+      return it("cuando actualizo solo los precios los datos no se modifican", function() {
+        syncer.settings.identifier = "barcode";
+        syncer.settings.synchro = {
+          prices: true,
+          data: false
+        };
+        syncer.execute([
+          new Adjustment({
+            identifier: "CamperaRompeNocheNegra",
             prices: [
               {
                 priceList: "Default",
                 value: "99"
               }
             ],
-            stocks: [
-              {
-                warehouse: "Palermo",
-                quantity: 38
-              }
-            ]
+            notes: "Lalala"
           })
         ]);
+        client.updateProduct.getCall(0).args[0].toJSON().prices.should.eql([
+          {
+            priceList: "Default",
+            amount: 99
+          }
+        ]);
+        return client.updateProduct.getCall(0).args[0].toJSON().should.not.have.property('notes');
       });
-      it("actualiza los precios", function() {
-        client.updatePrice.should.have.callCount(3);
-        client.updatePrice.should.have.been.calledWith(camperaVariable, "Precios Cuidados", 30);
-        client.updatePrice.should.have.been.calledWith(camperaVariable, "Con Tarjeta de Crédito", 90);
-        return client.updatePrice.should.have.been.calledWith(camperaVariable, "Default", 99);
+    });
+    describe("en el caso más completo (variantes - multi listaDePrecios / depósito)...", function() {
+      beforeEach(function() {
+        syncer.settings.identifier = "barcode";
+        return syncer.execute(adjustments);
+      });
+      it("actualiza los precios y los datos", function() {
+        var json;
+        client.updateProduct.should.have.callCount(2);
+        json = {
+          id: 1,
+          sku: "123456",
+          description: "Campera De Cuero Para Romper La Noche En Muchos Colores",
+          prices: [
+            {
+              priceList: "Precios Cuidados",
+              amount: 30
+            }, {
+              priceList: "Con Tarjeta de Crédito",
+              amount: 90
+            }, {
+              priceList: "Default",
+              amount: 99
+            }
+          ],
+          variations: [
+            {
+              id: 2,
+              barcode: "CamperaRompeNocheNegra",
+              stocks: [
+                {
+                  warehouse: "Villa Crespo",
+                  quantity: 12
+                }
+              ]
+            }, {
+              id: 4,
+              barcode: "CamperaRompeNocheBlanca",
+              stocks: [
+                {
+                  warehouse: "Villa Crespo",
+                  quantity: 16
+                }
+              ]
+            }
+          ],
+          description: "Saraza",
+          notes: "Lalala"
+        };
+        return client.updateProduct.getCall(0).args[0].toJSON().should.eql(json);
       });
       return it("actualiza los stocks", function() {
         client.updateStocks.should.have.callCount(2);
@@ -162,6 +251,56 @@
             {
               variation: 4,
               quantity: 38
+            }
+          ]
+        });
+      });
+    });
+    describe("si hay adjustments de productos nuevos", function() {
+      beforeEach(function() {
+        syncer.settings.identifier = "barcode";
+        return adjustments.push(new Adjustment({
+          identifier: "NuevoProducto",
+          name: "Campera de lana para losers",
+          prices: [
+            {
+              priceList: "Default",
+              value: "555"
+            }
+          ],
+          stocks: [
+            {
+              warehouse: "Palermo",
+              quantity: 11
+            }
+          ]
+        }));
+      });
+      it("no crea productos si createProduct es false", function() {
+        syncer.settings.createProducts = false;
+        syncer.execute(adjustments);
+        return client.createProduct.should.not.have.been.called;
+      });
+      return it("crea productos si createProduct es true", function() {
+        syncer.settings.createProducts = true;
+        syncer.execute(adjustments);
+        return client.createProduct.should.have.been.calledWith({
+          description: "Campera de lana para losers",
+          prices: [
+            {
+              priceList: "Default",
+              amount: 555
+            }
+          ],
+          variations: [
+            {
+              barcode: "NuevoProducto",
+              stocks: [
+                {
+                  warehouse: "Palermo",
+                  quantity: 11
+                }
+              ]
             }
           ]
         });
@@ -217,8 +356,22 @@
           });
         });
         return it("para actualizar el precio", function() {
-          return client.updatePrice.should.have.been.calledWith(campera, "Meli", 25);
+          return client.updateProduct.should.have.been.calledWith(campera);
         });
+      });
+      it("actualiza el producto si en las settings digo que quiero sincronizar precios", function() {
+        syncer.settings.synchro = {
+          prices: true
+        };
+        syncer.execute([ajuste]);
+        return client.updateProduct.called.should.be["true"];
+      });
+      it("actualiza el producto si en las settings digo que quiero sincronizar datos", function() {
+        syncer.settings.synchro = {
+          data: true
+        };
+        syncer.execute([ajuste]);
+        return client.updateProduct.called.should.be["true"];
       });
       it("si en las settings digo que no quiero sincronizar precios, no lo hace", function() {
         syncer.settings.synchro = {
@@ -226,7 +379,16 @@
           stocks: true
         };
         syncer.execute([ajuste]);
-        client.updatePrice.called.should.be["false"];
+        client.updateProduct.called.should.be["false"];
+        return client.updateStocks.called.should.be["true"];
+      });
+      it("si en las settings digo que no quiero sincronizar datos, no lo hace", function() {
+        syncer.settings.synchro = {
+          data: false,
+          stocks: true
+        };
+        syncer.execute([ajuste]);
+        client.updateProduct.called.should.be["false"];
         return client.updateStocks.called.should.be["true"];
       });
       return it("si en las settings digo que no quiero sincronizar stocks, no lo hace", function() {
@@ -235,7 +397,7 @@
           stocks: false
         };
         syncer.execute([ajuste]);
-        client.updatePrice.called.should.be["true"];
+        client.updateProduct.called.should.be["true"];
         return client.updateStocks.called.should.be["false"];
       });
     });

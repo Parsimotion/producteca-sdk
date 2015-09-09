@@ -6,6 +6,9 @@
 
   module.exports = Product = (function() {
     function Product(properties) {
+      this.updateWith = __bind(this.updateWith, this);
+      this.toJSON = __bind(this.toJSON, this);
+      this.updatePrice = __bind(this.updatePrice, this);
       this.firstVariation = __bind(this.firstVariation, this);
       this.getVariationForAdjustment = __bind(this.getVariationForAdjustment, this);
       this.hasVariantes = __bind(this.hasVariantes, this);
@@ -26,6 +29,23 @@
 
     Product.prototype.firstVariation = function() {
       return _.head(this.variations);
+    };
+
+    Product.prototype.updatePrice = function(priceList, amount) {
+      return this.prices = _(this.prices).reject({
+        priceList: priceList
+      }).concat({
+        priceList: priceList,
+        amount: amount
+      }).value();
+    };
+
+    Product.prototype.toJSON = function() {
+      return _.omit(this, _.isFunction);
+    };
+
+    Product.prototype.updateWith = function(obj) {
+      return _.assign(this, obj);
     };
 
     return Product;

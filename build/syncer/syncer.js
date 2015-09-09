@@ -1,30 +1,38 @@
 (function() {
-  var Q, Syncer, _,
+  var AdjustmentToNewProductTransformer, Q, Syncer, _,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
   Q = require("q");
 
   _ = require("lodash");
 
+  AdjustmentToNewProductTransformer = require("./adjustmentToNewProductTransformer");
+
   module.exports = Syncer = (function() {
     function Syncer(productecaApi, settings, products) {
       this.productecaApi = productecaApi;
       this.settings = settings;
       this.products = products;
+      this._createProducts = __bind(this._createProducts, this);
+      this._shouldSyncProductData = __bind(this._shouldSyncProductData, this);
       this._getProductsForAdjustments = __bind(this._getProductsForAdjustments, this);
       this._getVariation = __bind(this._getVariation, this);
       this._getStock = __bind(this._getStock, this);
       this._updateStock = __bind(this._updateStock, this);
-      this._updatePrice = __bind(this._updatePrice, this);
-      this._updateStocksAndPrices = __bind(this._updateStocksAndPrices, this);
+      this._updateProduct = __bind(this._updateProduct, this);
+      this._sync = __bind(this._sync, this);
       this._joinAdjustmentsAndProducts = __bind(this._joinAdjustmentsAndProducts, this);
       this.execute = __bind(this.execute, this);
     }
 
     Syncer.prototype.execute = function(adjustments) {
-      var adjustmentsAndProducts;
+      var adjustmentsAndProducts, promises;
       adjustmentsAndProducts = this._joinAdjustmentsAndProducts(adjustments);
-      return (Q.allSettled(this._updateStocksAndPrices(adjustmentsAndProducts))).then((function(_this) {
+      promises = this._sync(adjustmentsAndProducts);
+      if (this.settings.createProducts) {
+        promises = promises.concat(this._createProducts(adjustmentsAndProducts.unlinked));
+      }
+      return (Q.allSettled(promises)).then((function(_this) {
         return function(results) {
           return _.mapValues(adjustmentsAndProducts, function(adjustmentsAndProducts) {
             return adjustmentsAndProducts.map(function(it) {
@@ -58,9 +66,9 @@
       };
     };
 
-    Syncer.prototype._updateStocksAndPrices = function(adjustmentsAndProducts) {
-      var syncPrices, syncStocks;
-      syncPrices = this.settings.synchro.prices;
+    Syncer.prototype._sync = function(adjustmentsAndProducts) {
+      var syncProducts, syncStocks;
+      syncProducts = this._shouldSyncProductData();
       syncStocks = this.settings.synchro.stocks;
       return adjustmentsAndProducts.linked.map((function(_this) {
         return function(it) {
@@ -74,8 +82,8 @@
             }
           };
           return Q.all(_.flatten([
-            updateIf(syncPrices, function(p) {
-              return _this._updatePrice(it.adjustment, p);
+            updateIf(syncProducts, function(p) {
+              return _this._updateProduct(it.adjustment, p);
             }), updateIf(syncStocks, function(p) {
               return _this._updateStock(it.adjustment, p);
             })
@@ -89,16 +97,22 @@
       })(this));
     };
 
-    Syncer.prototype._updatePrice = function(adjustment, product) {
-      return adjustment.forEachPrice((function(_this) {
-        return function(price, priceList) {
-          if (priceList == null) {
-            priceList = _this.settings.priceList;
-          }
-          console.log("Updating price of ~" + adjustment.identifier + "(" + product.id + ") in priceList " + priceList + " with value $" + price + "...");
-          return _this.productecaApi.updatePrice(product, priceList, price);
-        };
-      })(this));
+    Syncer.prototype._updateProduct = function(adjustment, product) {
+      if (this.settings.synchro.prices) {
+        adjustment.forEachPrice((function(_this) {
+          return function(price, priceList) {
+            if (priceList == null) {
+              priceList = _this.settings.priceList;
+            }
+            console.log("Updating price of ~" + adjustment.identifier + "(" + product.id + ") in priceList " + priceList + " with value $" + price + "...");
+            return product.updatePrice(priceList, price);
+          };
+        })(this));
+      }
+      if (this.settings.synchro.data) {
+        product.updateWith(adjustment.productData());
+      }
+      return this.productecaApi.updateProduct(product);
     };
 
     Syncer.prototype._updateStock = function(adjustment, product) {
@@ -162,6 +176,20 @@
       } else {
         return matches;
       }
+    };
+
+    Syncer.prototype._shouldSyncProductData = function() {
+      return this.settings.synchro.prices || this.settings.synchro.data;
+    };
+
+    Syncer.prototype._createProducts = function(unlinkeds) {
+      var transformer;
+      transformer = new AdjustmentToNewProductTransformer(this.settings);
+      return unlinkeds.map((function(_this) {
+        return function(unlinked) {
+          return _this.productecaApi.createProduct(transformer.transform(unlinked.adjustment));
+        };
+      })(this));
     };
 
     return Syncer;

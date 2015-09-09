@@ -36,6 +36,8 @@
       this["return"] = __bind(this["return"], this);
       this.getShipment = __bind(this.getShipment, this);
       this.createShipment = __bind(this.createShipment, this);
+      this.createProduct = __bind(this.createProduct, this);
+      this.updateProduct = __bind(this.updateProduct, this);
       this.updatePrice = __bind(this.updatePrice, this);
       this.updateStocks = __bind(this.updateStocks, this);
       this.updateSalesOrder = __bind(this.updateSalesOrder, this);
@@ -110,17 +112,20 @@
     };
 
     ProductecaApi.prototype.updatePrice = function(product, priceList, amount) {
-      var body, url;
-      body = {
-        prices: _(product.prices).reject({
-          priceList: priceList
-        }).concat({
-          priceList: priceList,
-          amount: amount
-        }).value()
-      };
+      product.updatePrice(priceList, amount);
+      return this.updateProduct(product);
+    };
+
+    ProductecaApi.prototype.updateProduct = function(product) {
+      var url;
       url = "/products/" + product.id;
-      return this["return"](this.asyncClient.putAsync(url, body));
+      return this["return"](this.asyncClient.putAsync(url, _.omit(product.toJSON(), ["variations"])));
+    };
+
+    ProductecaApi.prototype.createProduct = function(product) {
+      var url;
+      url = "/products";
+      return this["return"](this.asyncClient.postAsync(url, product));
     };
 
     ProductecaApi.prototype.createShipment = function(salesOrderId, shipment) {
