@@ -43,6 +43,7 @@
 
   module.exports = Adjustment = (function() {
     function Adjustment(dto) {
+      this.productData = __bind(this.productData, this);
       this._adaptStock = __bind(this._adaptStock, this);
       this._adaptPrice = __bind(this._adaptPrice, this);
       this.forEachStock = __bind(this.forEachStock, this);
@@ -86,9 +87,9 @@
 
     Adjustment.prototype.forEachPrice = function(fn) {
       if (this.prices == null) {
-        return fn(this.price);
+        return [fn(this.price)];
       }
-      return this.prices.forEach((function(_this) {
+      return this.prices.map((function(_this) {
         return function(_arg) {
           var priceList, value;
           value = _arg.value, priceList = _arg.priceList;
@@ -99,9 +100,9 @@
 
     Adjustment.prototype.forEachStock = function(fn) {
       if (this.stocks == null) {
-        return fn(this.stock);
+        return [fn(this.stock)];
       }
-      return this.stocks.forEach((function(_this) {
+      return this.stocks.map((function(_this) {
         return function(_arg) {
           var quantity, warehouse;
           quantity = _arg.quantity, warehouse = _arg.warehouse;
@@ -116,6 +117,10 @@
 
     Adjustment.prototype._adaptStock = function(stock) {
       return _.max([0, smartParseInt(stock)]);
+    };
+
+    Adjustment.prototype.productData = function() {
+      return _.omit(_.omit(this, ['price', 'prices', 'stock', 'stocks', 'identifier', 'sku', 'name']), _.isFunction);
     };
 
     return Adjustment;
