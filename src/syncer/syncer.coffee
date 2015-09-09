@@ -1,5 +1,6 @@
 Q = require("q")
 _ = require("lodash")
+AdjustmentToNewProductTransformer = require("./adjustmentToNewProductTransformer")
 
 module.exports =
 
@@ -14,6 +15,7 @@ module.exports =
 #    priceList: Name of the default price list (used when the adjustment doesn't have one)
 #    warehouse: Name of the default warehouse (used when the adjustment doesn't have one)
 #    identifier: "sku" or "barcode"
+#    createProducts: true or false
 #  }
 #  products = Array of *Product*
 class Syncer
@@ -23,8 +25,12 @@ class Syncer
   # Returns a promise with a summary of the results
   execute: (adjustments) =>
     adjustmentsAndProducts = @_joinAdjustmentsAndProducts adjustments
+    promises = @_sync adjustmentsAndProducts
 
-    (Q.allSettled @_updateStocksAndPrices adjustmentsAndProducts).then (results) =>
+    if @settings.createProducts
+        promises = promises.concat @_createProducts adjustmentsAndProducts.unlinked
+
+    (Q.allSettled promises).then (results) =>
       _.mapValues adjustmentsAndProducts, (adjustmentsAndProducts) =>
         adjustmentsAndProducts.map (it) => _.pick it.adjustment, "identifier"
 
@@ -44,7 +50,7 @@ class Syncer
     linked: _.filter join, hasProducts
     unlinked: _.reject join, hasProducts
 
-  _updateStocksAndPrices: (adjustmentsAndProducts) =>
+  _sync: (adjustmentsAndProducts) =>
     syncProducts = @_shouldSyncProductData()
     syncStocks = @settings.synchro.stocks
 
@@ -106,4 +112,9 @@ class Syncer
 
   _shouldSyncProductData: =>
     @settings.synchro.prices or @settings.synchro.data
+
+  _createProducts: (unlinkeds) =>
+    transformer = new AdjustmentToNewProductTransformer @settings
+    unlinkeds.map (unlinked) =>
+      @productecaApi.createProduct transformer.transform unlinked.adjustment
 

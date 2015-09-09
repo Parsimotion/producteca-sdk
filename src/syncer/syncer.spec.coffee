@@ -15,11 +15,13 @@ describe "Syncer", ->
   syncer = null
   campera = null
   camperaVariable = null
+  adjustments = null
 
   beforeEach ->
     client =
       updateStocks: sinon.stub().returns Q()
       updateProduct: sinon.stub().returns Q()
+      createProduct: sinon.stub().returns Q()
 
     campera = new Product
       id: 1
@@ -73,6 +75,29 @@ describe "Syncer", ->
         ]
     ]
 
+    adjustments = [
+      new Adjustment(
+        identifier: "CamperaRompeNocheNegra",
+        prices: [
+          { priceList: "Precios Cuidados", value: "30" }
+          { priceList: "Con Tarjeta de Crédito", value: "90" }
+        ]
+        stocks: [
+          { warehouse: "Villa Lugano", quantity: 20 }
+        ]
+        description: "Saraza"
+        notes: "Lalala"
+      )
+      new Adjustment(
+        identifier: "CamperaRompeNocheBlanca",
+        prices: [
+          { priceList: "Default", value: "99" }
+        ]
+        stocks: [
+          { warehouse: "Palermo", quantity: 38 }
+        ]
+      )
+    ]
 # ----------
   describe "los precios y los datos son independientes,", ->
     it "cuando actualizo solo los datos los precios no se modifican", ->
@@ -106,30 +131,7 @@ describe "Syncer", ->
   describe "en el caso más completo (variantes - multi listaDePrecios / depósito)...", ->
     beforeEach ->
       syncer.settings.identifier = "barcode"
-
-      syncer.execute [
-        new Adjustment(
-          identifier: "CamperaRompeNocheNegra",
-          prices: [
-            { priceList: "Precios Cuidados", value: "30" }
-            { priceList: "Con Tarjeta de Crédito", value: "90" }
-          ]
-          stocks: [
-            { warehouse: "Villa Lugano", quantity: 20 }
-          ]
-          description: "Saraza"
-          notes: "Lalala"
-        )
-        new Adjustment(
-          identifier: "CamperaRompeNocheBlanca",
-          prices: [
-            { priceList: "Default", value: "99" }
-          ]
-          stocks: [
-            { warehouse: "Palermo", quantity: 38 }
-          ]
-        )
-    ]
+      syncer.execute adjustments
 
     it "actualiza los precios y los datos", ->
       client.updateProduct.should.have.callCount 2
@@ -179,6 +181,41 @@ describe "Syncer", ->
           quantity: 38
         ]
 
+  describe "si hay adjustments de productos nuevos", ->
+    beforeEach ->
+      syncer.settings.identifier = "barcode"
+
+      adjustments.push new Adjustment
+        identifier: "NuevoProducto",
+        name: "Campera de lana para losers"
+        prices: [
+          { priceList: "Default", value: "555" }
+        ]
+        stocks: [
+          { warehouse: "Palermo", quantity: 11 }
+        ]
+
+    it "no crea productos si createProduct es false", ->
+      syncer.settings.createProducts = false
+      syncer.execute adjustments
+      client.createProduct.should.not.have.been.called
+
+    it "crea productos si createProduct es true", ->
+      syncer.settings.createProducts = true
+      syncer.execute adjustments
+      client.createProduct.should.have.been.calledWith
+        description: "Campera de lana para losers"
+        prices: [
+          { priceList: "Default", amount: 555 }
+        ]
+        variations: [
+          barcode: "NuevoProducto"
+          stocks: [
+            { warehouse: "Palermo", quantity: 11 }
+          ]
+        ]
+
+        
   describe "cuando los productos no tienen variantes...", ->
     ajuste = new Adjustment
       identifier: "123456"

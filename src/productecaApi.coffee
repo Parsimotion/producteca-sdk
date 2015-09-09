@@ -94,6 +94,10 @@ class ProductecaApi
     url = "/products/#{product.id}"
     @return @asyncClient.putAsync url, _.omit product.toJSON(), ["variations"]
 
+  createProduct: (product) =>
+    url = "/products"
+    @return @asyncClient.postAsync url, product
+
   createShipment: (salesOrderId, shipment) =>
     @return @client.postAsync "/salesorders/#{salesOrderId}/shipments", shipment
 
