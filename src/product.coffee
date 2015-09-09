@@ -13,3 +13,18 @@ class Product
 
   firstVariation: =>
     _.head @variations
+
+  updatePrice: (priceList, amount) =>
+    @prices =
+      _(@prices)
+        .reject priceList: priceList
+        .concat
+          priceList: priceList
+          amount: amount
+      .value()
+
+  toJSON: =>
+    _.omit @, _.isFunction
+
+  updateWith: (obj) =>
+    _.assign @, obj

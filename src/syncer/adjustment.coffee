@@ -65,13 +65,15 @@ class Adjustment
 
   # Executes a function(value, priceList) for each price in the adjustment
   forEachPrice: (fn) =>
-    if not @prices? then return fn @price
-    @prices.forEach ({ value, priceList }) => fn value, priceList
+    if not @prices? then return [fn @price]
+    @prices.map ({ value, priceList }) => fn value, priceList
 
   # Executes a function(quantity, warehouse) for each stock in the adjustment
   forEachStock: (fn) =>
-    if not @stocks? then return fn @stock
-    @stocks.forEach ({ quantity, warehouse }) => fn quantity, warehouse
+    if not @stocks? then return [fn @stock]
+    @stocks.map ({ quantity, warehouse }) => fn quantity, warehouse
 
   _adaptPrice: (price) => smartParseFloat price
   _adaptStock: (stock) => _.max [0, smartParseInt stock]
+
+  productData: => _.omit _.omit(@, ['price', 'prices', 'stock', 'stocks', 'identifier', 'sku', 'name']), _.isFunction

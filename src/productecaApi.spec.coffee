@@ -7,6 +7,7 @@ chai.Should()
 chai.use require("sinon-chai")
 
 ProductecaApi = require("./productecaApi")
+Product = require("./product")
 
 describe "Producteca API", ->
   client = null ; asyncClient = null
@@ -26,7 +27,7 @@ describe "Producteca API", ->
     productecaApi = new ProductecaApi ""
 
   it "can update stocks", ->
-    productecaApi.updateStocks
+    productecaApi.updateStocks new Product
       id: 23
       warehouse: "Almagro"
       stocks: [
@@ -43,7 +44,7 @@ describe "Producteca API", ->
     ]
 
   it "can update the price", ->
-    productecaApi.updatePrice
+    product = new Product
       id: 25
       prices: [
         priceList: "Default"
@@ -51,11 +52,12 @@ describe "Producteca API", ->
       ,
         priceList: "Meli"
         amount: 210
-      ],
-      "Meli",
-      270
+      ]
+
+    productecaApi.updatePrice product, "Meli", 270
 
     asyncClient.putAsync.should.have.been.calledWith "/products/25",
+      id: 25
       prices: [
         amount: 180
         priceList: "Default"

@@ -86,17 +86,17 @@ class ProductecaApi
   #  priceList = Price list to edit
   #  amount = The new price
   updatePrice: (product, priceList, amount) =>
-    body =
-      prices:
-        _(product.prices)
-          .reject priceList: priceList
-          .concat
-            priceList: priceList
-            amount: amount
-        .value()
+    product.updatePrice priceList, amount
 
+    @updateProduct product
+
+  updateProduct: (product) =>
     url = "/products/#{product.id}"
-    @return @asyncClient.putAsync url, body
+    @return @asyncClient.putAsync url, _.omit product.toJSON(), ["variations"]
+
+  createProduct: (product) =>
+    url = "/products"
+    @return @asyncClient.postAsync url, product
 
   createShipment: (salesOrderId, shipment) =>
     @return @client.postAsync "/salesorders/#{salesOrderId}/shipments", shipment
