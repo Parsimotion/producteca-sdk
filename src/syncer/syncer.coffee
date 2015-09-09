@@ -9,6 +9,7 @@ module.exports =
 #    synchro: {
 #      prices: true or false
 #      stocks: true or false
+#      data: true or false
 #    }
 #    priceList: Name of the default price list (used when the adjustment doesn't have one)
 #    warehouse: Name of the default warehouse (used when the adjustment doesn't have one)
@@ -44,7 +45,7 @@ class Syncer
     unlinked: _.reject join, hasProducts
 
   _updateStocksAndPrices: (adjustmentsAndProducts) =>
-    syncPrices = @settings.synchro.prices
+    syncProducts = @_shouldSyncProductData()
     syncStocks = @settings.synchro.stocks
 
     adjustmentsAndProducts.linked.map (it) =>
@@ -54,17 +55,23 @@ class Syncer
         if condition then products.map update else []
 
       Q.all _.flatten [
-        updateIf syncPrices, (p) => @_updatePrice it.adjustment, p
+        updateIf syncProducts, (p) => @_updateProduct it.adjustment, p
         updateIf syncStocks, (p) => @_updateStock it.adjustment, p
       ]
       .then =>
         ids: _.map products, "id"
         identifier: it.adjustment.identifier
 
-  _updatePrice: (adjustment, product) =>
-    adjustment.forEachPrice (price, priceList = @settings.priceList) =>
-      console.log "Updating price of ~#{adjustment.identifier}(#{product.id}) in priceList #{priceList} with value $#{price}..."
-      @productecaApi.updatePrice product, priceList, price
+  _updateProduct: (adjustment, product) =>
+    if @settings.synchro.prices
+      adjustment.forEachPrice (price, priceList = @settings.priceList) =>
+        console.log "Updating price of ~#{adjustment.identifier}(#{product.id}) in priceList #{priceList} with value $#{price}..."
+        product.updatePrice priceList, price
+
+    if @settings.synchro.data
+      product.updateWith adjustment.productData()
+
+    @productecaApi.updateProduct product
 
   _updateStock: (adjustment, product) =>
     variationId = @_getVariation(product, adjustment).id
@@ -96,3 +103,7 @@ class Syncer
 
     if _.isEmpty matches then findBySku()
     else matches
+
+  _shouldSyncProductData: =>
+    @settings.synchro.prices or @settings.synchro.data
+

@@ -25,3 +25,6 @@ class Product
 
   toJSON: =>
     _.omit @, _.isFunction
+
+  updateWith: (obj) =>
+    _.assign @, obj

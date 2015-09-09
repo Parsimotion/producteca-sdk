@@ -19,7 +19,7 @@ describe "Syncer", ->
   beforeEach ->
     client =
       updateStocks: sinon.stub().returns Q()
-      updatePrice: sinon.stub().returns Q()
+      updateProduct: sinon.stub().returns Q()
 
     campera = new Product
       id: 1
@@ -55,7 +55,7 @@ describe "Syncer", ->
 
     settings =
       identifier: "sku"
-      synchro: prices: true, stocks: true
+      synchro: prices: true, stocks: true, data: true
       warehouse: "Villa Crespo"
       priceList: "Meli"
 
@@ -74,6 +74,34 @@ describe "Syncer", ->
     ]
 
 # ----------
+  describe "los precios y los datos son independientes,", ->
+    it "cuando actualizo solo los datos los precios no se modifican", ->
+      syncer.settings.identifier = "barcode"
+      syncer.settings.synchro = prices: false, data: true
+
+      syncer.execute [
+        new Adjustment
+          identifier: "CamperaRompeNocheNegra",
+          prices: []
+          notes: "Lalala"
+      ]
+      client.updateProduct.getCall(0).args[0].toJSON().should.not.have.property 'prices'
+      client.updateProduct.getCall(0).args[0].toJSON().should.have.property 'notes', 'Lalala'
+
+    it "cuando actualizo solo los precios los datos no se modifican", ->
+      syncer.settings.identifier = "barcode"
+      syncer.settings.synchro = prices: true, data: false
+
+      syncer.execute [
+        new Adjustment
+          identifier: "CamperaRompeNocheNegra",
+          prices: [
+            { priceList: "Default", value: "99" }
+          ]
+          notes: "Lalala"
+      ]
+      client.updateProduct.getCall(0).args[0].toJSON().prices.should.eql [{priceList: "Default", amount: 99}]
+      client.updateProduct.getCall(0).args[0].toJSON().should.not.have.property 'notes'
 
   describe "en el caso más completo (variantes - multi listaDePrecios / depósito)...", ->
     beforeEach ->
@@ -89,6 +117,8 @@ describe "Syncer", ->
           stocks: [
             { warehouse: "Villa Lugano", quantity: 20 }
           ]
+          description: "Saraza"
+          notes: "Lalala"
         )
         new Adjustment(
           identifier: "CamperaRompeNocheBlanca",
@@ -101,11 +131,36 @@ describe "Syncer", ->
         )
     ]
 
-    it "actualiza los precios", ->
-      client.updatePrice.should.have.callCount 3
-      client.updatePrice.should.have.been.calledWith camperaVariable, "Precios Cuidados", 30
-      client.updatePrice.should.have.been.calledWith camperaVariable, "Con Tarjeta de Crédito", 90
-      client.updatePrice.should.have.been.calledWith camperaVariable, "Default", 99
+    it "actualiza los precios y los datos", ->
+      client.updateProduct.should.have.callCount 2
+      json =
+        id: 1
+        sku: "123456"
+        description: "Campera De Cuero Para Romper La Noche En Muchos Colores"
+        prices: [
+          { priceList: "Precios Cuidados", amount: 30 }
+          { priceList: "Con Tarjeta de Crédito", amount: 90 }
+          { priceList: "Default", amount: 99 }
+        ]
+        variations: [
+          id: 2
+          barcode: "CamperaRompeNocheNegra"
+          stocks: [
+            warehouse: "Villa Crespo"
+            quantity: 12
+          ]
+        ,
+          id: 4
+          barcode: "CamperaRompeNocheBlanca"
+          stocks: [
+            warehouse: "Villa Crespo"
+            quantity: 16
+          ]
+        ]
+        description: "Saraza"
+        notes: "Lalala"
+
+      client.updateProduct.getCall(0).args[0].toJSON().should.eql json
 
     it "actualiza los stocks", ->
       client.updateStocks.should.have.callCount 2
@@ -160,18 +215,34 @@ describe "Syncer", ->
           ]
 
       it "para actualizar el precio", ->
-        client.updatePrice.should.have.been.calledWith campera, "Meli", 25
+        client.updateProduct.should.have.been.calledWith campera
+
+    it "actualiza el producto si en las settings digo que quiero sincronizar precios", ->
+      syncer.settings.synchro = prices: true
+      syncer.execute [ajuste]
+      client.updateProduct.called.should.be.true
+
+    it "actualiza el producto si en las settings digo que quiero sincronizar datos", ->
+      syncer.settings.synchro = data: true
+      syncer.execute [ajuste]
+      client.updateProduct.called.should.be.true
 
     it "si en las settings digo que no quiero sincronizar precios, no lo hace", ->
       syncer.settings.synchro = prices: false, stocks: true
       syncer.execute [ajuste]
-      client.updatePrice.called.should.be.false
+      client.updateProduct.called.should.be.false
+      client.updateStocks.called.should.be.true
+
+    it "si en las settings digo que no quiero sincronizar datos, no lo hace", ->
+      syncer.settings.synchro = data: false, stocks: true
+      syncer.execute [ajuste]
+      client.updateProduct.called.should.be.false
       client.updateStocks.called.should.be.true
 
     it "si en las settings digo que no quiero sincronizar stocks, no lo hace", ->
       syncer.settings.synchro = prices: true, stocks: false
       syncer.execute [ajuste]
-      client.updatePrice.called.should.be.true
+      client.updateProduct.called.should.be.true
       client.updateStocks.called.should.be.false
 
   describe "cuando los productos sí tienen variantes...", ->

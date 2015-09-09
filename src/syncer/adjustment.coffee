@@ -75,3 +75,5 @@ class Adjustment
 
   _adaptPrice: (price) => smartParseFloat price
   _adaptStock: (stock) => _.max [0, smartParseInt stock]
+
+  productData: => _.omit _.omit(@, ['price', 'prices', 'stock', 'stocks', 'identifier', 'sku']), _.isFunction
