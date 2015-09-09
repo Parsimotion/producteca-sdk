@@ -13,3 +13,5 @@ class Product
 
   firstVariation: =>
     _.head @variations
+  toJSON: =>
+    _.omit @, _.isFunction
