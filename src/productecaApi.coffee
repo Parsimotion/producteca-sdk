@@ -101,6 +101,9 @@ class ProductecaApi
   createShipment: (salesOrderId, shipment) =>
     @return @client.postAsync "/salesorders/#{salesOrderId}/shipments", shipment
 
+  updateShipment: (salesOrderId, shipmentId, shipmentUpdate) =>
+    @return @client.putAsync "/salesorders/#{salesOrderId}/shipments/#{shipmentId}", shipmentUpdate
+
   getShipment: (salesOrderId, shipmentId) =>
     @return @client.getAsync "/salesorders/#{salesOrderId}/shipments/#{shipmentId}"
   #---
