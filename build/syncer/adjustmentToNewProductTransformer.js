@@ -11,7 +11,7 @@
     AdjustmentToNewProductTransformer.prototype.transform = function(adjustment) {
       var product, variation;
       product = adjustment.productData();
-      product.description = adjustment.name;
+      product.description = product.description || adjustment.name;
       if (this.settings.identifier === "sku") {
         product.sku = adjustment.identifier;
       }
