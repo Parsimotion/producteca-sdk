@@ -98,14 +98,17 @@ class ProductecaApi
     url = "/products"
     @return @asyncClient.postAsync url, product
 
+  getShipment: (salesOrderId, shipmentId) =>
+    @return @client.getAsync "/salesorders/#{salesOrderId}/shipments/#{shipmentId}"
+
   createShipment: (salesOrderId, shipment) =>
     @return @client.postAsync "/salesorders/#{salesOrderId}/shipments", shipment
 
   updateShipment: (salesOrderId, shipmentId, shipmentUpdate) =>
     @return @client.putAsync "/salesorders/#{salesOrderId}/shipments/#{shipmentId}", shipmentUpdate
 
-  getShipment: (salesOrderId, shipmentId) =>
-    @return @client.getAsync "/salesorders/#{salesOrderId}/shipments/#{shipmentId}"
+  updateShipmentStatus: (salesOrderId, shipmentId, statusDto) =>
+    @return @client.putAsync "/salesorders/#{salesOrderId}/shipments/#{shipmentId}/status", statusDto
   #---
 
   return: (promise) =>
