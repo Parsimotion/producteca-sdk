@@ -115,6 +115,11 @@ class Syncer
 
   _createProducts: (unlinkeds) =>
     transformer = new AdjustmentToNewProductTransformer @settings
-    unlinkeds.map (unlinked) =>
-      @productecaApi.createProduct transformer.transform unlinked.adjustment
+    adjustments = unlinkeds.map (it) -> it.adjustment
+    groupedAdjustmentsObj = _.groupBy adjustments, 'code'
+    noCodeAdjustments = groupedAdjustmentsObj[undefined].map (it) -> [it]
+    withCodeAdjustments = _.values _.omit groupedAdjustmentsObj, (it) -> it is undefined
+
+    noCodeAdjustments.concat(withCodeAdjustments).map (adjustments) =>
+      @productecaApi.createProduct transformer.transform adjustments
 

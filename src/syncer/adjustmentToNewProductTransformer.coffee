@@ -4,18 +4,22 @@ module.exports =
 
     constructor: (@settings = {}) ->
 
-    transform: (adjustment) =>
-      product = adjustment.productData()
-      product.description = product.description or adjustment.name
-      product.sku = adjustment.identifier if @settings.identifier is "sku"
-      product.prices = adjustment.forEachPrice (value, priceList = @settings.priceList) =>
+    transform: (adjustments) =>
+      firstAdjustment = adjustments[0]
+      product = firstAdjustment.productData()
+      product.description = product.description or firstAdjustment.name
+      product.sku = if @settings.identifier is "sku" then firstAdjustment.identifier else firstAdjustment.code
+      product.prices = firstAdjustment.forEachPrice (value, priceList = @settings.priceList) =>
         priceList: priceList
         amount: value or 0
-      variation = 
-        stocks: adjustment.forEachStock (stock, warehouse = @settings.warehouse) =>
-          quantity: stock
-          warehouse: warehouse
-      variation.barcode = adjustment.identifier if @settings.identifier is "barcode"
-      product.variations = [variation]
+
+      product.variations = adjustments.map (adjustment) =>
+        variation = 
+          pictures: adjustment.pictures
+          stocks: adjustment.forEachStock (stock, warehouse = @settings.warehouse) =>
+            quantity: stock
+            warehouse: warehouse
+        variation.barcode = adjustment.identifier if @settings.identifier is "barcode"
+        variation
 
       product
