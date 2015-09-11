@@ -286,6 +286,7 @@
         syncer.execute(adjustments);
         return client.createProduct.should.have.been.calledWith({
           description: "Campera de lana para losers",
+          sku: void 0,
           prices: [
             {
               priceList: "Default",
@@ -295,6 +296,7 @@
           variations: [
             {
               barcode: "NuevoProducto",
+              pictures: void 0,
               stocks: [
                 {
                   warehouse: "Palermo",

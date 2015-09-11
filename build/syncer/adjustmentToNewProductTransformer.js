@@ -8,14 +8,13 @@
       this.transform = __bind(this.transform, this);
     }
 
-    AdjustmentToNewProductTransformer.prototype.transform = function(adjustment) {
-      var product, variation;
-      product = adjustment.productData();
-      product.description = product.description || adjustment.name;
-      if (this.settings.identifier === "sku") {
-        product.sku = adjustment.identifier;
-      }
-      product.prices = adjustment.forEachPrice((function(_this) {
+    AdjustmentToNewProductTransformer.prototype.transform = function(adjustments) {
+      var firstAdjustment, product;
+      firstAdjustment = adjustments[0];
+      product = firstAdjustment.productData();
+      product.description = product.description || firstAdjustment.name;
+      product.sku = this.settings.identifier === "sku" ? firstAdjustment.identifier : firstAdjustment.code;
+      product.prices = firstAdjustment.forEachPrice((function(_this) {
         return function(value, priceList) {
           if (priceList == null) {
             priceList = _this.settings.priceList;
@@ -26,23 +25,27 @@
           };
         };
       })(this));
-      variation = {
-        stocks: adjustment.forEachStock((function(_this) {
-          return function(stock, warehouse) {
-            if (warehouse == null) {
-              warehouse = _this.settings.warehouse;
-            }
-            return {
-              quantity: stock,
-              warehouse: warehouse
-            };
+      product.variations = adjustments.map((function(_this) {
+        return function(adjustment) {
+          var variation;
+          variation = {
+            pictures: adjustment.pictures,
+            stocks: adjustment.forEachStock(function(stock, warehouse) {
+              if (warehouse == null) {
+                warehouse = _this.settings.warehouse;
+              }
+              return {
+                quantity: stock,
+                warehouse: warehouse
+              };
+            })
           };
-        })(this))
-      };
-      if (this.settings.identifier === "barcode") {
-        variation.barcode = adjustment.identifier;
-      }
-      product.variations = [variation];
+          if (_this.settings.identifier === "barcode") {
+            variation.barcode = adjustment.identifier;
+          }
+          return variation;
+        };
+      })(this));
       return product;
     };
 
