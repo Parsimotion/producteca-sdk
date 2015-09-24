@@ -19,6 +19,9 @@ module.exports =
           stocks: adjustment.forEachStock (stock, warehouse = @settings.warehouse) =>
             quantity: stock
             warehouse: warehouse
+          primaryColor: adjustment.primaryColor
+          secondaryColor: adjustment.secondaryColor
+          size: adjustment.size
         variation.barcode = adjustment.identifier if @settings.identifier is "barcode"
         variation
 
