@@ -38,7 +38,10 @@
                 quantity: stock,
                 warehouse: warehouse
               };
-            })
+            }),
+            primaryColor: adjustment.primaryColor,
+            secondaryColor: adjustment.secondaryColor,
+            size: adjustment.size
           };
           if (_this.settings.identifier === "barcode") {
             variation.barcode = adjustment.identifier;
