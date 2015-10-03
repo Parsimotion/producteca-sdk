@@ -79,7 +79,7 @@
           if (products.length < TOP) {
             return products;
           }
-          return _this.getProductsPageByPage(skip + TOP).then(function(moreProducts) {
+          return _this._getProductsPageByPage(skip + TOP).then(function(moreProducts) {
             return products.concat(moreProducts);
           });
         };

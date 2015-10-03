@@ -40,7 +40,7 @@ class ProductecaApi
     @return(@client.getAsync "/products?$top=#{TOP}&$skip=#{skip}").then (obj) =>
       products = obj.results
       return products if products.length < TOP
-      @getProductsPageByPage(skip + TOP).then (moreProducts) ->
+      @_getProductsPageByPage(skip + TOP).then (moreProducts) ->
         products.concat moreProducts
 
   #Returns multiple products by their comma separated ids
