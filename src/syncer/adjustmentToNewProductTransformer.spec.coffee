@@ -25,7 +25,10 @@ describe "AdjustmentToNewProductTransformer", ->
         stocks: [
           warehouse: "Default"
           quantity: 0
-        ] 
+        ]
+        primaryColor: undefined
+        secondaryColor: undefined
+        size: undefined
       ]
 
   it "should create a product with barcode when the identifier is set as barcode", ->
@@ -52,6 +55,9 @@ describe "AdjustmentToNewProductTransformer", ->
           warehouse: "Default"
           quantity: 0
         ] 
+        primaryColor: undefined
+        secondaryColor: undefined
+        size: undefined
       ]
 
   it "should create a product with prices", ->
@@ -86,7 +92,10 @@ describe "AdjustmentToNewProductTransformer", ->
         stocks: [
           warehouse: "Default"
           quantity: 0
-        ] 
+        ]
+        primaryColor: undefined
+        secondaryColor: undefined
+        size: undefined
       ]
 
 
@@ -148,6 +157,9 @@ describe "AdjustmentToNewProductTransformer", ->
           quantity: 3
         ] 
         barcode: "915004085101"
+        primaryColor: undefined
+        secondaryColor: undefined
+        size: undefined
       ,
         pictures: [url: "http://picture2.com"]
         stocks: [
@@ -155,4 +167,7 @@ describe "AdjustmentToNewProductTransformer", ->
           quantity: 4
         ] 
         barcode: "915004085102"
+        primaryColor: undefined
+        secondaryColor: undefined
+        size: undefined
       ]

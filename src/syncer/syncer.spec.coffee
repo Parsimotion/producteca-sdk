@@ -215,6 +215,9 @@ describe "Syncer", ->
           stocks: [
             { warehouse: "Palermo", quantity: 11 }
           ]
+          primaryColor: undefined
+          secondaryColor: undefined
+          size: undefined
         ]
 
         
