@@ -35,6 +35,14 @@ class ProductecaApi
     @returnMany(@client.getAsync "/products").then (products) =>
       @_createProducts products
 
+  getProductsPageByPage: (skip = 0) =>
+    TOP = 500
+    @return(@client.getAsync "/products?$top=#{TOP}&$skip=#{skip}").then (obj) =>
+      products = obj.results
+      return products if products.length < TOP
+      @getProductsPageByPage(skip + TOP).then (moreProducts) ->
+        products.concat moreProducts
+
   #Returns multiple products by their comma separated ids
   getMultipleProducts: (ids) =>
     @return(@client.getAsync "/products?ids=#{ids}").then (products) =>
