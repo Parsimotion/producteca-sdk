@@ -23,6 +23,9 @@ class Product
           amount: amount
       .value()
 
+  hasAllDimensions: =>
+    ["width", "height", "length", "weight"].every (it) => @dimensions[it]?
+
   toJSON: =>
     _.omit @, _.isFunction
 

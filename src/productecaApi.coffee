@@ -57,6 +57,14 @@ class ProductecaApi
   getSalesOrder: (id) =>
     @return @client.getAsync "/salesorders/#{id}"
 
+  #Returns a sales order by id and all the products in its lines
+  getSalesOrderAndFullProducts: (id) =>
+    @getSalesOrder(id)
+      .then (salesOrder) =>
+        productIds = _.map(salesOrder.lines, "product.id").join ","
+        @getMultipleProducts(productIds).then (products) ->
+          { salesOrder, products }
+
   #Updates a sales order by id
   updateSalesOrder: (id, update) =>
     @return @client.putAsync "/salesorders/#{id}", update
