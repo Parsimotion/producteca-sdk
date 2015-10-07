@@ -45,7 +45,10 @@
                 warehouse: "Default",
                 quantity: 0
               }
-            ]
+            ],
+            primaryColor: void 0,
+            secondaryColor: void 0,
+            size: void 0
           }
         ]
       });
@@ -90,7 +93,10 @@
                 warehouse: "Default",
                 quantity: 0
               }
-            ]
+            ],
+            primaryColor: void 0,
+            secondaryColor: void 0,
+            size: void 0
           }
         ]
       });
@@ -145,7 +151,10 @@
                 warehouse: "Default",
                 quantity: 0
               }
-            ]
+            ],
+            primaryColor: void 0,
+            secondaryColor: void 0,
+            size: void 0
           }
         ]
       });
@@ -234,7 +243,10 @@
                 quantity: 3
               }
             ],
-            barcode: "915004085101"
+            barcode: "915004085101",
+            primaryColor: void 0,
+            secondaryColor: void 0,
+            size: void 0
           }, {
             pictures: [
               {
@@ -247,7 +259,10 @@
                 quantity: 4
               }
             ],
-            barcode: "915004085102"
+            barcode: "915004085102",
+            primaryColor: void 0,
+            secondaryColor: void 0,
+            size: void 0
           }
         ]
       });

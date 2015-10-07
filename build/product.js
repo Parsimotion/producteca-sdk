@@ -8,6 +8,7 @@
     function Product(properties) {
       this.updateWith = __bind(this.updateWith, this);
       this.toJSON = __bind(this.toJSON, this);
+      this.hasAllDimensions = __bind(this.hasAllDimensions, this);
       this.updatePrice = __bind(this.updatePrice, this);
       this.firstVariation = __bind(this.firstVariation, this);
       this.getVariationForAdjustment = __bind(this.getVariationForAdjustment, this);
@@ -38,6 +39,14 @@
         priceList: priceList,
         amount: amount
       }).value();
+    };
+
+    Product.prototype.hasAllDimensions = function() {
+      return ["width", "height", "length", "weight"].every((function(_this) {
+        return function(it) {
+          return _this.dimensions[it] != null;
+        };
+      })(this));
     };
 
     Product.prototype.toJSON = function() {

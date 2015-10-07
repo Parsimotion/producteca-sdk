@@ -43,6 +43,7 @@
       this.updatePrice = __bind(this.updatePrice, this);
       this.updateStocks = __bind(this.updateStocks, this);
       this.updateSalesOrder = __bind(this.updateSalesOrder, this);
+      this.getSalesOrderAndFullProducts = __bind(this.getSalesOrderAndFullProducts, this);
       this.getSalesOrder = __bind(this.getSalesOrder, this);
       this.getSalesOrders = __bind(this.getSalesOrders, this);
       this._createProducts = __bind(this._createProducts, this);
@@ -111,6 +112,21 @@
 
     ProductecaApi.prototype.getSalesOrder = function(id) {
       return this["return"](this.client.getAsync("/salesorders/" + id));
+    };
+
+    ProductecaApi.prototype.getSalesOrderAndFullProducts = function(id) {
+      return this.getSalesOrder(id).then((function(_this) {
+        return function(salesOrder) {
+          var productIds;
+          productIds = _.map(salesOrder.lines, "product.id").join(",");
+          return _this.getMultipleProducts(productIds).then(function(products) {
+            return {
+              salesOrder: salesOrder,
+              products: products
+            };
+          });
+        };
+      })(this));
     };
 
     ProductecaApi.prototype.updateSalesOrder = function(id, update) {

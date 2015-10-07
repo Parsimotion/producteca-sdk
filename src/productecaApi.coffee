@@ -125,6 +125,7 @@ class ProductecaApi
 
   updateShipmentStatus: (salesOrderId, shipmentId, statusDto) =>
     @return @client.putAsync "/salesorders/#{salesOrderId}/shipments/#{shipmentId}/status", statusDto
+
   #---
 
   return: (promise) =>

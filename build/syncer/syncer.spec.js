@@ -302,7 +302,10 @@
                   warehouse: "Palermo",
                   quantity: 11
                 }
-              ]
+              ],
+              primaryColor: void 0,
+              secondaryColor: void 0,
+              size: void 0
             }
           ]
         });
