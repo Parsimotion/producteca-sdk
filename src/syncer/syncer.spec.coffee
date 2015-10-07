@@ -205,14 +205,19 @@ describe "Syncer", ->
       syncer.execute adjustments
       client.createProduct.should.have.been.calledWith
         description: "Campera de lana para losers"
+        sku: undefined
         prices: [
           { priceList: "Default", amount: 555 }
         ]
         variations: [
           barcode: "NuevoProducto"
+          pictures: undefined
           stocks: [
             { warehouse: "Palermo", quantity: 11 }
           ]
+          primaryColor: undefined
+          secondaryColor: undefined
+          size: undefined
         ]
 
         

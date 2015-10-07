@@ -120,7 +120,7 @@
     };
 
     Adjustment.prototype.productData = function() {
-      return _.omit(_.omit(this, ['price', 'prices', 'stock', 'stocks', 'identifier', 'sku', 'name']), _.isFunction);
+      return _.omit(_.omit(this, ['price', 'prices', 'stock', 'stocks', 'identifier', 'sku', 'name', 'pictures', 'code']), _.isFunction);
     };
 
     return Adjustment;

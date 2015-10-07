@@ -47,6 +47,7 @@
       this.getSalesOrders = __bind(this.getSalesOrders, this);
       this._createProducts = __bind(this._createProducts, this);
       this.getMultipleProducts = __bind(this.getMultipleProducts, this);
+      this._getProductsPageByPage = __bind(this._getProductsPageByPage, this);
       this.getProducts = __bind(this.getProducts, this);
       this.getProduct = __bind(this.getProduct, this);
       this.initializeClients = __bind(this.initializeClients, this);
@@ -58,9 +59,29 @@
     };
 
     ProductecaApi.prototype.getProducts = function() {
-      return this.returnMany(this.client.getAsync("/products")).then((function(_this) {
+      return this._getProductsPageByPage().then((function(_this) {
         return function(products) {
           return _this._createProducts(products);
+        };
+      })(this));
+    };
+
+    ProductecaApi.prototype._getProductsPageByPage = function(skip) {
+      var TOP;
+      if (skip == null) {
+        skip = 0;
+      }
+      TOP = 500;
+      return this["return"](this.client.getAsync("/products?$top=" + TOP + "&$skip=" + skip)).then((function(_this) {
+        return function(obj) {
+          var products;
+          products = obj.results;
+          if (products.length < TOP) {
+            return products;
+          }
+          return _this._getProductsPageByPage(skip + TOP).then(function(moreProducts) {
+            return products.concat(moreProducts);
+          });
         };
       })(this));
     };

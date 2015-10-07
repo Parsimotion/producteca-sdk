@@ -183,11 +183,21 @@
     };
 
     Syncer.prototype._createProducts = function(unlinkeds) {
-      var transformer;
+      var adjustments, groupedAdjustmentsObj, noCodeAdjustments, transformer, withCodeAdjustments, _ref;
       transformer = new AdjustmentToNewProductTransformer(this.settings);
-      return unlinkeds.map((function(_this) {
-        return function(unlinked) {
-          return _this.productecaApi.createProduct(transformer.transform(unlinked.adjustment));
+      adjustments = unlinkeds.map(function(it) {
+        return it.adjustment;
+      });
+      groupedAdjustmentsObj = _.groupBy(adjustments, 'code');
+      noCodeAdjustments = (_ref = groupedAdjustmentsObj[void 0]) != null ? _ref.map(function(it) {
+        return [it];
+      }) : void 0;
+      withCodeAdjustments = _.values(_.omit(groupedAdjustmentsObj, function(it) {
+        return it === void 0;
+      }));
+      return withCodeAdjustments.concat(noCodeAdjustments || []).map((function(_this) {
+        return function(adjustments) {
+          return _this.productecaApi.createProduct(transformer.transform(adjustments));
         };
       })(this));
     };
