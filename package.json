@@ -5,11 +5,11 @@
     "type": "git",
     "url": "git://github.com/Parsimotion/producteca-sdk.git"
   },
-  "version": "0.0.43",
+  "version": "0.0.44",
   "main": "build/sdk.js",
   "dependencies": {
     "bluebird": "^2.3.11",
-    "lodash": "~2.4.1",
+    "lodash": "^3.10.1",
     "q": "~1.0.1",
     "restify": "^2.8.2"
   },
