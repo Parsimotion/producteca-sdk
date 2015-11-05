@@ -1,10 +1,8 @@
 Product = require("./product")
-encode = encodeURIComponent
-
 module.exports =
 
 class ProductsApi
-  constructor: (@client, @asyncClient) ->
+  constructor: ({ @client, @asyncClient }) ->
 
   #Returns a product by id
   getProduct: (id) =>
@@ -17,8 +15,9 @@ class ProductsApi
 
   # Find a product by code (currently SKU | TODO: change this)
   findProductByCode: (code) =>
-    oDataQuery = encode "$filter=sku eq '#{code}'"
-    @returnMany @client.getAsync "/products/?#{oDataQuery}"
+    oDataQuery = encodeURIComponent "sku eq '#{code}'"
+    @client.getAsync "/products/?$filter=#{oDataQuery}"
+    @returnMany @client.getAsync "/products/?$filter=#{oDataQuery}"
 
   #Returns multiple products by their comma separated ids
   getMultipleProducts: (ids) =>

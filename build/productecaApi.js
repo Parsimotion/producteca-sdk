@@ -1,5 +1,5 @@
 (function() {
-  var Product, ProductecaApi, Promise, Restify, _,
+  var ProductecaApi, ProductsApi, Promise, Restify, _,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
   Promise = require("bluebird");
@@ -8,7 +8,7 @@
 
   _ = require("lodash");
 
-  Product = require("./product");
+  ProductsApi = require("./productsApi");
 
   module.exports = ProductecaApi = (function() {
     ProductecaApi.prototype.initializeClients = function(endpoint) {
@@ -26,10 +26,21 @@
         };
       })(this);
       this.client = createClient(endpoint.url);
-      return this.asyncClient = createClient(this._makeUrlAsync(endpoint.url));
+      this.asyncClient = createClient(this._makeUrlAsync(endpoint.url));
+      return this.productsApi = new ProductsApi({
+        client: this.client,
+        asyncClient: this.asyncClient
+      });
     };
 
     function ProductecaApi(endpoint) {
+      this.createProduct = __bind(this.createProduct, this);
+      this.updateProduct = __bind(this.updateProduct, this);
+      this.updatePrice = __bind(this.updatePrice, this);
+      this.updateStocks = __bind(this.updateStocks, this);
+      this.getMultipleProducts = __bind(this.getMultipleProducts, this);
+      this.getProducts = __bind(this.getProducts, this);
+      this.getProduct = __bind(this.getProduct, this);
       this._makeUrlAsync = __bind(this._makeUrlAsync, this);
       this._buildSalesOrdersFilters = __bind(this._buildSalesOrdersFilters, this);
       this.returnMany = __bind(this.returnMany, this);
@@ -38,68 +49,13 @@
       this.updateShipment = __bind(this.updateShipment, this);
       this.createShipment = __bind(this.createShipment, this);
       this.getShipment = __bind(this.getShipment, this);
-      this.createProduct = __bind(this.createProduct, this);
-      this.updateProduct = __bind(this.updateProduct, this);
-      this.updatePrice = __bind(this.updatePrice, this);
-      this.updateStocks = __bind(this.updateStocks, this);
       this.updateSalesOrder = __bind(this.updateSalesOrder, this);
       this.getSalesOrderAndFullProducts = __bind(this.getSalesOrderAndFullProducts, this);
       this.getSalesOrder = __bind(this.getSalesOrder, this);
       this.getSalesOrders = __bind(this.getSalesOrders, this);
-      this._createProducts = __bind(this._createProducts, this);
-      this.getMultipleProducts = __bind(this.getMultipleProducts, this);
-      this._getProductsPageByPage = __bind(this._getProductsPageByPage, this);
-      this.getProducts = __bind(this.getProducts, this);
-      this.getProduct = __bind(this.getProduct, this);
       this.initializeClients = __bind(this.initializeClients, this);
       this.initializeClients(endpoint);
     }
-
-    ProductecaApi.prototype.getProduct = function(id) {
-      return this["return"](this.client.getAsync("/products/" + id));
-    };
-
-    ProductecaApi.prototype.getProducts = function() {
-      return this._getProductsPageByPage().then((function(_this) {
-        return function(products) {
-          return _this._createProducts(products);
-        };
-      })(this));
-    };
-
-    ProductecaApi.prototype._getProductsPageByPage = function(skip) {
-      var TOP;
-      if (skip == null) {
-        skip = 0;
-      }
-      TOP = 500;
-      return this["return"](this.client.getAsync("/products?$top=" + TOP + "&$skip=" + skip)).then((function(_this) {
-        return function(obj) {
-          var products;
-          products = obj.results;
-          if (products.length < TOP) {
-            return products;
-          }
-          return _this._getProductsPageByPage(skip + TOP).then(function(moreProducts) {
-            return products.concat(moreProducts);
-          });
-        };
-      })(this));
-    };
-
-    ProductecaApi.prototype.getMultipleProducts = function(ids) {
-      return this["return"](this.client.getAsync("/products?ids=" + ids)).then((function(_this) {
-        return function(products) {
-          return _this._createProducts(products);
-        };
-      })(this));
-    };
-
-    ProductecaApi.prototype._createProducts = function(products) {
-      return products.map(function(it) {
-        return new Product(it);
-      });
-    };
 
     ProductecaApi.prototype.getSalesOrders = function(filters) {
       var querystring;
@@ -131,40 +87,6 @@
 
     ProductecaApi.prototype.updateSalesOrder = function(id, update) {
       return this["return"](this.client.putAsync("/salesorders/" + id, update));
-    };
-
-    ProductecaApi.prototype.updateStocks = function(adjustment) {
-      var body, url;
-      body = _.map(adjustment.stocks, function(it) {
-        return {
-          variation: it.variation,
-          stocks: [
-            {
-              warehouse: adjustment.warehouse,
-              quantity: it.quantity
-            }
-          ]
-        };
-      });
-      url = "/products/" + adjustment.id + "/stocks";
-      return this["return"](this.asyncClient.putAsync(url, body));
-    };
-
-    ProductecaApi.prototype.updatePrice = function(product, priceList, amount) {
-      product.updatePrice(priceList, amount);
-      return this.updateProduct(product);
-    };
-
-    ProductecaApi.prototype.updateProduct = function(product) {
-      var url;
-      url = "/products/" + product.id;
-      return this["return"](this.asyncClient.putAsync(url, _.omit(product.toJSON(), ["variations"])));
-    };
-
-    ProductecaApi.prototype.createProduct = function(product) {
-      var url;
-      url = "/products";
-      return this["return"](this.asyncClient.postAsync(url, product));
     };
 
     ProductecaApi.prototype.getShipment = function(salesOrderId, shipmentId) {
@@ -227,6 +149,34 @@
       parts = url.split(".");
       parts[0] += "-async";
       return parts.join(".");
+    };
+
+    ProductecaApi.prototype.getProduct = function(id) {
+      return this.productsApi.getProduct(id);
+    };
+
+    ProductecaApi.prototype.getProducts = function() {
+      return this.productsApi.getProducts();
+    };
+
+    ProductecaApi.prototype.getMultipleProducts = function(ids) {
+      return this.productsApi.getMultipleProducts(ids);
+    };
+
+    ProductecaApi.prototype.updateStocks = function(adjustment) {
+      return this.productsApi.updateStocks(adjustment);
+    };
+
+    ProductecaApi.prototype.updatePrice = function(product, priceList, amount) {
+      return this.productsApi.updatePrice(product, priceList, amount);
+    };
+
+    ProductecaApi.prototype.updateProduct = function(product) {
+      return this.productsApi.updateProductAsync(product);
+    };
+
+    ProductecaApi.prototype.createProduct = function(product) {
+      return this.productsApi.createProductAsync(product);
     };
 
     return ProductecaApi;
