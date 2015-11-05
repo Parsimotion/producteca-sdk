@@ -36,7 +36,6 @@
     ProductsApi.prototype.findProductByCode = function(code) {
       var oDataQuery;
       oDataQuery = encodeURIComponent("sku eq '" + code + "'");
-      this.client.getAsync("/products/?$filter=" + oDataQuery);
       return this.returnMany(this.client.getAsync("/products/?$filter=" + oDataQuery));
     };
 

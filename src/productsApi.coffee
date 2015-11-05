@@ -16,7 +16,6 @@ class ProductsApi
   # Find a product by code (currently SKU | TODO: change this)
   findProductByCode: (code) =>
     oDataQuery = encodeURIComponent "sku eq '#{code}'"
-    @client.getAsync "/products/?$filter=#{oDataQuery}"
     @returnMany @client.getAsync "/products/?$filter=#{oDataQuery}"
 
   #Returns multiple products by their comma separated ids
