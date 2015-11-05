@@ -37,7 +37,6 @@
       var oDataQuery;
       oDataQuery = encodeURIComponent("sku eq '" + code + "'");
       this.client.getAsync("/products/?$filter=" + oDataQuery);
-      console.log("Estoy pegando a ", "/products/?$filter=" + oDataQuery);
       return this.returnMany(this.client.getAsync("/products/?$filter=" + oDataQuery));
     };
 
@@ -90,9 +89,7 @@
     };
 
     ProductsApi.prototype.returnMany = function(promise) {
-      console.log("voy a ver qué onda");
       return promise.spread(function(req, res, obj) {
-        console.log("el object es", obj);
         return obj.results;
       });
     };
