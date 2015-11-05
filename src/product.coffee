@@ -5,6 +5,7 @@ class Product
   constructor: (properties) ->
     _.extend @, properties
 
+  # esto fue un typo y quedó
   hasVariantes: =>
     _.size @variations > 1
 

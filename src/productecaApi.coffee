@@ -1,7 +1,7 @@
 Promise = require("bluebird")
 Restify = require("restify")
 _ = require("lodash")
-Product = require("./product")
+ProductsApi = require("./productsApi")
 module.exports =
 
 # Producteca API
@@ -23,33 +23,12 @@ class ProductecaApi
     @client = createClient endpoint.url
     @asyncClient = createClient @_makeUrlAsync endpoint.url
 
+    @productsApi = new ProductsApi
+      client: @client
+      asyncClient: @asyncClient
+
   constructor: (endpoint) ->
     @initializeClients endpoint
-
-  #Returns a product by id
-  getProduct: (id) =>
-    @return @client.getAsync "/products/#{id}"
-
-  #Returns all the products
-  getProducts: =>
-    @_getProductsPageByPage().then (products) =>
-      @_createProducts products
-
-  _getProductsPageByPage: (skip = 0) =>
-    TOP = 500
-    @return(@client.getAsync "/products?$top=#{TOP}&$skip=#{skip}").then (obj) =>
-      products = obj.results
-      return products if products.length < TOP
-      @_getProductsPageByPage(skip + TOP).then (moreProducts) ->
-        products.concat moreProducts
-
-  #Returns multiple products by their comma separated ids
-  getMultipleProducts: (ids) =>
-    @return(@client.getAsync "/products?ids=#{ids}").then (products) =>
-      @_createProducts products
-
-  _createProducts: (products) =>
-    products.map (it) -> new Product it
 
   #Returns all the opened the sales orders
   # filters = {
@@ -76,43 +55,6 @@ class ProductecaApi
   #Updates a sales order by id
   updateSalesOrder: (id, update) =>
     @return @client.putAsync "/salesorders/#{id}", update
-
-  #Updates the stocks with an *adjustment*.
-  #  adjustment = {
-  #    id: Id of the product
-  #    warehouse: Warehouse to edit
-  #    stocks: [
-  #      variation: Id of the variation
-  #      quantity: The new stock
-  #    ]
-  #  }
-  updateStocks: (adjustment) =>
-    body = _.map adjustment.stocks, (it) ->
-      variation: it.variation
-      stocks: [
-        warehouse: adjustment.warehouse
-        quantity: it.quantity
-      ]
-
-    url = "/products/#{adjustment.id}/stocks"
-    @return @asyncClient.putAsync url, body
-
-  #Updates the price of a product:
-  #  product = The product obtained in *getProducts*
-  #  priceList = Price list to edit
-  #  amount = The new price
-  updatePrice: (product, priceList, amount) =>
-    product.updatePrice priceList, amount
-
-    @updateProduct product
-
-  updateProduct: (product) =>
-    url = "/products/#{product.id}"
-    @return @asyncClient.putAsync url, _.omit product.toJSON(), ["variations"]
-
-  createProduct: (product) =>
-    url = "/products"
-    @return @asyncClient.postAsync url, product
 
   getShipment: (salesOrderId, shipmentId) =>
     @return @client.getAsync "/salesorders/#{salesOrderId}/shipments/#{shipmentId}"
@@ -154,3 +96,28 @@ class ProductecaApi
 
   _makeUrlAsync: (url) =>
     parts = url.split "." ; parts[0] += "-async" ; parts.join "."
+
+  # ---
+  # RETROCOMPATIBILITY
+  # ---
+
+  getProduct: (id) =>
+    @productsApi.getProduct id
+
+  getProducts: =>
+    @productsApi.getProducts()
+
+  getMultipleProducts: (ids) =>
+    @productsApi.getMultipleProducts ids
+
+  updateStocks: (adjustment) =>
+    @productsApi.updateStocks adjustment
+
+  updatePrice: (product, priceList, amount) =>
+    @productsApi.updatePrice product, priceList, amount
+
+  updateProduct: (product) =>
+    @productsApi.updateProductAsync product
+
+  createProduct: (product) =>
+    @productsApi.createProductAsync product
