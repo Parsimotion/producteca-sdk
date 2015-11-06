@@ -1,4 +1,5 @@
 Product = require("./product")
+_ = require("lodash")
 module.exports =
 
 class ProductsApi
