@@ -14,10 +14,15 @@ class ProductsApi
     @_getProductsPageByPage().then (products) =>
       @_createProducts products
 
-  # Find a product by code (currently SKU | TODO: change this)
+  # Find a product by code (currently "sku" - it needs to be changed)
   findProductByCode: (code) =>
     oDataQuery = encodeURIComponent "sku eq '#{code}'"
-    @returnMany @client.getAsync "/products/?$filter=#{oDataQuery}"
+
+    (@returnMany @client.getAsync "/products/?$filter=#{oDataQuery}").then (products) =>
+      firstMatch = _.first products
+      @_mapDeprecatedProperties firstMatch
+    .catch =>
+      throw "not found"
 
   #Returns multiple products by their comma separated ids
   getMultipleProducts: (ids) =>
@@ -50,8 +55,11 @@ class ProductsApi
   #  amount = The new price
   updatePrice: (product, priceList, amount) =>
     product.updatePrice priceList, amount
-
     @updateProductAsync product
+
+  #Updates a product
+  updateProduct: (id, update) =>
+    @return @client.putAsync "/products/#{id}", update
 
   #Updates a product (async)
   updateProductAsync: (product) =>
@@ -79,3 +87,25 @@ class ProductsApi
 
   _createProducts: (products) =>
     products.map (it) -> new Product it
+
+  # ---
+  # DEPRECATED PROPERTIES
+  # ---
+
+  _mapDeprecatedProperties: (product) =>
+    if not product? then return
+
+    if not product.code?
+      product.code = firstMatch.sku
+      delete firstMatch.sku
+
+    if not product.name?
+      product.name = firstMatch.description
+      delete firstMatch.description
+
+    product.variations.forEach (variation) ->
+      if not variation.sku?
+        variation.sku = variation.barcode
+        delete variation.barcode
+
+    product

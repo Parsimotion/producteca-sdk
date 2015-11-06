@@ -15,6 +15,7 @@
       this["return"] = __bind(this["return"], this);
       this.createProductAsync = __bind(this.createProductAsync, this);
       this.updateProductAsync = __bind(this.updateProductAsync, this);
+      this.updateProduct = __bind(this.updateProduct, this);
       this.updatePrice = __bind(this.updatePrice, this);
       this.updateStocks = __bind(this.updateStocks, this);
       this.getMultipleProducts = __bind(this.getMultipleProducts, this);
@@ -38,7 +39,25 @@
     ProductsApi.prototype.findProductByCode = function(code) {
       var oDataQuery;
       oDataQuery = encodeURIComponent("sku eq '" + code + "'");
-      return this.returnMany(this.client.getAsync("/products/?$filter=" + oDataQuery));
+      return (this.returnMany(this.client.getAsync("/products/?$filter=" + oDataQuery))).then((function(_this) {
+        return function(products) {
+          var firstMatch;
+          firstMatch = _.first(products);
+          if (firstMatch != null) {
+            firstMatch.code = firstMatch.sku;
+            delete firstMatch.sku;
+            firstMatch.variations.forEach(function(variation) {
+              variation.sku = variation.barcode;
+              return delete variation.barcode;
+            });
+            return firstMatch;
+          }
+        };
+      })(this))["catch"]((function(_this) {
+        return function() {
+          throw "not found";
+        };
+      })(this));
     };
 
     ProductsApi.prototype.getMultipleProducts = function(ids) {
@@ -69,6 +88,10 @@
     ProductsApi.prototype.updatePrice = function(product, priceList, amount) {
       product.updatePrice(priceList, amount);
       return this.updateProductAsync(product);
+    };
+
+    ProductsApi.prototype.updateProduct = function(id, update) {
+      return this["return"](this.client.putAsync("/products/" + id, update));
     };
 
     ProductsApi.prototype.updateProductAsync = function(product) {
