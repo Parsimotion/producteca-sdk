@@ -1,8 +1,10 @@
 (function() {
-  var Product, ProductsApi,
+  var Product, ProductsApi, _,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
   Product = require("./product");
+
+  _ = require("lodash");
 
   module.exports = ProductsApi = (function() {
     function ProductsApi(_arg) {

@@ -26,11 +26,7 @@
         };
       })(this);
       this.client = createClient(endpoint.url);
-      this.asyncClient = createClient(this._makeUrlAsync(endpoint.url));
-      return this.productsApi = new ProductsApi({
-        client: this.client,
-        asyncClient: this.asyncClient
-      });
+      return this.asyncClient = createClient(this._makeUrlAsync(endpoint.url));
     };
 
     function ProductecaApi(endpoint) {
@@ -55,6 +51,10 @@
       this.getSalesOrders = __bind(this.getSalesOrders, this);
       this.initializeClients = __bind(this.initializeClients, this);
       this.initializeClients(endpoint);
+      this.productsApi = new ProductsApi({
+        client: this.client,
+        asyncClient: this.asyncClient
+      });
     }
 
     ProductecaApi.prototype.getSalesOrders = function(filters) {
