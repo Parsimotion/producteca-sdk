@@ -192,9 +192,7 @@
       noCodeAdjustments = (_ref = groupedAdjustmentsObj[void 0]) != null ? _ref.map(function(it) {
         return [it];
       }) : void 0;
-      withCodeAdjustments = _.values(_.omit(groupedAdjustmentsObj, function(it) {
-        return it === void 0;
-      }));
+      withCodeAdjustments = _.values(_.omit(groupedAdjustmentsObj, void 0));
       return withCodeAdjustments.concat(noCodeAdjustments || []).map((function(_this) {
         return function(adjustments) {
           return _this.productecaApi.createProduct(transformer.transform(adjustments));
