@@ -19,7 +19,7 @@
     }
 
     Product.prototype.hasVariations = function() {
-      return _.size(this.variations > 1);
+      return _.size(this.variations) > 1;
     };
 
     Product.prototype.findVariationBySku = function(sku) {

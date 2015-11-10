@@ -22,19 +22,24 @@ class ProductsApi
       firstMatch = _.first products
       new Product(@_mapDeprecatedProperties firstMatch)
     .catch =>
-      throw "not found"
+      throw new Error("The product with code=#{code} wasn't found")
 
   #Returns multiple products by their comma separated ids
   getMultipleProducts: (ids) =>
     @return(@client.getAsync "/products?ids=#{ids}").then (products) =>
       @_createProducts products
 
-  #Updates the stocks of one or more variations.
+  #Creates one or more variations of a product definition
+  createVariations: (productId, variations) =>
+    url = "/products/#{productId}/variations"
+    @return @client.postAsync url, variations
+
+  #Updates the stocks of one or more variations
   updateVariationStocks: (productId, adjustments) =>
     url = "/products/#{productId}/stocks"
     @return @client.putAsync url, adjustments
 
-  #Updates the pictures of one or more variations.
+  #Updates the pictures of one or more variations
   updateVariationPictures: (productId, pictures) =>
     url = "/products/#{productId}/pictures"
     @return @client.postAsync url, pictures

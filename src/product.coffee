@@ -6,7 +6,7 @@ class Product
     _.extend @, properties
 
   hasVariations: =>
-    _.size @variations > 1
+    _.size(@variations) > 1
 
   findVariationBySku: (sku) =>
     if not @hasVariations()

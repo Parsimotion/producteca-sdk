@@ -21,6 +21,7 @@
       this.updateStocks = __bind(this.updateStocks, this);
       this.updateVariationPictures = __bind(this.updateVariationPictures, this);
       this.updateVariationStocks = __bind(this.updateVariationStocks, this);
+      this.createVariations = __bind(this.createVariations, this);
       this.getMultipleProducts = __bind(this.getMultipleProducts, this);
       this.findProductByCode = __bind(this.findProductByCode, this);
       this.getProducts = __bind(this.getProducts, this);
@@ -50,7 +51,7 @@
         };
       })(this))["catch"]((function(_this) {
         return function() {
-          throw "not found";
+          throw new Error("The product with code=" + code + " wasn't found");
         };
       })(this));
     };
@@ -61,6 +62,12 @@
           return _this._createProducts(products);
         };
       })(this));
+    };
+
+    ProductsApi.prototype.createVariations = function(productId, variations) {
+      var url;
+      url = "/products/" + productId + "/variations";
+      return this["return"](this.client.postAsync(url, variations));
     };
 
     ProductsApi.prototype.updateVariationStocks = function(productId, adjustments) {
