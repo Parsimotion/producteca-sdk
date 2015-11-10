@@ -5,24 +5,17 @@ class Product
   constructor: (properties) ->
     _.extend @, properties
 
-  # esto fue un typo y quedó
-  hasVariantes: =>
+  hasVariations: =>
     _.size @variations > 1
 
-  getVariationForAdjustment: (adjustment) =>
-    _.find @variations, (it) => it.barcode is adjustment.identifier
+  findVariationBySku: (sku) =>
+    if not @hasVariations()
+      return @firstVariation()
+
+    _.find @variations, {sku}
 
   firstVariation: =>
     _.head @variations
-
-  updatePrice: (priceList, amount) =>
-    @prices =
-      _(@prices)
-        .reject priceList: priceList
-        .concat
-          priceList: priceList
-          amount: amount
-      .value()
 
   hasAllDimensions: =>
     ["width", "height", "length", "weight"].every (it) => @dimensions[it]?
@@ -32,3 +25,19 @@ class Product
 
   updateWith: (obj) =>
     _.assign @, obj
+
+  # ---
+  # RETROCOMPATIBILITY
+  # ---
+
+  hasVariantes: => @hasVariations()
+
+  getVariationForAdjustment: (adjustment) =>
+    _.find @variations, (it) => it.barcode is adjustment.identifier
+
+  updatePrice: (priceList, amount) =>
+    @prices =
+      _(@prices)
+        .reject priceList: priceList
+        .concat { priceList, amount }
+      .value()

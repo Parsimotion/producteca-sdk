@@ -20,7 +20,7 @@ class ProductsApi
 
     (@returnMany @client.getAsync "/products/?$filter=#{oDataQuery}").then (products) =>
       firstMatch = _.first products
-      @_mapDeprecatedProperties firstMatch
+      new Product(@_mapDeprecatedProperties firstMatch)
     .catch =>
       throw "not found"
 
@@ -29,6 +29,17 @@ class ProductsApi
     @return(@client.getAsync "/products?ids=#{ids}").then (products) =>
       @_createProducts products
 
+  #Updates the stocks of one or more variations.
+  updateVariationStocks: (productId, adjustments) =>
+    url = "/products/#{productId}/stocks"
+    @return @client.putAsync url, adjustments
+
+  #Updates the pictures of one or more variations.
+  updateVariationPictures: (productId, pictures) =>
+    url = "/products/#{productId}/pictures"
+    @return @client.postAsync url, pictures
+
+  # TODO: ESTO A FUTURO VA A VOLAR
   #Updates the stocks with an *adjustment*.
   #  adjustment = {
   #    id: Id of the product

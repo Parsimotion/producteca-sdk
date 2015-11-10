@@ -30,6 +30,8 @@ class ProductecaApi
       client: @client
       asyncClient: @asyncClient
 
+  # TODO: Mover esto a una API de SalesOrders
+
   #Returns all the opened the sales orders
   # filters = {
   #  paid: true or false,

@@ -9,6 +9,7 @@
   module.exports = ProductsApi = (function() {
     function ProductsApi(_arg) {
       this.client = _arg.client, this.asyncClient = _arg.asyncClient;
+      this._mapDeprecatedProperties = __bind(this._mapDeprecatedProperties, this);
       this._createProducts = __bind(this._createProducts, this);
       this._getProductsPageByPage = __bind(this._getProductsPageByPage, this);
       this.returnMany = __bind(this.returnMany, this);
@@ -18,6 +19,8 @@
       this.updateProduct = __bind(this.updateProduct, this);
       this.updatePrice = __bind(this.updatePrice, this);
       this.updateStocks = __bind(this.updateStocks, this);
+      this.updateVariationPictures = __bind(this.updateVariationPictures, this);
+      this.updateVariationStocks = __bind(this.updateVariationStocks, this);
       this.getMultipleProducts = __bind(this.getMultipleProducts, this);
       this.findProductByCode = __bind(this.findProductByCode, this);
       this.getProducts = __bind(this.getProducts, this);
@@ -43,15 +46,7 @@
         return function(products) {
           var firstMatch;
           firstMatch = _.first(products);
-          if (firstMatch != null) {
-            firstMatch.code = firstMatch.sku;
-            delete firstMatch.sku;
-            firstMatch.variations.forEach(function(variation) {
-              variation.sku = variation.barcode;
-              return delete variation.barcode;
-            });
-            return firstMatch;
-          }
+          return new Product(_this._mapDeprecatedProperties(firstMatch));
         };
       })(this))["catch"]((function(_this) {
         return function() {
@@ -66,6 +61,18 @@
           return _this._createProducts(products);
         };
       })(this));
+    };
+
+    ProductsApi.prototype.updateVariationStocks = function(productId, adjustments) {
+      var url;
+      url = "/products/" + productId + "/stocks";
+      return this["return"](this.client.putAsync(url, adjustments));
+    };
+
+    ProductsApi.prototype.updateVariationPictures = function(productId, pictures) {
+      var url;
+      url = "/products/" + productId + "/pictures";
+      return this["return"](this.client.postAsync(url, pictures));
     };
 
     ProductsApi.prototype.updateStocks = function(adjustment) {
@@ -142,6 +149,27 @@
       return products.map(function(it) {
         return new Product(it);
       });
+    };
+
+    ProductsApi.prototype._mapDeprecatedProperties = function(product) {
+      if (product == null) {
+        return;
+      }
+      if (product.code == null) {
+        product.code = firstMatch.sku;
+        delete firstMatch.sku;
+      }
+      if (product.name == null) {
+        product.name = firstMatch.description;
+        delete firstMatch.description;
+      }
+      product.variations.forEach(function(variation) {
+        if (variation.sku == null) {
+          variation.sku = variation.barcode;
+          return delete variation.barcode;
+        }
+      });
+      return product;
     };
 
     return ProductsApi;
