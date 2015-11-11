@@ -16,13 +16,13 @@ class ProductsApi
 
   # Find a product by code (currently "sku" - it needs to be changed)
   findProductByCode: (code) =>
-    oDataQuery = encodeURIComponent "sku eq '#{code}'"
+    @_findOne(encodeURIComponent "sku eq '#{code}'")
+    .catch => throw new Error("The product with code=#{code} wasn't found")
 
-    (@returnMany @client.getAsync "/products/?$filter=#{oDataQuery}").then (products) =>
-      firstMatch = _.first products
-      new Product(firstMatch)
-    .catch =>
-      throw new Error("The product with code=#{code} wasn't found")
+  # Find a product by the variation SKU (currently "barcode" - it needs to be changed)
+  findProductByVariationSku: (sku) =>
+    @_findOne(encodeURIComponent "variations/any(variation variation/barcode eq '#{sku}')")
+    .catch => throw new Error("The product with sku=#{sku} wasn't found")
 
   #Returns multiple products by their comma separated ids
   getMultipleProducts: (ids) =>
@@ -109,6 +109,11 @@ class ProductsApi
 
   _createProducts: (products) =>
     products.map (it) -> new Product it
+
+  _findOne: (oDataQuery) =>
+    (@returnMany @client.getAsync "/products/?$filter=#{oDataQuery}").then (products) =>
+      firstMatch = _.first products
+      new Product(firstMatch)
 
   # ---
   # DEPRECATED PROPERTIES

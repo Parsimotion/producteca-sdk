@@ -12,6 +12,7 @@
       this._convert = __bind(this._convert, this);
       this._convertNewToDeprecated = __bind(this._convertNewToDeprecated, this);
       this._convertDeprecatedToNew = __bind(this._convertDeprecatedToNew, this);
+      this._findOne = __bind(this._findOne, this);
       this._createProducts = __bind(this._createProducts, this);
       this._getProductsPageByPage = __bind(this._getProductsPageByPage, this);
       this.returnMany = __bind(this.returnMany, this);
@@ -26,6 +27,7 @@
       this.createVariations = __bind(this.createVariations, this);
       this.createProduct = __bind(this.createProduct, this);
       this.getMultipleProducts = __bind(this.getMultipleProducts, this);
+      this.findProductByVariationSku = __bind(this.findProductByVariationSku, this);
       this.findProductByCode = __bind(this.findProductByCode, this);
       this.getProducts = __bind(this.getProducts, this);
       this.getProduct = __bind(this.getProduct, this);
@@ -44,17 +46,17 @@
     };
 
     ProductsApi.prototype.findProductByCode = function(code) {
-      var oDataQuery;
-      oDataQuery = encodeURIComponent("sku eq '" + code + "'");
-      return (this.returnMany(this.client.getAsync("/products/?$filter=" + oDataQuery))).then((function(_this) {
-        return function(products) {
-          var firstMatch;
-          firstMatch = _.first(products);
-          return new Product(firstMatch);
-        };
-      })(this))["catch"]((function(_this) {
+      return this._findOne(encodeURIComponent("sku eq '" + code + "'"))["catch"]((function(_this) {
         return function() {
           throw new Error("The product with code=" + code + " wasn't found");
+        };
+      })(this));
+    };
+
+    ProductsApi.prototype.findProductByVariationSku = function(sku) {
+      return this._findOne(encodeURIComponent("variations/any(variation variation/barcode eq '" + sku + "')"))["catch"]((function(_this) {
+        return function() {
+          throw new Error("The product with sku=" + sku + " wasn't found");
         };
       })(this));
     };
@@ -166,6 +168,16 @@
       return products.map(function(it) {
         return new Product(it);
       });
+    };
+
+    ProductsApi.prototype._findOne = function(oDataQuery) {
+      return (this.returnMany(this.client.getAsync("/products/?$filter=" + oDataQuery))).then((function(_this) {
+        return function(products) {
+          var firstMatch;
+          firstMatch = _.first(products);
+          return new Product(firstMatch);
+        };
+      })(this));
     };
 
     ProductsApi.prototype._convertDeprecatedToNew = function(product) {
