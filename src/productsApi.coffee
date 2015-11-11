@@ -20,7 +20,7 @@ class ProductsApi
 
     (@returnMany @client.getAsync "/products/?$filter=#{oDataQuery}").then (products) =>
       firstMatch = _.first products
-      new Product(@_mapDeprecatedProperties firstMatch)
+      new Product(firstMatch)
     .catch =>
       throw new Error("The product with code=#{code} wasn't found")
 
@@ -29,9 +29,15 @@ class ProductsApi
     @return(@client.getAsync "/products?ids=#{ids}").then (products) =>
       @_createProducts products
 
+  #Creates a product
+  createProduct: (product) =>
+    @return @client.postAsync "/products", @_convertNewToDeprecated(product)
+
   #Creates one or more variations of a product definition
   createVariations: (productId, variations) =>
     url = "/products/#{productId}/variations"
+
+    variation.forEach @_convertNewToDeprecated
     @return @client.postAsync url, variations
 
   #Updates the stocks of one or more variations
@@ -75,7 +81,7 @@ class ProductsApi
 
   #Updates a product
   updateProduct: (id, update) =>
-    @return @client.putAsync "/products/#{id}", update
+    @return @client.putAsync "/products/#{id}", @_convertNewToDeprecated(update)
 
   #Updates a product (async)
   updateProductAsync: (product) =>
@@ -108,20 +114,29 @@ class ProductsApi
   # DEPRECATED PROPERTIES
   # ---
 
-  _mapDeprecatedProperties: (product) =>
+  _convertDeprecatedToNew: (product) =>
     if not product? then return
 
-    if not product.code?
-      product.code = firstMatch.sku
-      delete firstMatch.sku
+    @_convert product, "sku", "code"
+    @_convert product, "description", "name"
 
-    if not product.name?
-      product.name = firstMatch.description
-      delete firstMatch.description
-
-    product.variations.forEach (variation) ->
-      if not variation.sku?
-        variation.sku = variation.barcode
-        delete variation.barcode
+    product.variations.forEach (variation) =>
+      @_convert variation, "barcode", "sku"
 
     product
+
+  _convertNewToDeprecated: (product) =>
+    if not product? then return
+
+    @_convert product, "code", "sku"
+    @_convert product, "name", "description"
+
+    product.variations.forEach (variation) =>
+      @_convert variation, "sku", "barcode"
+
+    product
+
+  _convert: (obj, oldProperty, newProperty) =>
+    if not obj[newProperty]?
+      obj[newProperty] = obj[oldProperty]
+      delete obj[oldProperty]

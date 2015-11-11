@@ -9,7 +9,9 @@
   module.exports = ProductsApi = (function() {
     function ProductsApi(_arg) {
       this.client = _arg.client, this.asyncClient = _arg.asyncClient;
-      this._mapDeprecatedProperties = __bind(this._mapDeprecatedProperties, this);
+      this._convert = __bind(this._convert, this);
+      this._convertNewToDeprecated = __bind(this._convertNewToDeprecated, this);
+      this._convertDeprecatedToNew = __bind(this._convertDeprecatedToNew, this);
       this._createProducts = __bind(this._createProducts, this);
       this._getProductsPageByPage = __bind(this._getProductsPageByPage, this);
       this.returnMany = __bind(this.returnMany, this);
@@ -22,6 +24,7 @@
       this.updateVariationPictures = __bind(this.updateVariationPictures, this);
       this.updateVariationStocks = __bind(this.updateVariationStocks, this);
       this.createVariations = __bind(this.createVariations, this);
+      this.createProduct = __bind(this.createProduct, this);
       this.getMultipleProducts = __bind(this.getMultipleProducts, this);
       this.findProductByCode = __bind(this.findProductByCode, this);
       this.getProducts = __bind(this.getProducts, this);
@@ -47,7 +50,7 @@
         return function(products) {
           var firstMatch;
           firstMatch = _.first(products);
-          return new Product(_this._mapDeprecatedProperties(firstMatch));
+          return new Product(firstMatch);
         };
       })(this))["catch"]((function(_this) {
         return function() {
@@ -64,9 +67,14 @@
       })(this));
     };
 
+    ProductsApi.prototype.createProduct = function(product) {
+      return this["return"](this.client.postAsync("/products", this._convertNewToDeprecated(product)));
+    };
+
     ProductsApi.prototype.createVariations = function(productId, variations) {
       var url;
       url = "/products/" + productId + "/variations";
+      variation.forEach(this._convertNewToDeprecated);
       return this["return"](this.client.postAsync(url, variations));
     };
 
@@ -105,7 +113,7 @@
     };
 
     ProductsApi.prototype.updateProduct = function(id, update) {
-      return this["return"](this.client.putAsync("/products/" + id, update));
+      return this["return"](this.client.putAsync("/products/" + id, this._convertNewToDeprecated(update)));
     };
 
     ProductsApi.prototype.updateProductAsync = function(product) {
@@ -158,25 +166,39 @@
       });
     };
 
-    ProductsApi.prototype._mapDeprecatedProperties = function(product) {
+    ProductsApi.prototype._convertDeprecatedToNew = function(product) {
       if (product == null) {
         return;
       }
-      if (product.code == null) {
-        product.code = firstMatch.sku;
-        delete firstMatch.sku;
-      }
-      if (product.name == null) {
-        product.name = firstMatch.description;
-        delete firstMatch.description;
-      }
-      product.variations.forEach(function(variation) {
-        if (variation.sku == null) {
-          variation.sku = variation.barcode;
-          return delete variation.barcode;
-        }
-      });
+      this._convert(product, "sku", "code");
+      this._convert(product, "description", "name");
+      product.variations.forEach((function(_this) {
+        return function(variation) {
+          return _this._convert(variation, "barcode", "sku");
+        };
+      })(this));
       return product;
+    };
+
+    ProductsApi.prototype._convertNewToDeprecated = function(product) {
+      if (product == null) {
+        return;
+      }
+      this._convert(product, "code", "sku");
+      this._convert(product, "name", "description");
+      product.variations.forEach((function(_this) {
+        return function(variation) {
+          return _this._convert(variation, "sku", "barcode");
+        };
+      })(this));
+      return product;
+    };
+
+    ProductsApi.prototype._convert = function(obj, oldProperty, newProperty) {
+      if (obj[newProperty] == null) {
+        obj[newProperty] = obj[oldProperty];
+        return delete obj[oldProperty];
+      }
     };
 
     return ProductsApi;
