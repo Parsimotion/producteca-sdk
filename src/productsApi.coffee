@@ -37,7 +37,7 @@ class ProductsApi
   createVariations: (productId, variations) =>
     url = "/products/#{productId}/variations"
 
-    variations.forEach @_convertNewToDeprecated
+    variations = (@_convertNewToDeprecated { variations }).variations
     @return @client.postAsync url, variations
 
   #Updates the stocks of one or more variations
@@ -116,27 +116,29 @@ class ProductsApi
 
   _convertDeprecatedToNew: (product) =>
     if not product? then return
+    product = _.cloneDeep product
 
     @_convert product, "sku", "code"
     @_convert product, "description", "name"
 
-    product.variations.forEach (variation) =>
+    product.variations?.forEach (variation) =>
       @_convert variation, "barcode", "sku"
 
     product
 
   _convertNewToDeprecated: (product) =>
     if not product? then return
+    product = _.cloneDeep product
 
     @_convert product, "code", "sku"
     @_convert product, "name", "description"
 
-    product.variations.forEach (variation) =>
+    product.variations?.forEach (variation) =>
       @_convert variation, "sku", "barcode"
 
     product
 
   _convert: (obj, oldProperty, newProperty) =>
-    if not obj[newProperty]?
+    if not obj[newProperty]? and obj[oldProperty]
       obj[newProperty] = obj[oldProperty]
       delete obj[oldProperty]

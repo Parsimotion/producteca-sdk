@@ -7,7 +7,7 @@ ProductsApi = require("./productsApi")
 describe "ProductsApi", ->
   api = new ProductsApi({})
 
-  deprecatedProduct = ->
+  deprecatedProduct =
     description: "Cosa"
     sku: "COSA"
     variations: [
@@ -17,7 +17,7 @@ describe "ProductsApi", ->
       }
     ]
 
-  newProduct = ->
+  newProduct =
     name: "Cosa"
     code: "COSA"
     variations: [
@@ -29,10 +29,10 @@ describe "ProductsApi", ->
 
   describe "_convertDeprecatedToNew", ->
     it "should map the properties ok", ->
-      api._convertDeprecatedToNew(deprecatedProduct())
-        .should.eql newProduct()
+      api._convertDeprecatedToNew(deprecatedProduct)
+        .should.eql newProduct
 
   describe "_convertNewToDeprecated", ->
     it "should map the properties ok", ->
-      api._convertNewToDeprecated(newProduct())
-        .should.eql deprecatedProduct()
+      api._convertNewToDeprecated(newProduct)
+        .should.eql deprecatedProduct

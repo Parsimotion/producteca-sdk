@@ -23,7 +23,7 @@ class ProductecaApi
     @client = createClient endpoint.url
     @asyncClient = createClient @_makeUrlAsync endpoint.url
 
-  constructor: (endpoint) ->
+  constructor: (endpoint = {}) ->
     @initializeClients endpoint
 
     @productsApi = new ProductsApi

@@ -74,7 +74,9 @@
     ProductsApi.prototype.createVariations = function(productId, variations) {
       var url;
       url = "/products/" + productId + "/variations";
-      variations.forEach(this._convertNewToDeprecated);
+      variations = (this._convertNewToDeprecated({
+        variations: variations
+      })).variations;
       return this["return"](this.client.postAsync(url, variations));
     };
 
@@ -167,35 +169,43 @@
     };
 
     ProductsApi.prototype._convertDeprecatedToNew = function(product) {
+      var _ref;
       if (product == null) {
         return;
       }
+      product = _.cloneDeep(product);
       this._convert(product, "sku", "code");
       this._convert(product, "description", "name");
-      product.variations.forEach((function(_this) {
-        return function(variation) {
-          return _this._convert(variation, "barcode", "sku");
-        };
-      })(this));
+      if ((_ref = product.variations) != null) {
+        _ref.forEach((function(_this) {
+          return function(variation) {
+            return _this._convert(variation, "barcode", "sku");
+          };
+        })(this));
+      }
       return product;
     };
 
     ProductsApi.prototype._convertNewToDeprecated = function(product) {
+      var _ref;
       if (product == null) {
         return;
       }
+      product = _.cloneDeep(product);
       this._convert(product, "code", "sku");
       this._convert(product, "name", "description");
-      product.variations.forEach((function(_this) {
-        return function(variation) {
-          return _this._convert(variation, "sku", "barcode");
-        };
-      })(this));
+      if ((_ref = product.variations) != null) {
+        _ref.forEach((function(_this) {
+          return function(variation) {
+            return _this._convert(variation, "sku", "barcode");
+          };
+        })(this));
+      }
       return product;
     };
 
     ProductsApi.prototype._convert = function(obj, oldProperty, newProperty) {
-      if (obj[newProperty] == null) {
+      if ((obj[newProperty] == null) && obj[oldProperty]) {
         obj[newProperty] = obj[oldProperty];
         return delete obj[oldProperty];
       }

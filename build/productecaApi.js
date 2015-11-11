@@ -30,6 +30,9 @@
     };
 
     function ProductecaApi(endpoint) {
+      if (endpoint == null) {
+        endpoint = {};
+      }
       this.createProduct = __bind(this.createProduct, this);
       this.updateProduct = __bind(this.updateProduct, this);
       this.updatePrice = __bind(this.updatePrice, this);
