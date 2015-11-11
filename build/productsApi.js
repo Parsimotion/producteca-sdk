@@ -74,7 +74,7 @@
     ProductsApi.prototype.createVariations = function(productId, variations) {
       var url;
       url = "/products/" + productId + "/variations";
-      variation.forEach(this._convertNewToDeprecated);
+      variations.forEach(this._convertNewToDeprecated);
       return this["return"](this.client.postAsync(url, variations));
     };
 

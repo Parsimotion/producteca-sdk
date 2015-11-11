@@ -37,7 +37,7 @@ class ProductsApi
   createVariations: (productId, variations) =>
     url = "/products/#{productId}/variations"
 
-    variation.forEach @_convertNewToDeprecated
+    variations.forEach @_convertNewToDeprecated
     @return @client.postAsync url, variations
 
   #Updates the stocks of one or more variations
