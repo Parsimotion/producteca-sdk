@@ -1,5 +1,4 @@
 Product = require("./models/product")
-{ returnOne, returnMany } = require("./helpers/return")
 _ = require("lodash")
 module.exports =
 
@@ -68,6 +67,12 @@ class ProductsApi
       .then (products) =>
         firstMatch = _.first products
         new Product(firstMatch)
+
+  returnOne: (promise) =>
+    promise.spread (req, res, obj) -> obj
+
+  returnMany: (promise) =>
+    promise.spread (req, res, obj) -> obj.results
 
   _convertJsonToProducts: (products) =>
     products.map (it) -> new Product it

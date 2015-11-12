@@ -1,38 +1,61 @@
-chai = require("chai")
-chai.Should()
-chai.use require("sinon-chai")
-
-ProductsApi = require("./productsApi")
+should = require("chai").should()
+nock = require("nock")
+ProductecaApi = require("./productecaApi")
+Product = require("./models/product")
+PRODUCTECA_API = "http://api.producteca.com"
 
 describe "ProductsApi", ->
-  api = new ProductsApi({})
+  api = new ProductecaApi(
+    accessToken: "TokenSaraza",
+    url: PRODUCTECA_API
+  ).productsApi
 
-  deprecatedProduct =
-    description: "Cosa"
-    sku: "COSA"
-    variations: [
-      {
-        barcode: "COSAVERDE"
-        primaryColor: "Verde"
-      }
-    ]
+  beforeEach ->
+    nock.cleanAll()
 
-  newProduct =
-    name: "Cosa"
-    code: "COSA"
-    variations: [
-      {
-        sku: "COSAVERDE"
-        primaryColor: "Verde"
-      }
-    ]
+  describe "getProduct", ->
 
-  describe "_convertDeprecatedToNew", ->
-    it "should map the properties ok", ->
-      api._convertDeprecatedToNew(deprecatedProduct)
-        .should.eql newProduct
+    it.only "should return a Product with Id=1 when ask for getProduct(1)", ->
+      productOne = new Product
+        id: 1,
+        variations: [ 
+          sku: "a"
+        ]
 
-  describe "_convertNewToDeprecated", ->
-    it "should map the properties ok", ->
-      api._convertNewToDeprecated(newProduct)
-        .should.eql deprecatedProduct
+      nock(PRODUCTECA_API)
+        .get("/products/1")
+          .reply 200, productOne
+
+      api.getProduct(1).then (result) =>
+        result.should.be.eql productOne.toJSON()
+
+  describe "Deprecated names of properties", ->
+    deprecatedProduct =
+      description: "Cosa"
+      sku: "COSA"
+      variations: [
+        {
+          barcode: "COSAVERDE"
+          primaryColor: "Verde"
+        }
+      ]
+
+    newProduct =
+      name: "Cosa"
+      code: "COSA"
+      variations: [
+        {
+          sku: "COSAVERDE"
+          primaryColor: "Verde"
+        }
+      ]
+
+    describe "_convertDeprecatedToNew", ->
+      it "should map the properties ok", ->
+        api._convertDeprecatedToNew(deprecatedProduct)
+          .should.eql newProduct
+
+    describe "_convertNewToDeprecated", ->
+      it "should map the properties ok", ->
+        api._convertNewToDeprecated(newProduct)
+          .should.eql deprecatedProduct
