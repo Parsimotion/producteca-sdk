@@ -1,8 +1,4 @@
-global.chai = require("chai")
-
-chai.Should()
-chai.use require("sinon-chai")
-
+should = require("chai").should()
 Product = require("./product")
 
 describe.only "Product", ->
