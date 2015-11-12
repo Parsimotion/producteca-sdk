@@ -7,7 +7,7 @@ chai.Should()
 chai.use require("sinon-chai")
 
 ProductecaApi = require("./productecaApi")
-Product = require("./product")
+Product = require("./models/product")
 
 describe "Producteca API", ->
   client = null ; asyncClient = null
