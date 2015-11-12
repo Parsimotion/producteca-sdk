@@ -12,28 +12,13 @@ class Product
     if not @hasVariations()
       return @firstVariation()
 
-    _.find @variations, {sku}
+    _.find @variations, { sku }
 
   firstVariation: =>
     _.head @variations
 
   hasAllDimensions: =>
     ["width", "height", "length", "weight"].every (it) => @dimensions[it]?
-
-  toJSON: =>
-    _.omit @, _.isFunction
-
-  updateWith: (obj) =>
-    _.assign @, obj
-
-  # ---
-  # RETROCOMPATIBILITY
-  # ---
-
-  hasVariantes: => @hasVariations()
-
-  getVariationForAdjustment: (adjustment) =>
-    _.find @variations, (it) => it.barcode is adjustment.identifier
 
   updatePrice: (priceList, amount) =>
     @prices =

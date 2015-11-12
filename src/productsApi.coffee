@@ -1,119 +1,76 @@
-Product = require("./product")
+Product = require("./models/product")
+{ returnOne, returnMany } = require("./helpers/return")
 _ = require("lodash")
 module.exports =
 
 class ProductsApi
-  constructor: ({ @client, @asyncClient }) ->
+  constructor: ({ @client }) ->
 
-  #Returns a product by id
+  # Returns a product by id
   getProduct: (id) =>
-    @return @client.getAsync "/products/#{id}"
+    @returnOne @client.getAsync "/products/#{id}"
 
-  #Returns all the products
+  # Returns all the products
   getProducts: =>
-    @_getProductsPageByPage().then (products) =>
-      @_createProducts products
+    @_getProductsPageByPage()
+      .then @_convertJsonToProducts
 
-  # Find a product by code (currently "sku" - it needs to be changed)
-  findProductByCode: (code) =>
-    @_findOne(encodeURIComponent "sku eq '#{code}'")
-    .catch => throw new Error("The product with code=#{code} wasn't found")
-
-  # Find a product by the variation SKU (currently "barcode" - it needs to be changed)
-  findProductByVariationSku: (sku) =>
-    @_findOne(encodeURIComponent "variations/any(variation variation/barcode eq '#{sku}')")
-    .catch => throw new Error("The product with sku=#{sku} wasn't found")
-
-  #Returns multiple products by their comma separated ids
+  # Returns multiple products by their comma separated ids
   getMultipleProducts: (ids) =>
-    @return(@client.getAsync "/products?ids=#{ids}").then (products) =>
-      @_createProducts products
+    @returnOne(@client.getAsync "/products?ids=#{ids}")
+      .then @_convertJsonToProducts
 
-  #Creates a product
+  # Find a product by code (currently "sku" - IT NEEDS TO BE CHANGED)
+  findProductByCode: (code) =>
+    @_findOne("sku eq '#{code}'")
+      .catch => throw new Error("The product with code=#{code} wasn't found")
+
+  # Find a product by the variation SKU (currently "barcode" - IT NEEDS TO BE CHANGED)
+  findProductByVariationSku: (sku) =>
+    @_findOne("variations/any(variation variation/barcode eq '#{sku}')")
+      .catch => throw new Error("The product with sku=#{sku} wasn't found")
+
+  # Creates a product
   createProduct: (product) =>
-    @return @client.postAsync "/products", @_convertNewToDeprecated(product)
+    @returnOne @client.postAsync "/products", @_convertNewToDeprecated(product)
 
-  #Creates one or more variations of a product definition
+  # Creates one or more variations of a product definition
   createVariations: (productId, variations) =>
     url = "/products/#{productId}/variations"
 
     variations = (@_convertNewToDeprecated { variations }).variations
-    @return @client.postAsync url, variations
+    @returnOne @client.postAsync url, variations
 
-  #Updates the stocks of one or more variations
+  # Updates the stocks of one or more variations
   updateVariationStocks: (productId, adjustments) =>
     url = "/products/#{productId}/stocks"
-    @return @client.putAsync url, adjustments
+    @returnOne @client.putAsync url, adjustments
 
-  #Updates the pictures of one or more variations
+  # Updates the pictures of one or more variations
   updateVariationPictures: (productId, pictures) =>
     url = "/products/#{productId}/pictures"
-    @return @client.postAsync url, pictures
+    @returnOne @client.postAsync url, pictures
 
-  # TODO: ESTO A FUTURO VA A VOLAR
-  #Updates the stocks with an *adjustment*.
-  #  adjustment = {
-  #    id: Id of the product
-  #    warehouse: Warehouse to edit
-  #    stocks: [
-  #      variation: Id of the variation
-  #      quantity: The new stock
-  #    ]
-  #  }
-  updateStocks: (adjustment) =>
-    body = _.map adjustment.stocks, (it) ->
-      variation: it.variation
-      stocks: [
-        warehouse: adjustment.warehouse
-        quantity: it.quantity
-      ]
-
-    url = "/products/#{adjustment.id}/stocks"
-    @return @asyncClient.putAsync url, body
-
-  #Updates the price of a product:
-  #  product = The product obtained in *getProducts*
-  #  priceList = Price list to edit
-  #  amount = The new price
-  updatePrice: (product, priceList, amount) =>
-    product.updatePrice priceList, amount
-    @updateProductAsync product
-
-  #Updates a product
+  # Updates a product
   updateProduct: (id, update) =>
-    @return @client.putAsync "/products/#{id}", @_convertNewToDeprecated(update)
-
-  #Updates a product (async)
-  updateProductAsync: (product) =>
-    url = "/products/#{product.id}"
-    @return @asyncClient.putAsync url, _.omit product.toJSON(), ["variations"]
-
-  #Creates a product (async)
-  createProductAsync: (product) =>
-    url = "/products"
-    @return @asyncClient.postAsync url, product
-
-  return: (promise) =>
-    promise.spread (req, res, obj) -> obj
-
-  returnMany: (promise) =>
-    promise.spread (req, res, obj) -> obj.results
+    @returnOne @client.putAsync "/products/#{id}", @_convertNewToDeprecated(update)
 
   _getProductsPageByPage: (skip = 0) =>
     TOP = 500
-    @return(@client.getAsync "/products?$top=#{TOP}&$skip=#{skip}").then (obj) =>
+    @returnOne(@client.getAsync "/products?$top=#{TOP}&$skip=#{skip}").then (obj) =>
       products = obj.results
       return products if products.length < TOP
       @_getProductsPageByPage(skip + TOP).then (moreProducts) ->
         products.concat moreProducts
 
-  _createProducts: (products) =>
-    products.map (it) -> new Product it
-
   _findOne: (oDataQuery) =>
-    (@returnMany @client.getAsync "/products/?$filter=#{oDataQuery}").then (products) =>
-      firstMatch = _.first products
-      new Product(firstMatch)
+    (@returnMany @client.getAsync "/products/?$filter=#{encodeURIComponent oDataQuery}")
+      .then (products) =>
+        firstMatch = _.first products
+        new Product(firstMatch)
+
+  _convertJsonToProducts: (products) =>
+    products.map (it) -> new Product it
 
   # ---
   # DEPRECATED PROPERTIES

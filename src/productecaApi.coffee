@@ -1,7 +1,8 @@
 Promise = require("bluebird")
 Restify = require("restify")
-_ = require("lodash")
 ProductsApi = require("./productsApi")
+_ = require("lodash")
+{ returnOne, returnMany } = require("./helpers/return")
 module.exports =
 
 # Producteca API
@@ -44,7 +45,7 @@ class ProductecaApi
 
   #Returns a sales order by id
   getSalesOrder: (id) =>
-    @return @client.getAsync "/salesorders/#{id}"
+    @returnOne @client.getAsync "/salesorders/#{id}"
 
   #Returns a sales order by id and all the products in its lines
   getSalesOrderAndFullProducts: (id) =>
@@ -56,27 +57,21 @@ class ProductecaApi
 
   #Updates a sales order by id
   updateSalesOrder: (id, update) =>
-    @return @client.putAsync "/salesorders/#{id}", update
+    @returnOne @client.putAsync "/salesorders/#{id}", update
 
   getShipment: (salesOrderId, shipmentId) =>
-    @return @client.getAsync "/salesorders/#{salesOrderId}/shipments/#{shipmentId}"
+    @returnOne @client.getAsync "/salesorders/#{salesOrderId}/shipments/#{shipmentId}"
 
   createShipment: (salesOrderId, shipment) =>
-    @return @client.postAsync "/salesorders/#{salesOrderId}/shipments", shipment
+    @returnOne @client.postAsync "/salesorders/#{salesOrderId}/shipments", shipment
 
   updateShipment: (salesOrderId, shipmentId, shipmentUpdate) =>
-    @return @client.putAsync "/salesorders/#{salesOrderId}/shipments/#{shipmentId}", shipmentUpdate
+    @returnOne @client.putAsync "/salesorders/#{salesOrderId}/shipments/#{shipmentId}", shipmentUpdate
 
   updateShipmentStatus: (salesOrderId, shipmentId, statusDto) =>
-    @return @client.putAsync "/salesorders/#{salesOrderId}/shipments/#{shipmentId}/status", statusDto
+    @returnOne @client.putAsync "/salesorders/#{salesOrderId}/shipments/#{shipmentId}/status", statusDto
 
   #---
-
-  return: (promise) =>
-    promise.spread (req, res, obj) -> obj
-
-  returnMany: (promise) =>
-    promise.spread (req, res, obj) -> obj.results
 
   _buildSalesOrdersFilters: (filters) =>
     querystring = "?$filter=(IsOpen%20eq%20true)%20and%20(IsCanceled%20eq%20false)"
