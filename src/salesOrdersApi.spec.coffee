@@ -15,12 +15,31 @@ describe.only "SalesOrders", ->
     nock.cleanAll()
 
   describe "getSalesOrders", ->
-    it "should return all the salesorders", ->
+    it "should return all the opened salesOrders without filters", ->
       oDataQuery = "(IsOpen eq true) and (IsCanceled eq false)"
-      nockProductecaApi "/salesorders/?$filter=#{encodeURIComponent oDataQuery}", results: [{ id: 1 }, { id: 2 }]
+      nockProductecaApi "/salesorders/?$filter=#{encodeURIComponent oDataQuery}"
+      api.getSalesOrders()
 
-      api.getSalesOrders().then (salesOrders) ->
-        salesOrders.should.be.eql [{ id: 1 }, { id: 2 }]
+    describe "when filtering...", ->
+      it "should return all the paid salesOrders", ->
+        oDataQuery = "(IsOpen eq true) and (IsCanceled eq false) and (PaymentStatus eq 'Approved')"
+        nockProductecaApi "/salesorders/?$filter=#{encodeURIComponent oDataQuery}"
+        api.getSalesOrders paid: true
+
+      it "should return all the salesOrders of a brand", ->
+        oDataQuery = "(IsOpen eq true) and (IsCanceled eq false) and ((Lines/any(line:line/Variation/Definition/Brand/Id eq 3)) or (Lines/any(line:line/Variation/Definition/Brand/Id eq 4)))"
+        nockProductecaApi "/salesorders/?$filter=#{encodeURIComponent oDataQuery}"
+        api.getSalesOrders brands: [ 3, 4 ]
+
+      it "should return all the salesOrders of a brand", ->
+        oDataQuery = "(IsOpen eq true) and (IsCanceled eq false) and (property/inner eq 'string')"
+        nockProductecaApi "/salesorders/?$filter=#{encodeURIComponent oDataQuery}"
+        api.getSalesOrders other: "property/inner eq 'string'"
+
+      it "should be able to combine filters", ->
+        oDataQuery = "(IsOpen eq true) and (IsCanceled eq false) and (PaymentStatus eq 'Approved') and (property/inner eq 'string')"
+        nockProductecaApi "/salesorders/?$filter=#{encodeURIComponent oDataQuery}"
+        api.getSalesOrders paid: true, other: "property/inner eq 'string'"
 
   describe "getSalesOrder", ->
     it "should return a SalesOrder with Id=1", ->
