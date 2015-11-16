@@ -2,7 +2,7 @@ chai = require("chai")
 should = chai.should()
 Product = require("./product")
 
-describe.only "Product", ->
+describe "Product", ->
 
   describe "hasVariations", ->
 
@@ -24,7 +24,7 @@ describe.only "Product", ->
       product = createProductWithVariations { sku: "A" }
       product.findVariationBySku("C").should.be.eql { sku: "A" }
 
-    it.only "should return undefined when product has variation and the variation was not found", ->
+    it "should return undefined when product has variation and the variation was not found", ->
       product = createProductWithVariations { sku: "A" }, { sku: "B" }
       chai.expect(product.findVariationBySku("C")).to.be.undefined
 
