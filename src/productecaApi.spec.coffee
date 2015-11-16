@@ -9,7 +9,7 @@ chai.use require("sinon-chai")
 ProductecaApi = require("./productecaApi")
 Product = require("./models/product")
 
-describe "Producteca API", ->
+describe.skip "Producteca API", ->
   client = null ; asyncClient = null
   productecaApi = null
 

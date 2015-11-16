@@ -7,7 +7,7 @@ class ProductsApi
 
   # Returns a product by id
   getProduct: (id) =>
-    @response @client.getAsync "/products/#{id}"
+    @respond @client.getAsync "/products/#{id}"
 
   # Returns all the products
   getProducts: =>
@@ -16,7 +16,7 @@ class ProductsApi
 
   # Returns multiple products by their comma separated ids
   getMultipleProducts: (ids) =>
-    @response(@client.getAsync "/products?ids=#{ids}")
+    @respond(@client.getAsync "/products?ids=#{ids}")
       .then @_convertJsonToProducts
 
   # Find a product by code (currently "sku" - IT NEEDS TO BE CHANGED)
@@ -31,32 +31,32 @@ class ProductsApi
 
   # Creates a product
   createProduct: (product) =>
-    @response @client.postAsync "/products", @_convertNewToDeprecated(product)
+    @respond @client.postAsync "/products", @_convertNewToDeprecated(product)
 
   # Creates one or more variations of a product definition
   createVariations: (productId, variations) =>
     url = "/products/#{productId}/variations"
 
     variations = (@_convertNewToDeprecated { variations }).variations
-    @response @client.postAsync url, variations
+    @respond @client.postAsync url, variations
 
   # Updates the stocks of one or more variations
   updateVariationStocks: (productId, adjustments) =>
     url = "/products/#{productId}/stocks"
-    @response @client.putAsync url, adjustments
+    @respond @client.putAsync url, adjustments
 
   # Updates the pictures of one or more variations
   updateVariationPictures: (productId, pictures) =>
     url = "/products/#{productId}/pictures"
-    @response @client.postAsync url, pictures
+    @respond @client.postAsync url, pictures
 
   # Updates a product
   updateProduct: (id, update) =>
-    @response @client.putAsync "/products/#{id}", @_convertNewToDeprecated(update)
+    @respond @client.putAsync "/products/#{id}", @_convertNewToDeprecated(update)
 
   _getProductsPageByPage: (skip = 0) =>
     TOP = 500
-    @response(@client.getAsync "/products?$top=#{TOP}&$skip=#{skip}").then (obj) =>
+    @respond(@client.getAsync "/products?$top=#{TOP}&$skip=#{skip}").then (obj) =>
       products = obj.results
       return products if products.length < TOP
       @_getProductsPageByPage(skip + TOP).then (moreProducts) ->
@@ -68,7 +68,7 @@ class ProductsApi
         firstMatch = _.first products
         new Product(firstMatch)
 
-  response: (promise) =>
+  respond: (promise) =>
     promise.spread (req, res, obj) -> obj
 
   returnMany: (promise) =>

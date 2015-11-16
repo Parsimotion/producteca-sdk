@@ -40,20 +40,20 @@ describe "ProductsApi", ->
         havePropertiesEqual results, products
 
   describe "findProductByCode", ->
-    it.skip "should return a product with code='calcetines'", ->
+    it "should return a product with code='calcetines'", ->
       oDataQuery = "sku eq 'calcetines'"
-      nockProductecaApi "/products/?$filter=#{encodeURIComponent oDataQuery}", anotherProductWithoutVariations
+      nockProductecaApi "/products/?$filter=#{encodeURIComponent oDataQuery}", results: [ anotherProductWithoutVariations ]
 
       api.findProductByCode("calcetines").then (product) ->
-        product.should.be.eql anotherProductWithoutVariations
+        havePropertiesEqual product, anotherProductWithoutVariations
 
-  describe "findProductByVariation", ->
-    it.skip "should return a product with variation id='c'", ->
+  describe "findProductByVariationSku", ->
+    it "should return a product with variation sku='c'", ->
       oDataQuery = "variations/any(variation variation/barcode eq 'c')"
-      nockProductecaApi "/products/?$filter=#{encodeURIComponent oDataQuery}", productWithMoreThanOneVariations
+      nockProductecaApi "/products/?$filter=#{encodeURIComponent oDataQuery}", results: [ productWithMoreThanOneVariations ]
 
-      api.findProductByCode("pantalon").then (product) ->
-        product.should.be.eql productWithMoreThanOneVariations
+      api.findProductByVariationSku("c").then (product) ->
+        havePropertiesEqual product, productWithMoreThanOneVariations
 
   describe "createProduct", ->
     it "should create a product", ->
@@ -126,5 +126,5 @@ describe "ProductsApi", ->
         api._convertNewToDeprecated(newProduct)
           .should.eql deprecatedProduct
 
-nockProductecaApi = (subUrl, entity, verb = "get") ->
-  nock(PRODUCTECA_API)[verb](subUrl).reply 200, entity
+nockProductecaApi = (resource, entity, verb = "get") ->
+  nock(PRODUCTECA_API)[verb](resource).reply 200, entity
