@@ -5,7 +5,7 @@ Product = require("./models/product")
 PRODUCTECA_API_URL = "http://api.producteca.com"
 havePropertiesEqual = require("./helpers/havePropertiesEqual")
 
-describe.only "SalesOrders", ->
+describe "SalesOrders", ->
   api = new SalesOrdersApi(
     accessToken: "TokenSaraza",
     url: PRODUCTECA_API_URL
@@ -31,7 +31,7 @@ describe.only "SalesOrders", ->
         nockProductecaApi "/salesorders/?$filter=#{encodeURIComponent oDataQuery}"
         api.getSalesOrders brands: [ 3, 4 ]
 
-      it "should return all the salesOrders of a brand", ->
+      it "should return all the salesOrders for a property/inner", ->
         oDataQuery = "(IsOpen eq true) and (IsCanceled eq false) and (property/inner eq 'string')"
         nockProductecaApi "/salesorders/?$filter=#{encodeURIComponent oDataQuery}"
         api.getSalesOrders other: "property/inner eq 'string'"
@@ -61,6 +61,31 @@ describe.only "SalesOrders", ->
 
       api.getSalesOrderAndFullProducts(1).then (salesOrderWithProducts) ->
         havePropertiesEqual salesOrderWithProducts, { salesOrder, products }
+
+  describe "updateSalesOrder", ->
+    it "should update a salesOrder", ->
+      nockProductecaApi "/salesorders/1", { id: 1 }, "put"
+      api.updateSalesOrder 1, { id: 1}
+
+  describe "getShipment", ->
+    it "should return a shipment with id=42 from the orderSales with id=1", ->
+      nockProductecaApi "/salesorders/1/shipments/42"
+      api.getShipment 1, 42
+
+  describe "createShipment", ->
+    it "should create a shipment for the salesOrder with id=1", ->
+      nockProductecaApi "/salesorders/1/shipments", { id: 30 }, "post"
+      api.createShipment 1, { id: 30 }
+
+  describe "updateShipment", ->
+    it "should update shipment with id=42 from the salesOrder with id=1", ->
+      nockProductecaApi "/salesorders/1/shipments/42", { Date: "14/07/2016 11:15:00" }, "put"
+      api.updateShipment 1, 42, { Date: "14/07/2016 11:15:00" }
+
+  describe "updateShipmentStatus", ->
+    it "should update shipment(id=42) status from the salesOrder with id=1", ->
+      nockProductecaApi "/salesorders/1/shipments/42/status", { status: "arrived" }, "put"
+      api.updateShipmentStatus 1, 42, { status: "arrived" }
 
 
 nockProductecaApi = (resource, entity, verb = "get") ->
