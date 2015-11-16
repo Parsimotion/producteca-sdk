@@ -1,9 +1,19 @@
 _ = require("lodash")
+expect = require("chai").expect
+clean = (it) -> JSON.stringify it
 
-havePropertiesEqual = (actual, expected) ->
-  _.forOwn expected, (value, key) ->
-    if _.isPlainObject value
-      return havePropertiesEqual actual[key], value
-    value.should.be.eql actual[key]
+havePropertiesEqual = (oldObject, newObject) ->
+  return false if not oldObject? and newObject?
+  return false if oldObject? and not newObject?
+
+  keys = _.keys newObject
+
+  _.every keys, (key) ->
+    value = newObject[key]
+
+    if _.isPlainObject(value) or _.isArray(value)
+      return havePropertiesEqual oldObject[key], value
+
+    expect(clean oldObject[key]).to.eql clean(value)
 
 module.exports = havePropertiesEqual

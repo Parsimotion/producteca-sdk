@@ -50,11 +50,14 @@ describe.only "SalesOrders", ->
 
   describe "getSalesOrderAndFullProducts", ->
     it "should return the salesOrder and all its products", ->
-      product31 = id: 31
-      product32 = id: 32
+      product31 = id: 31 ; product32 = id: 32
+      products = [ product31, product32 ]
+      salesOrder =
+        id: 1
+        lines: [{ product: product31 }, { product: product32 } ]
 
-      nockProductecaApi "/salesorders/1", { id: 1, lines: [ { product: product31 }, { product: product32 } ] }
-      nockProductecaApi "/products?ids=31,32", [ product31, product32 ]
+      nockProductecaApi "/salesorders/1", salesOrder
+      nockProductecaApi "/products?ids=31,32", products
 
       api.getSalesOrderAndFullProducts(1).then (salesOrderWithProducts) ->
         havePropertiesEqual salesOrderWithProducts,
