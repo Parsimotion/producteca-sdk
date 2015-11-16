@@ -26,9 +26,7 @@ describe "ProductsApi", ->
 
   describe "getProduct", ->
     it "should return a Product with Id=1", ->
-      nock(PRODUCTECA_API)
-        .get("/products/1")
-          .reply 200, productWithOneVariations
+      nockProductecaApi "/products/1", productWithOneVariations
 
       api.getProduct(1).then (product) ->
         product.should.be.eql productWithOneVariations
@@ -36,9 +34,7 @@ describe "ProductsApi", ->
   describe "getMultipleProducts", ->
     it "should returns an array of products matched by id", ->
       products = [ productWithMoreThanOneVariations, productWithoutVariations, anotherProductWithoutVariations ]
-      nock(PRODUCTECA_API)
-        .get("/products?ids=2,3,4")
-          .reply 200, products
+      nockProductecaApi "/products?ids=2,3,4", products
 
       api.getMultipleProducts("2,3,4").then (results) ->
         havePropertiesEqual results, products
@@ -46,9 +42,7 @@ describe "ProductsApi", ->
   describe "findProductByCode", ->
     it.skip "should return a product with code='calcetines'", ->
       oDataQuery = "sku eq 'calcetines'"
-      nock(PRODUCTECA_API)
-        .get("/products/?$filter=#{encodeURIComponent oDataQuery}")
-          .reply 200, anotherProductWithoutVariations
+      nockProductecaApi "/products/?$filter=#{encodeURIComponent oDataQuery}", anotherProductWithoutVariations
 
       api.findProductByCode("calcetines").then (product) ->
         product.should.be.eql anotherProductWithoutVariations
@@ -56,21 +50,50 @@ describe "ProductsApi", ->
   describe "findProductByVariation", ->
     it.skip "should return a product with variation id='c'", ->
       oDataQuery = "variations/any(variation variation/barcode eq 'c')"
-      nock(PRODUCTECA_API)
-        .get("/products/?$filter=#{encodeURIComponent oDataQuery}")
-          .reply 200, productWithMoreThanOneVariations
+      nockProductecaApi "/products/?$filter=#{encodeURIComponent oDataQuery}", productWithMoreThanOneVariations
 
       api.findProductByCode("pantalon").then (product) ->
         product.should.be.eql productWithMoreThanOneVariations
 
   describe "createProduct", ->
     it "should create a product", ->
-      nock(PRODUCTECA_API)
-        .post("/products")
-          .reply 200, anotherProductWithoutVariations
+      nockProductecaApi "/products", anotherProductWithoutVariations, "post"
 
       api.createProduct(new Product(anotherProductWithoutVariations)).then (product) ->
         product.should.be.eql anotherProductWithoutVariations
+
+  describe "createVariations", ->
+    it "should create variations", ->
+      variations = [ { sku: "b" }, { sku: "c" }, { sku: "d" } ]
+      nockProductecaApi "/products/3/variations", variations, "post"
+      
+      api.createVariations(3, variations).then (variationsCreated) ->
+        variationsCreated.should.be.eql variations
+
+  describe "updateVariationStocks", ->
+    it "should update stock from variation", ->
+      stocks = [ { warehouse: "Default", quantity: 2 } ]
+      nockProductecaApi "/products/1/stocks", stocks, "put"
+
+      api.updateVariationStocks(1, stocks).then (variationsUpdated) ->
+        variationsUpdated.should.be.eql stocks
+
+    describe "updateVariationPictures", ->
+      it "should update pictures from variation", ->
+        pictures = [ { url: "mediaTostada.jpg" } ]
+        nockProductecaApi "/products/1/pictures", pictures, "post"
+
+        api.updateVariationPictures(1, pictures).then (variationsUpdated) ->
+          variationsUpdated.should.be.eql pictures
+
+    describe "updateProduct", ->
+      it "should update a product", ->
+        product =
+          notes: "actualizo la nota!"
+        nockProductecaApi "/products/1", product, "put"
+
+        api.updateProduct(1, product).then (productUpdated) ->
+          productUpdated.should.be.eql product
 
   describe "Deprecated names of properties", ->
     deprecatedProduct =
@@ -102,3 +125,6 @@ describe "ProductsApi", ->
       it "should map the properties ok", ->
         api._convertNewToDeprecated(newProduct)
           .should.eql deprecatedProduct
+
+nockProductecaApi = (subUrl, entity, verb = "get") ->
+  nock(PRODUCTECA_API)[verb](subUrl).reply 200, entity
