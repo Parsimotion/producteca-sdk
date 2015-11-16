@@ -10,7 +10,7 @@ createProduct = (id, code, variations = []) ->
   sku: code
   variations: variations
 
-describe "ProductsApi", ->
+describe.only "ProductsApi", ->
   api = new ProductsApi(
     accessToken: "TokenSaraza",
     url: PRODUCTECA_API_URL
@@ -29,7 +29,7 @@ describe "ProductsApi", ->
       nockProductecaApi "/products/1", productWithOneVariations
 
       api.getProduct(1).then (product) ->
-        product.should.be.eql productWithOneVariations
+        havePropertiesEqual productWithOneVariations
 
   describe "getMultipleProducts", ->
     it "should returns an array of products matched by id", ->
@@ -58,33 +58,28 @@ describe "ProductsApi", ->
   describe "createProduct", ->
     it "should create a product", ->
       nockProductecaApi "/products", anotherProductWithoutVariations, "post"
-
-      api.createProduct(new Product(anotherProductWithoutVariations)).then (product) ->
-        product.should.be.eql anotherProductWithoutVariations
+      api.createProduct new Product(anotherProductWithoutVariations)
 
   describe "createVariations", ->
     it "should create variations", ->
       variations = [ { sku: "b" }, { sku: "c" }, { sku: "d" } ]
       nockProductecaApi "/products/3/variations", variations, "post"
       
-      api.createVariations(3, variations).then (variationsCreated) ->
-        variationsCreated.should.be.eql variations
+      api.createVariations 3, variations
 
   describe "updateVariationStocks", ->
     it "should update stock from variation", ->
       stocks = [ { warehouse: "Default", quantity: 2 } ]
       nockProductecaApi "/products/1/stocks", stocks, "put"
 
-      api.updateVariationStocks(1, stocks).then (variationsUpdated) ->
-        variationsUpdated.should.be.eql stocks
+      api.updateVariationStocks 1, stocks
 
     describe "updateVariationPictures", ->
       it "should update pictures from variation", ->
         pictures = [ { url: "mediaTostada.jpg" } ]
         nockProductecaApi "/products/1/pictures", pictures, "post"
 
-        api.updateVariationPictures(1, pictures).then (variationsUpdated) ->
-          variationsUpdated.should.be.eql pictures
+        api.updateVariationPictures 1, pictures
 
     describe "updateProduct", ->
       it "should update a product", ->
@@ -92,8 +87,7 @@ describe "ProductsApi", ->
           notes: "actualizo la nota!"
         nockProductecaApi "/products/1", product, "put"
 
-        api.updateProduct(1, product).then (productUpdated) ->
-          productUpdated.should.be.eql product
+        api.updateProduct 1, product
 
   describe "Deprecated names of properties", ->
     deprecatedProduct =

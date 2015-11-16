@@ -6,7 +6,8 @@ module.exports =
 class ProductsApi extends ProductecaApi
   # Returns a product by id
   getProduct: (id) =>
-    @respond @client.getAsync "/products/#{id}"
+    (@respond @client.getAsync("/products/#{id}")).then (json) =>
+      new Product json
 
   # Returns all the products
   getProducts: =>

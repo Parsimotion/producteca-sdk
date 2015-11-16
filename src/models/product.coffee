@@ -26,6 +26,3 @@ class Product
         .reject priceList: priceList
         .concat { priceList, amount }
       .value()
-
-  toJSON: =>
-    _.omit @, _.isFunction
