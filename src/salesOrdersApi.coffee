@@ -1,7 +1,13 @@
 ProductecaApi = require("./productecaApi")
+ProductsApi = require("./productsApi")
+_ = require("lodash")
 module.exports =
 
 class SalesOrdersApi extends ProductecaApi
+  constructor: (endpoint) ->
+    @productsApi = new ProductsApi(endpoint)
+    super endpoint
+
   #Returns all the opened the sales orders
   # filters = {
   #  paid: true or false,
@@ -21,7 +27,7 @@ class SalesOrdersApi extends ProductecaApi
     @getSalesOrder(id)
       .then (salesOrder) =>
         productIds = _.map(salesOrder.lines, "product.id").join ","
-        @getMultipleProducts(productIds).then (products) ->
+        @productsApi.getMultipleProducts(productIds).then (products) ->
           { salesOrder, products }
 
   #Updates a sales order by id

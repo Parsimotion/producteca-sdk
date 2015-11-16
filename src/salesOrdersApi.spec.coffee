@@ -5,7 +5,7 @@ Product = require("./models/product")
 PRODUCTECA_API_URL = "http://api.producteca.com"
 havePropertiesEqual = require("./helpers/havePropertiesEqual")
 
-describe "SalesOrders", ->
+describe.only "SalesOrders", ->
   api = new SalesOrdersApi(
     accessToken: "TokenSaraza",
     url: PRODUCTECA_API_URL
@@ -49,11 +49,17 @@ describe "SalesOrders", ->
         salesOrder.should.be.eql id: 1
 
   describe "getSalesOrderAndFullProducts", ->
-    it.skip "should return a SalesOrder merged with its products", ->
-      nockProductecaApi "/salesorders/1", id: 1
+    it "should return the salesOrder and all its products", ->
+      product31 = id: 31
+      product32 = id: 32
 
-      api.getSalesOrder(1).then (salesOrder) ->
-        salesOrder.should.be.eql id: 1
+      nockProductecaApi "/salesorders/1", { id: 1, lines: [ { product: product31 }, { product: product32 } ] }
+      nockProductecaApi "/products?ids=31,32", [ product31, product32 ]
+
+      api.getSalesOrderAndFullProducts(1).then (salesOrderWithProducts) ->
+        havePropertiesEqual salesOrderWithProducts,
+          salesOrder: { id: 1, lines: [ { product: product31 }, { product: product32 } ] }
+          products: [ product31, product32 ]
 
 
 nockProductecaApi = (resource, entity, verb = "get") ->

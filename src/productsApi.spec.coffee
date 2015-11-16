@@ -10,7 +10,7 @@ createProduct = (id, code, variations = []) ->
   sku: code
   variations: variations
 
-describe.only "ProductsApi", ->
+describe "ProductsApi", ->
   api = new ProductsApi(
     accessToken: "TokenSaraza",
     url: PRODUCTECA_API_URL
