@@ -1,4 +1,4 @@
-ProductsApi = require("./productsApi")
+ProductecaApi = require("./productecaApi")
 module.exports =
 
 class SalesOrdersApi extends ProductecaApi
@@ -10,7 +10,7 @@ class SalesOrdersApi extends ProductecaApi
   # }
   getSalesOrders: (filters = {}) =>
     querystring = @_buildSalesOrdersFilters filters
-    @respondMany @client.getAsync "/salesorders#{querystring}"
+    @respondMany @client.getAsync "/salesorders/?$filter=#{querystring}"
 
   #Returns a sales order by id
   getSalesOrder: (id) =>
@@ -43,19 +43,19 @@ class SalesOrdersApi extends ProductecaApi
   #---
 
   _buildSalesOrdersFilters: (filters) =>
-    querystring = "?$filter=(IsOpen%20eq%20true)%20and%20(IsCanceled%20eq%20false)"
-    addAnd = (condition) => querystring += "%20and%20(#{condition})"
+    querystring = "(IsOpen eq true) and (IsCanceled eq false)"
+    addAnd = (condition) => querystring += " and (#{condition})"
 
     brandsFilter = (brandIds) =>
       brandIds
-        .map (id) => "(Lines%2Fany(line%3Aline%2FVariation%2FDefinition%2FBrand%2FId%20eq%20#{id}))"
-        .join "%20or%20"
+        .map (id) => "(Lines/any(line:line/Variation/Definition/Brand/Id eq #{id}))"
+        .join " or "
 
     if filters.paid?
-      addAnd "PaymentStatus%20eq%20%27Approved%27"
+      addAnd "PaymentStatus eq 'Approved'"
     if filters.brands?
       addAnd brandsFilter(filters.brands)
     if filters.other?
       addAnd filters.other
 
-    querystring
+    encodeURIComponent querystring
