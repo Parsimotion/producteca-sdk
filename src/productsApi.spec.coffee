@@ -1,8 +1,8 @@
 should = require("chai").should()
 nock = require("nock")
-ProductecaApi = require("./productecaApi")
+ProductsApi = require("./productsApi")
 Product = require("./models/product")
-PRODUCTECA_API = "http://api.producteca.com"
+PRODUCTECA_API_URL = "http://api.producteca.com"
 havePropertiesEqual = require("./helpers/havePropertiesEqual")
 
 createProduct = (id, code, variations = []) ->
@@ -11,10 +11,10 @@ createProduct = (id, code, variations = []) ->
   variations: variations
 
 describe "ProductsApi", ->
-  api = new ProductecaApi(
+  api = new ProductsApi(
     accessToken: "TokenSaraza",
-    url: PRODUCTECA_API
-  ).productsApi
+    url: PRODUCTECA_API_URL
+  )
 
   productWithOneVariations = createProduct 1, "pantalon", [ { sku: "a" } ]
   productWithMoreThanOneVariations = createProduct 2, "remera", [ { sku: "b" }, { sku: "c" }, { sku: "d" } ]
@@ -127,4 +127,4 @@ describe "ProductsApi", ->
           .should.eql deprecatedProduct
 
 nockProductecaApi = (resource, entity, verb = "get") ->
-  nock(PRODUCTECA_API)[verb](resource).reply 200, entity
+  nock(PRODUCTECA_API_URL)[verb](resource).reply 200, entity

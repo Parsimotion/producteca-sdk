@@ -1,10 +1,9 @@
+ProductecaApi = require("./productecaApi")
 Product = require("./models/product")
 _ = require("lodash")
 module.exports =
 
-class ProductsApi
-  constructor: ({ @client }) ->
-
+class ProductsApi extends ProductecaApi
   # Returns a product by id
   getProduct: (id) =>
     @respond @client.getAsync "/products/#{id}"
@@ -63,16 +62,10 @@ class ProductsApi
         products.concat moreProducts
 
   _findOne: (oDataQuery) =>
-    (@returnMany @client.getAsync "/products/?$filter=#{encodeURIComponent oDataQuery}")
+    (@respondMany @client.getAsync "/products/?$filter=#{encodeURIComponent oDataQuery}")
       .then (products) =>
         firstMatch = _.first products
         new Product(firstMatch)
-
-  respond: (promise) =>
-    promise.spread (req, res, obj) -> obj
-
-  returnMany: (promise) =>
-    promise.spread (req, res, obj) -> obj.results
 
   _convertJsonToProducts: (products) =>
     products.map (it) -> new Product it
