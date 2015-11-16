@@ -60,9 +60,7 @@ describe.only "SalesOrders", ->
       nockProductecaApi "/products?ids=31,32", products
 
       api.getSalesOrderAndFullProducts(1).then (salesOrderWithProducts) ->
-        havePropertiesEqual salesOrderWithProducts,
-          salesOrder: { id: 1, lines: [ { product: product31 }, { product: product32 } ] }
-          products: [ product31, product32 ]
+        havePropertiesEqual salesOrderWithProducts, { salesOrder, products }
 
 
 nockProductecaApi = (resource, entity, verb = "get") ->
