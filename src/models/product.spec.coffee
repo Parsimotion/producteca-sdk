@@ -10,7 +10,7 @@ describe "Product", ->
       product = createProductWithVariations { id: 2 }, { id: 3 }
       product.hasVariations().should.be.ok
 
-    it "should not ok if product has only one variation", ->
+    it "should not be ok if product has only one variation", ->
       product = createProductWithVariations { id: 2 }
       product.hasVariations().should.be.not.ok
 
