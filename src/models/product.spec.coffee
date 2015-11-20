@@ -4,7 +4,7 @@ Product = require("./product")
 
 describe "Product", ->
 
-  describe "hasVariations", ->
+  describe "when hasVariations is called", ->
 
     it "should be ok if product has more than one variation", ->
       product = createProductWithVariations { id: 2 }, { id: 3 }
@@ -14,7 +14,7 @@ describe "Product", ->
       product = createProductWithVariations { id: 2 }
       product.hasVariations().should.be.not.ok
 
-  describe "findVariationBySku", ->
+  describe "when findVariationBySku is called", ->
 
     it "should return the variation where the sku is equal", ->
       product = createProductWithVariations { sku: "A" }, { sku: "B" }
@@ -28,13 +28,13 @@ describe "Product", ->
       product = createProductWithVariations { sku: "A" }, { sku: "B" }
       chai.expect(product.findVariationBySku("C")).to.be.undefined
 
-  describe "firstVariation", ->
+  describe "when firstVariation is called", ->
 
     it "should return the first variation", ->
       product = createProductWithVariations { sku: "A" }, { sku: "B" }
       product.firstVariation().should.be.eql { sku: "A" }
 
-  describe "hasAllDimensions", ->
+  describe "when hasAllDimensions is called", ->
 
     it "should return true if the product has all the dimensions", ->
       product = new Product
@@ -52,7 +52,7 @@ describe "Product", ->
           weight: 4
       product.hasAllDimensions().should.not.be.ok
 
-  describe "updatePrice", ->
+  describe "when updatePrice is called", ->
 
     it "should update a single price", ->
       product = new Product
