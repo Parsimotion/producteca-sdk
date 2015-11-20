@@ -14,7 +14,7 @@ describe "SalesOrders", ->
   beforeEach ->
     nock.cleanAll()
 
-  describe "getSalesOrders", ->
+  describe "when getSalesOrders is called", ->
     it "should return all the opened salesOrders without filters", ->
       oDataQuery = "(IsOpen eq true) and (IsCanceled eq false)"
       nockProductecaApi "/salesorders/?$filter=#{encodeURIComponent oDataQuery}"
@@ -41,14 +41,14 @@ describe "SalesOrders", ->
         nockProductecaApi "/salesorders/?$filter=#{encodeURIComponent oDataQuery}"
         api.getSalesOrders paid: true, other: "property/inner eq 'string'"
 
-  describe "getSalesOrder", ->
+  describe "when getSalesOrder is called", ->
     it "should return a SalesOrder with Id=1", ->
       nockProductecaApi "/salesorders/1", id: 1
 
       api.getSalesOrder(1).then (salesOrder) ->
         salesOrder.should.be.eql id: 1
 
-  describe "getSalesOrderAndFullProducts", ->
+  describe "when getSalesOrderAndFullProducts is called", ->
     it "should return the salesOrder and all its products", ->
       product31 = id: 31 ; product32 = id: 32
       products = [ product31, product32 ]
@@ -62,27 +62,27 @@ describe "SalesOrders", ->
       api.getSalesOrderAndFullProducts(1).then (salesOrderWithProducts) ->
         havePropertiesEqual salesOrderWithProducts, { salesOrder, products }
 
-  describe "updateSalesOrder", ->
+  describe "when updateSalesOrder is called", ->
     it "should update a salesOrder", ->
       nockProductecaApi "/salesorders/1", { id: 1 }, "put"
       api.updateSalesOrder 1, { id: 1}
 
-  describe "getShipment", ->
+  describe "when getShipment is called", ->
     it "should return a shipment with id=42 from the orderSales with id=1", ->
       nockProductecaApi "/salesorders/1/shipments/42"
       api.getShipment 1, 42
 
-  describe "createShipment", ->
+  describe "when createShipment is called", ->
     it "should create a shipment for the salesOrder with id=1", ->
       nockProductecaApi "/salesorders/1/shipments", { id: 30 }, "post"
       api.createShipment 1, { id: 30 }
 
-  describe "updateShipment", ->
+  describe "when updateShipment is called", ->
     it "should update shipment with id=42 from the salesOrder with id=1", ->
       nockProductecaApi "/salesorders/1/shipments/42", { Date: "14/07/2016 11:15:00" }, "put"
       api.updateShipment 1, 42, { Date: "14/07/2016 11:15:00" }
 
-  describe "updateShipmentStatus", ->
+  describe "when updateShipmentStatus is called", ->
     it "should update shipment(id=42) status from the salesOrder with id=1", ->
       nockProductecaApi "/salesorders/1/shipments/42/status", { status: "arrived" }, "put"
       api.updateShipmentStatus 1, 42, { status: "arrived" }

@@ -24,14 +24,14 @@ describe "ProductsApi", ->
   beforeEach ->
     nock.cleanAll()
 
-  describe "getProduct", ->
+  describe "when getProduct is called", ->
     it "should return a Product with Id=1", ->
       nockProductecaApi "/products/1", productWithOneVariations
 
       api.getProduct(1).then (product) ->
         havePropertiesEqual productWithOneVariations
 
-  describe "getMultipleProducts", ->
+  describe "when getMultipleProducts is called", ->
     it "should returns an array of products matched by id", ->
       products = [ productWithMoreThanOneVariations, productWithoutVariations, anotherProductWithoutVariations ]
       nockProductecaApi "/products?ids=2,3,4", products
@@ -39,7 +39,7 @@ describe "ProductsApi", ->
       api.getMultipleProducts("2,3,4").then (results) ->
         havePropertiesEqual results, products
 
-  describe "findProductByCode", ->
+  describe "when findProductByCode is called", ->
     it "should return a product with code='calcetines'", ->
       oDataQuery = "sku eq 'calcetines'"
       nockProductecaApi "/products/?$filter=#{encodeURIComponent oDataQuery}", results: [ anotherProductWithoutVariations ]
@@ -47,7 +47,7 @@ describe "ProductsApi", ->
       api.findProductByCode("calcetines").then (product) ->
         havePropertiesEqual product, anotherProductWithoutVariations
 
-  describe "findProductByVariationSku", ->
+  describe "when findProductByVariationSku is called", ->
     it "should return a product with variation sku='c'", ->
       oDataQuery = "variations/any(variation variation/barcode eq 'c')"
       nockProductecaApi "/products/?$filter=#{encodeURIComponent oDataQuery}", results: [ productWithMoreThanOneVariations ]
@@ -55,33 +55,33 @@ describe "ProductsApi", ->
       api.findProductByVariationSku("c").then (product) ->
         havePropertiesEqual product, productWithMoreThanOneVariations
 
-  describe "createProduct", ->
+  describe "when createProduct is called", ->
     it "should create a product", ->
       nockProductecaApi "/products", anotherProductWithoutVariations, "post"
       api.createProduct new Product(anotherProductWithoutVariations)
 
-  describe "createVariations", ->
+  describe "when createVariations is called", ->
     it "should create variations", ->
       variations = [ { sku: "b" }, { sku: "c" }, { sku: "d" } ]
       nockProductecaApi "/products/3/variations", variations, "post"
-      
+
       api.createVariations 3, variations
 
-  describe "updateVariationStocks", ->
+  describe "when updateVariationStocks is called", ->
     it "should update stock from variation", ->
       stocks = [ { warehouse: "Default", quantity: 2 } ]
       nockProductecaApi "/products/1/stocks", stocks, "put"
 
       api.updateVariationStocks 1, stocks
 
-    describe "updateVariationPictures", ->
+    describe "when updateVariationPictures is called", ->
       it "should update pictures from variation", ->
         pictures = [ { url: "mediaTostada.jpg" } ]
         nockProductecaApi "/products/1/pictures", pictures, "post"
 
         api.updateVariationPictures 1, pictures
 
-    describe "updateProduct", ->
+    describe "when updateProduct is called", ->
       it "should update a product", ->
         product =
           notes: "actualizo la nota!"
