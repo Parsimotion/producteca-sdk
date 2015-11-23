@@ -36,7 +36,7 @@
     ProductsApi.prototype.getProduct = function(id) {
       return (this.respond(this.client.getAsync("/products/" + id))).then((function(_this) {
         return function(json) {
-          return new Product(json);
+          return _this._convertDeprecatedToNew(new Product(json));
         };
       })(this));
     };
@@ -119,14 +119,14 @@
         return function(products) {
           var firstMatch;
           firstMatch = _.first(products);
-          return new Product(firstMatch);
+          return _this._convertDeprecatedToNew(new Product(firstMatch));
         };
       })(this));
     };
 
     ProductsApi.prototype._convertJsonToProducts = function(products) {
       return products.map(function(it) {
-        return new Product(it);
+        return this._convertDeprecatedToNew(new Product(it));
       });
     };
 

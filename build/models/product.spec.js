@@ -9,7 +9,7 @@
   Product = require("./product");
 
   describe("Product", function() {
-    describe("hasVariations", function() {
+    describe("when hasVariations is called", function() {
       it("should be ok if product has more than one variation", function() {
         var product;
         product = createProductWithVariations({
@@ -19,7 +19,7 @@
         });
         return product.hasVariations().should.be.ok;
       });
-      return it("should not ok if product has only one variation", function() {
+      return it("should not be ok if product has only one variation", function() {
         var product;
         product = createProductWithVariations({
           id: 2
@@ -27,7 +27,7 @@
         return product.hasVariations().should.be.not.ok;
       });
     });
-    describe("findVariationBySku", function() {
+    describe("when findVariationBySku is called", function() {
       it("should return the variation where the sku is equal", function() {
         var product;
         product = createProductWithVariations({
@@ -58,7 +58,7 @@
         return chai.expect(product.findVariationBySku("C")).to.be.undefined;
       });
     });
-    describe("firstVariation", function() {
+    describe("when firstVariation is called", function() {
       return it("should return the first variation", function() {
         var product;
         product = createProductWithVariations({
@@ -71,7 +71,7 @@
         });
       });
     });
-    describe("hasAllDimensions", function() {
+    describe("when hasAllDimensions is called", function() {
       it("should return true if the product has all the dimensions", function() {
         var product;
         product = new Product({
@@ -95,7 +95,7 @@
         return product.hasAllDimensions().should.not.be.ok;
       });
     });
-    return describe("updatePrice", function() {
+    return describe("when updatePrice is called", function() {
       return it("should update a single price", function() {
         var product;
         product = new Product({

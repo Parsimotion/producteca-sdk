@@ -7,7 +7,7 @@ class ProductsApi extends ProductecaApi
   # Returns a product by id
   getProduct: (id) =>
     (@respond @client.getAsync("/products/#{id}")).then (json) =>
-      new Product json
+      @_convertDeprecatedToNew new Product json
 
   # Returns all the products
   getProducts: =>
@@ -66,10 +66,10 @@ class ProductsApi extends ProductecaApi
     (@respondMany @client.getAsync "/products/?$filter=#{encodeURIComponent oDataQuery}")
       .then (products) =>
         firstMatch = _.first products
-        new Product(firstMatch)
+        @_convertDeprecatedToNew new Product(firstMatch)
 
   _convertJsonToProducts: (products) =>
-    products.map (it) -> new Product it
+    products.map (it) -> @_convertDeprecatedToNew new Product it
 
   # ---
   # DEPRECATED PROPERTIES
