@@ -6,9 +6,14 @@ PRODUCTECA_API_URL = "http://api.producteca.com"
 havePropertiesEqual = require("./helpers/havePropertiesEqual")
 
 createProduct = (id, code, variations = []) ->
-  id: id
-  sku: code
-  variations: variations
+  old:
+    id: id
+    sku: code
+    variations: variations.map (it) -> barcode: it.sku
+  new:
+    id: id
+    variations: variations
+    code: code
 
 describe "ProductsApi", ->
   api = new ProductsApi(
@@ -19,46 +24,62 @@ describe "ProductsApi", ->
   productWithOneVariations = createProduct 1, "pantalon", [ { sku: "a" } ]
   productWithMoreThanOneVariations = createProduct 2, "remera", [ { sku: "b" }, { sku: "c" }, { sku: "d" } ]
   productWithoutVariations = createProduct 3, "campera"
-  anotherProductWithoutVariations = createProduct 4, "calcetines"
+  anotherproductWithoutVariations = createProduct 4, "calcetines"
 
   beforeEach ->
     nock.cleanAll()
 
   describe "when getProduct is called", ->
-    it "should return a Product with Id=1", ->
-      nockProductecaApi "/products/1", productWithOneVariations
-
-      api.getProduct(1).then (product) ->
-        havePropertiesEqual productWithOneVariations
+    it "should send a GET to the api with the given id", ->
+      get = nockProductecaApi "/products/1", productWithOneVariations.old
+      api.getProduct(1).then ->
+        get.done()
 
   describe "when getMultipleProducts is called", ->
-    it "should returns an array of products matched by id", ->
-      products = [ productWithMoreThanOneVariations, productWithoutVariations, anotherProductWithoutVariations ]
+    it "should send a GET to the api with the given string of ids", ->
+      products = [ productWithMoreThanOneVariations.old, productWithoutVariations.old, anotherproductWithoutVariations.old ]
       nockProductecaApi "/products?ids=2,3,4", products
-
-      api.getMultipleProducts("2,3,4").then (results) ->
-        havePropertiesEqual results, products
+      get = api.getMultipleProducts("2,3,4").then ->
+        get.done()
 
   describe "when findProductByCode is called", ->
-    it "should return a product with code='calcetines'", ->
-      oDataQuery = "sku eq 'calcetines'"
-      nockProductecaApi "/products/?$filter=#{encodeURIComponent oDataQuery}", results: [ anotherProductWithoutVariations ]
+    get = null
+    product = null
 
-      api.findProductByCode("calcetines").then (product) ->
-        havePropertiesEqual product, anotherProductWithoutVariations
+    beforeEach ->
+      oDataQuery = "sku eq 'calcetines'"
+      get = nockProductecaApi "/products/?$filter=#{encodeURIComponent oDataQuery}", results: [ anotherproductWithoutVariations.old ]
+      api.findProductByCode("calcetines").then (result) ->
+        product = result
+    
+    it "should send a GET to the api with an oData query to filter products with code='calcetines'", ->
+      get.done()
+
+    it "should return the first product", ->
+      havePropertiesEqual product, anotherproductWithoutVariations.new
+      product.should.be.an.instanceof Product
 
   describe "when findProductByVariationSku is called", ->
-    it "should return a product with variation sku='c'", ->
-      oDataQuery = "variations/any(variation variation/barcode eq 'c')"
-      nockProductecaApi "/products/?$filter=#{encodeURIComponent oDataQuery}", results: [ productWithMoreThanOneVariations ]
+    get = null
+    product = null
 
-      api.findProductByVariationSku("c").then (product) ->
-        havePropertiesEqual product, productWithMoreThanOneVariations
+    beforeEach ->
+      oDataQuery = "variations/any(variation variation/barcode eq 'c')"
+      nockProductecaApi "/products/?$filter=#{encodeURIComponent oDataQuery}", results: [ productWithMoreThanOneVariations.old ]
+      get = api.findProductByVariationSku("c").then (result) ->
+        product = result
+
+    it "should send a GET to the api with an oData query to filter products containing a variation with sku='c'", ->
+      get.done()
+
+    it "should return the first product", ->
+      havePropertiesEqual product, productWithMoreThanOneVariations.new
+      product.should.be.an.instanceof Product
 
   describe "when createProduct is called", ->
     it "should create a product", ->
-      nockProductecaApi "/products", anotherProductWithoutVariations, "post"
-      api.createProduct new Product(anotherProductWithoutVariations)
+      nockProductecaApi "/products", anotherproductWithoutVariations.old, "post"
+      api.createProduct new Product(anotherproductWithoutVariations.old)
 
   describe "when createVariations is called", ->
     it "should create variations", ->
