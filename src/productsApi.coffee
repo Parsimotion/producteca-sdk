@@ -69,7 +69,7 @@ class ProductsApi extends ProductecaApi
         new Product(@_convertDeprecatedToNew firstMatch)
 
   _convertJsonToProducts: (products) =>
-    products.map (it) -> new Product @_convertDeprecatedToNew it
+    products.map (it) => new Product @_convertDeprecatedToNew it
 
   # ---
   # DEPRECATED PROPERTIES
