@@ -125,9 +125,11 @@
     };
 
     ProductsApi.prototype._convertJsonToProducts = function(products) {
-      return products.map(function(it) {
-        return new Product(this._convertDeprecatedToNew(it));
-      });
+      return products.map((function(_this) {
+        return function(it) {
+          return new Product(_this._convertDeprecatedToNew(it));
+        };
+      })(this));
     };
 
     ProductsApi.prototype._convertDeprecatedToNew = function(product) {
