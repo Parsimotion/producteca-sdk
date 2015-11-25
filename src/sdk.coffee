@@ -1,5 +1,4 @@
 module.exports =
   Api: require("./productecaApi")
-  Sync:
-    Adjustment: require("./syncer/adjustment")
-    Syncer: require("./syncer/syncer")
+  ProductsApi: require("./productsApi")
+  SalesOrdersApi: require("./salesOrdersApi")
