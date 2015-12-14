@@ -14,24 +14,24 @@ class SalesOrdersApi extends ProductecaApi
   #  brand: [id1, id2, id3]
   #  other: "property/inner eq 'string'"
   # }
-  getSalesOrders: (filters = {}) =>
+  getAll: (filters = {}) =>
     querystring = @_buildSalesOrdersFilters filters
     @respondMany @client.getAsync "/salesorders/?$filter=#{querystring}"
 
   #Returns a sales order by id
-  getSalesOrder: (id) =>
+  get: (id) =>
     @respond @client.getAsync "/salesorders/#{id}"
 
   #Returns a sales order by id and all the products in its lines
-  getSalesOrderAndFullProducts: (id) =>
-    @getSalesOrder(id)
+  getWithFullProducts: (id) =>
+    @get(id)
       .then (salesOrder) =>
         productIds = _.map(salesOrder.lines, "product.id").join ","
-        @productsApi.getMultipleProducts(productIds).then (products) ->
+        @productsApi.getMany(productIds).then (products) ->
           { salesOrder, products }
 
   #Updates a sales order by id
-  updateSalesOrder: (id, update) =>
+  update: (id, update) =>
     @respond @client.putAsync "/salesorders/#{id}", update
 
   getShipment: (salesOrderId, shipmentId) =>

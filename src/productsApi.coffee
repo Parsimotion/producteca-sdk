@@ -5,32 +5,32 @@ module.exports =
 
 class ProductsApi extends ProductecaApi
   # Returns a product by id
-  getProduct: (id) =>
+  get: (id) =>
     (@respond @client.getAsync("/products/#{id}")).then (json) =>
       new Product @_convertDeprecatedToNew json
 
   # Returns all the products
-  getProducts: =>
+  getAll: =>
     @_getProductsPageByPage()
       .then @_convertJsonToProducts
 
   # Returns multiple products by their comma separated ids
-  getMultipleProducts: (ids) =>
+  getMany: (ids) =>
     @respond(@client.getAsync "/products?ids=#{ids}")
       .then @_convertJsonToProducts
 
   # Find a product by code (currently "sku" - IT NEEDS TO BE CHANGED)
-  findProductByCode: (code) =>
+  findByCode: (code) =>
     @_findOne("sku eq '#{code}'")
       .catch => throw new Error("The product with code=#{code} wasn't found")
 
   # Find a product by the variation SKU (currently "barcode" - IT NEEDS TO BE CHANGED)
-  findProductByVariationSku: (sku) =>
+  findByVariationSku: (sku) =>
     @_findOne("variations/any(variation variation/barcode eq '#{sku}')")
       .catch => throw new Error("The product with sku=#{sku} wasn't found")
 
   # Creates a product
-  createProduct: (product) =>
+  create: (product) =>
     @respond @client.postAsync "/products", @_convertNewToDeprecated(product)
 
   # Creates one or more variations of a product definition
@@ -51,7 +51,7 @@ class ProductsApi extends ProductecaApi
     @respond @client.postAsync url, pictures
 
   # Updates a product
-  updateProduct: (id, update) =>
+  update: (id, update) =>
     @respond @client.putAsync "/products/#{id}", @_convertNewToDeprecated(update)
 
   _getProductsPageByPage: (skip = 0) =>

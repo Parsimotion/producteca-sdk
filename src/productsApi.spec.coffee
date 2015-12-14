@@ -29,29 +29,29 @@ describe "ProductsApi", ->
   beforeEach ->
     nock.cleanAll()
 
-  describe "when getProduct is called", ->
+  describe "when get is called", ->
     it "should send a GET to the api with the given id", ->
       get = nockProductecaApi "/products/1", productWithOneVariations.old
-      api.getProduct(1).then ->
+      api.get(1).then ->
         get.done()
 
-  describe "when getMultipleProducts is called", ->
+  describe "when getMany is called", ->
     it "should send a GET to the api with the given string of ids", ->
       products = [ productWithMoreThanOneVariations.old, productWithoutVariations.old, anotherproductWithoutVariations.old ]
       nockProductecaApi "/products?ids=2,3,4", products
-      get = api.getMultipleProducts("2,3,4").then ->
+      get = api.getMany("2,3,4").then ->
         get.done()
 
-  describe "when findProductByCode is called", ->
+  describe "when findByCode is called", ->
     get = null
     product = null
 
     beforeEach ->
       oDataQuery = "sku eq 'calcetines'"
       get = nockProductecaApi "/products/?$filter=#{encodeURIComponent oDataQuery}", results: [ anotherproductWithoutVariations.old ]
-      api.findProductByCode("calcetines").then (result) ->
+      api.findByCode("calcetines").then (result) ->
         product = result
-    
+
     it "should send a GET to the api with an oData query to filter products with code='calcetines'", ->
       get.done()
 
@@ -59,14 +59,14 @@ describe "ProductsApi", ->
       havePropertiesEqual product, anotherproductWithoutVariations.new
       product.should.be.an.instanceof Product
 
-  describe "when findProductByVariationSku is called", ->
+  describe "when findByVariationSku is called", ->
     get = null
     product = null
 
     beforeEach ->
       oDataQuery = "variations/any(variation variation/barcode eq 'c')"
       nockProductecaApi "/products/?$filter=#{encodeURIComponent oDataQuery}", results: [ productWithMoreThanOneVariations.old ]
-      get = api.findProductByVariationSku("c").then (result) ->
+      get = api.findByVariationSku("c").then (result) ->
         product = result
 
     it "should send a GET to the api with an oData query to filter products containing a variation with sku='c'", ->
@@ -76,10 +76,10 @@ describe "ProductsApi", ->
       havePropertiesEqual product, productWithMoreThanOneVariations.new
       product.should.be.an.instanceof Product
 
-  describe "when createProduct is called", ->
+  describe "when create is called", ->
     it "should create a product", ->
       nockProductecaApi "/products", anotherproductWithoutVariations.old, "post"
-      api.createProduct new Product(anotherproductWithoutVariations.old)
+      api.create new Product(anotherproductWithoutVariations.old)
 
   describe "when createVariations is called", ->
     it "should create variations", ->
@@ -102,13 +102,13 @@ describe "ProductsApi", ->
 
         api.updateVariationPictures 1, pictures
 
-    describe "when updateProduct is called", ->
+    describe "when update is called", ->
       it "should update a product", ->
         product =
           notes: "actualizo la nota!"
         nockProductecaApi "/products/1", product, "put"
 
-        api.updateProduct 1, product
+        api.update 1, product
 
   describe "Deprecated names of properties", ->
     deprecatedProduct =

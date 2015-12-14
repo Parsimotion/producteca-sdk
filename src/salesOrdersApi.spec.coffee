@@ -14,41 +14,41 @@ describe "SalesOrders", ->
   beforeEach ->
     nock.cleanAll()
 
-  describe "when getSalesOrders is called", ->
+  describe "when getAll is called", ->
     it "should return all the opened salesOrders without filters", ->
       oDataQuery = "(IsOpen eq true) and (IsCanceled eq false)"
       nockProductecaApi "/salesorders/?$filter=#{encodeURIComponent oDataQuery}"
-      api.getSalesOrders()
+      api.getAll()
 
     describe "when filtering...", ->
       it "should return all the paid salesOrders", ->
         oDataQuery = "(IsOpen eq true) and (IsCanceled eq false) and (PaymentStatus eq 'Approved')"
         nockProductecaApi "/salesorders/?$filter=#{encodeURIComponent oDataQuery}"
-        api.getSalesOrders paid: true
+        api.getAll paid: true
 
       it "should return all the salesOrders of a brand", ->
         oDataQuery = "(IsOpen eq true) and (IsCanceled eq false) and ((Lines/any(line:line/Variation/Definition/Brand/Id eq 3)) or (Lines/any(line:line/Variation/Definition/Brand/Id eq 4)))"
         nockProductecaApi "/salesorders/?$filter=#{encodeURIComponent oDataQuery}"
-        api.getSalesOrders brands: [ 3, 4 ]
+        api.getAll brands: [ 3, 4 ]
 
       it "should return all the salesOrders for a property/inner", ->
         oDataQuery = "(IsOpen eq true) and (IsCanceled eq false) and (property/inner eq 'string')"
         nockProductecaApi "/salesorders/?$filter=#{encodeURIComponent oDataQuery}"
-        api.getSalesOrders other: "property/inner eq 'string'"
+        api.getAll other: "property/inner eq 'string'"
 
       it "should be able to combine filters", ->
         oDataQuery = "(IsOpen eq true) and (IsCanceled eq false) and (PaymentStatus eq 'Approved') and (property/inner eq 'string')"
         nockProductecaApi "/salesorders/?$filter=#{encodeURIComponent oDataQuery}"
-        api.getSalesOrders paid: true, other: "property/inner eq 'string'"
+        api.getAll paid: true, other: "property/inner eq 'string'"
 
-  describe "when getSalesOrder is called", ->
+  describe "when get is called", ->
     it "should return a SalesOrder with Id=1", ->
       nockProductecaApi "/salesorders/1", id: 1
 
-      api.getSalesOrder(1).then (salesOrder) ->
+      api.get(1).then (salesOrder) ->
         salesOrder.should.be.eql id: 1
 
-  describe "when getSalesOrderAndFullProducts is called", ->
+  describe "when getWithFullProducts is called", ->
     it "should return the salesOrder and all its products", ->
       product31 = id: 31 ; product32 = id: 32
       products = [ product31, product32 ]
@@ -59,13 +59,13 @@ describe "SalesOrders", ->
       nockProductecaApi "/salesorders/1", salesOrder
       nockProductecaApi "/products?ids=31,32", products
 
-      api.getSalesOrderAndFullProducts(1).then (salesOrderWithProducts) ->
+      api.getWithFullProducts(1).then (salesOrderWithProducts) ->
         havePropertiesEqual salesOrderWithProducts, { salesOrder, products }
 
-  describe "when updateSalesOrder is called", ->
+  describe "when update is called", ->
     it "should update a salesOrder", ->
       nockProductecaApi "/salesorders/1", { id: 1 }, "put"
-      api.updateSalesOrder 1, { id: 1}
+      api.update 1, { id: 1}
 
   describe "when getShipment is called", ->
     it "should return a shipment with id=42 from the orderSales with id=1", ->
