@@ -19,15 +19,15 @@
       this.updateShipment = __bind(this.updateShipment, this);
       this.createShipment = __bind(this.createShipment, this);
       this.getShipment = __bind(this.getShipment, this);
-      this.updateSalesOrder = __bind(this.updateSalesOrder, this);
-      this.getSalesOrderAndFullProducts = __bind(this.getSalesOrderAndFullProducts, this);
-      this.getSalesOrder = __bind(this.getSalesOrder, this);
-      this.getSalesOrders = __bind(this.getSalesOrders, this);
+      this.update = __bind(this.update, this);
+      this.getWithFullProducts = __bind(this.getWithFullProducts, this);
+      this.get = __bind(this.get, this);
+      this.getAll = __bind(this.getAll, this);
       this.productsApi = new ProductsApi(endpoint);
       SalesOrdersApi.__super__.constructor.call(this, endpoint);
     }
 
-    SalesOrdersApi.prototype.getSalesOrders = function(filters) {
+    SalesOrdersApi.prototype.getAll = function(filters) {
       var querystring;
       if (filters == null) {
         filters = {};
@@ -36,16 +36,16 @@
       return this.respondMany(this.client.getAsync("/salesorders/?$filter=" + querystring));
     };
 
-    SalesOrdersApi.prototype.getSalesOrder = function(id) {
+    SalesOrdersApi.prototype.get = function(id) {
       return this.respond(this.client.getAsync("/salesorders/" + id));
     };
 
-    SalesOrdersApi.prototype.getSalesOrderAndFullProducts = function(id) {
-      return this.getSalesOrder(id).then((function(_this) {
+    SalesOrdersApi.prototype.getWithFullProducts = function(id) {
+      return this.get(id).then((function(_this) {
         return function(salesOrder) {
           var productIds;
           productIds = _.map(salesOrder.lines, "product.id").join(",");
-          return _this.productsApi.getMultipleProducts(productIds).then(function(products) {
+          return _this.productsApi.getMany(productIds).then(function(products) {
             return {
               salesOrder: salesOrder,
               products: products
@@ -55,7 +55,7 @@
       })(this));
     };
 
-    SalesOrdersApi.prototype.updateSalesOrder = function(id, update) {
+    SalesOrdersApi.prototype.update = function(id, update) {
       return this.respond(this.client.putAsync("/salesorders/" + id, update));
     };
 

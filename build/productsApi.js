@@ -20,20 +20,20 @@
       this._convertJsonToProducts = __bind(this._convertJsonToProducts, this);
       this._findOne = __bind(this._findOne, this);
       this._getProductsPageByPage = __bind(this._getProductsPageByPage, this);
-      this.updateProduct = __bind(this.updateProduct, this);
+      this.update = __bind(this.update, this);
       this.updateVariationPictures = __bind(this.updateVariationPictures, this);
       this.updateVariationStocks = __bind(this.updateVariationStocks, this);
       this.createVariations = __bind(this.createVariations, this);
-      this.createProduct = __bind(this.createProduct, this);
-      this.findProductByVariationSku = __bind(this.findProductByVariationSku, this);
-      this.findProductByCode = __bind(this.findProductByCode, this);
-      this.getMultipleProducts = __bind(this.getMultipleProducts, this);
-      this.getProducts = __bind(this.getProducts, this);
-      this.getProduct = __bind(this.getProduct, this);
+      this.create = __bind(this.create, this);
+      this.findByVariationSku = __bind(this.findByVariationSku, this);
+      this.findByCode = __bind(this.findByCode, this);
+      this.getMany = __bind(this.getMany, this);
+      this.getAll = __bind(this.getAll, this);
+      this.get = __bind(this.get, this);
       return ProductsApi.__super__.constructor.apply(this, arguments);
     }
 
-    ProductsApi.prototype.getProduct = function(id) {
+    ProductsApi.prototype.get = function(id) {
       return (this.respond(this.client.getAsync("/products/" + id))).then((function(_this) {
         return function(json) {
           return new Product(_this._convertDeprecatedToNew(json));
@@ -41,15 +41,15 @@
       })(this));
     };
 
-    ProductsApi.prototype.getProducts = function() {
+    ProductsApi.prototype.getAll = function() {
       return this._getProductsPageByPage().then(this._convertJsonToProducts);
     };
 
-    ProductsApi.prototype.getMultipleProducts = function(ids) {
+    ProductsApi.prototype.getMany = function(ids) {
       return this.respond(this.client.getAsync("/products?ids=" + ids)).then(this._convertJsonToProducts);
     };
 
-    ProductsApi.prototype.findProductByCode = function(code) {
+    ProductsApi.prototype.findByCode = function(code) {
       return this._findOne("sku eq '" + code + "'")["catch"]((function(_this) {
         return function() {
           throw new Error("The product with code=" + code + " wasn't found");
@@ -57,7 +57,7 @@
       })(this));
     };
 
-    ProductsApi.prototype.findProductByVariationSku = function(sku) {
+    ProductsApi.prototype.findByVariationSku = function(sku) {
       return this._findOne("variations/any(variation variation/barcode eq '" + sku + "')")["catch"]((function(_this) {
         return function() {
           throw new Error("The product with sku=" + sku + " wasn't found");
@@ -65,7 +65,7 @@
       })(this));
     };
 
-    ProductsApi.prototype.createProduct = function(product) {
+    ProductsApi.prototype.create = function(product) {
       return this.respond(this.client.postAsync("/products", this._convertNewToDeprecated(product)));
     };
 
@@ -90,7 +90,7 @@
       return this.respond(this.client.postAsync(url, pictures));
     };
 
-    ProductsApi.prototype.updateProduct = function(id, update) {
+    ProductsApi.prototype.update = function(id, update) {
       return this.respond(this.client.putAsync("/products/" + id, this._convertNewToDeprecated(update)));
     };
 
