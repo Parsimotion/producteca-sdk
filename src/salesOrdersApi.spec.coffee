@@ -53,7 +53,7 @@ describe "SalesOrders", ->
       products = [ product31, product32 ]
       salesOrder =
         id: 1
-        lines: [{ product: product31 }, { product: product32 } ]
+        lines: [ { product: product31 }, { product: product32 } ]
 
       nockProductecaApi "/salesorders/1", salesOrder
       nockProductecaApi "/products?ids=31,32", products
@@ -63,7 +63,7 @@ describe "SalesOrders", ->
 
   describe "when update is called", ->
     it "should update a salesOrder", ->
-      nockProductecaApi "/salesorders/1", { id: 1 }, "put"
+      nockProductecaApi "/salesorders/1", {}, "put", { id: 1 }
       api.update 1, { id: 1}
 
   describe "when getShipment is called", ->
@@ -73,17 +73,17 @@ describe "SalesOrders", ->
 
   describe "when createShipment is called", ->
     it "should create a shipment for the salesOrder with id=1", ->
-      nockProductecaApi "/salesorders/1/shipments", { id: 30 }, "post"
+      nockProductecaApi "/salesorders/1/shipments", {}, "post", { id: 30 }
       api.createShipment 1, { id: 30 }
 
   describe "when updateShipment is called", ->
     it "should update shipment with id=42 from the salesOrder with id=1", ->
-      nockProductecaApi "/salesorders/1/shipments/42", { Date: "14/07/2016 11:15:00" }, "put"
+      nockProductecaApi "/salesorders/1/shipments/42", {}, "put", { Date: "14/07/2016 11:15:00" }
       api.updateShipment 1, 42, { Date: "14/07/2016 11:15:00" }
 
   describe "when updateShipmentStatus is called", ->
     it "should update shipment(id=42) status from the salesOrder with id=1", ->
-      nockProductecaApi "/salesorders/1/shipments/42/status", { status: "arrived" }, "put"
+      nockProductecaApi "/salesorders/1/shipments/42/status", {}, "put", { status: "arrived" }
       api.updateShipmentStatus 1, 42, { status: "arrived" }
 
 nockProductecaApi = (resource, entity, verb = "get", expectedBody) ->
