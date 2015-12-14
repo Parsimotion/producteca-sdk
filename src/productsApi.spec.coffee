@@ -15,6 +15,12 @@ createProduct = (id, code, variations = []) ->
     variations: variations
     code: code
 
+variations =
+  old:
+    [ { barcode: "b" }, { barcode: "c" }, { barcode: "d" } ]
+  new:
+    [ { sku: "b" }, { sku: "c" }, { sku: "d" } ]
+
 describe "ProductsApi", ->
   api = new ProductsApi(
     accessToken: "TokenSaraza",
@@ -78,27 +84,26 @@ describe "ProductsApi", ->
 
   describe "when create is called", ->
     it "should create a product", ->
-      nockProductecaApi "/products", anotherproductWithoutVariations.old, "post"
+      nockProductecaApi "/products", {}, "post", anotherproductWithoutVariations.old
       api.create new Product(anotherproductWithoutVariations.old)
 
   describe "when createVariations is called", ->
     it "should create variations", ->
-      variations = [ { sku: "b" }, { sku: "c" }, { sku: "d" } ]
-      nockProductecaApi "/products/3/variations", variations, "post"
+      nockProductecaApi "/products/3/variations", {}, "post", variations.old
 
-      api.createVariations 3, variations
+      api.createVariations 3, variations.new
 
   describe "when updateVariationStocks is called", ->
     it "should update stock from variation", ->
       stocks = [ { warehouse: "Default", quantity: 2 } ]
-      nockProductecaApi "/products/1/stocks", stocks, "put"
+      nockProductecaApi "/products/1/stocks", {}, "put", stocks
 
       api.updateVariationStocks 1, stocks
 
     describe "when updateVariationPictures is called", ->
       it "should update pictures from variation", ->
         pictures = [ { url: "mediaTostada.jpg" } ]
-        nockProductecaApi "/products/1/pictures", pictures, "post"
+        nockProductecaApi "/products/1/pictures", {}, "post", pictures
 
         api.updateVariationPictures 1, pictures
 
@@ -106,7 +111,7 @@ describe "ProductsApi", ->
       it "should update a product", ->
         product =
           notes: "actualizo la nota!"
-        nockProductecaApi "/products/1", product, "put"
+        nockProductecaApi "/products/1", {}, "put", product
 
         api.update 1, product
 
@@ -141,5 +146,5 @@ describe "ProductsApi", ->
         api._convertNewToDeprecated(newProduct)
           .should.eql deprecatedProduct
 
-nockProductecaApi = (resource, entity, verb = "get") ->
-  nock(PRODUCTECA_API_URL)[verb](resource).reply 200, entity
+nockProductecaApi = (resource, entity, verb = "get", expectedBody) ->
+  nock(PRODUCTECA_API_URL)[verb](resource, expectedBody).reply 200, entity
