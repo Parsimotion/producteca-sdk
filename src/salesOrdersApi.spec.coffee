@@ -1,7 +1,6 @@
 should = require("chai").should()
 nock = require("nock")
 SalesOrdersApi = require("./salesOrdersApi")
-Product = require("./models/product")
 PRODUCTECA_API_URL = "http://api.producteca.com"
 havePropertiesEqual = require("./helpers/havePropertiesEqual")
 
