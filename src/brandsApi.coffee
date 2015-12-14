@@ -16,4 +16,4 @@ class BrandsApi extends ProductecaApi
 
   # Deletes a brand by id
   delete: (id) =>
-    @respond @client.deleteAsync "/brands/#{id}"
+    @respond @client.delAsync "/brands/#{id}"
