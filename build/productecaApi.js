@@ -67,21 +67,29 @@
       })(this));
     };
 
-    ProductecaApi.prototype._getProductsPageByPage = function(skip) {
+    ProductecaApi.prototype._getProductsPageByPage = function(skip, retry) {
       var TOP;
       if (skip == null) {
         skip = 0;
       }
-      TOP = 500;
+      TOP = 100;
+      console.log("/products?$top=" + TOP + "&$skip=" + skip);
       return this["return"](this.client.getAsync("/products?$top=" + TOP + "&$skip=" + skip)).then((function(_this) {
         return function(obj) {
           var products;
           products = obj.results;
+          console.log(products.map(function(it){ return it.sku; }));
           if (products.length < TOP) {
             return products;
           }
           return _this._getProductsPageByPage(skip + TOP).then(function(moreProducts) {
             return products.concat(moreProducts);
+          }).catch(function(){
+            if(!retry){
+              return _this._getProductsPageByPage(skip + TOP, true).then(function(moreProducts) {
+                return products.concat(moreProducts);
+              });              
+            }
           });
         };
       })(this));
