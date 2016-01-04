@@ -74,7 +74,7 @@
       }
       TOP = 100;
       console.log("/products?$top=" + TOP + "&$skip=" + skip);
-      return this["return"](this.client.getAsync("/products?$top=" + TOP + "&$skip=" + skip)).then((function(_this) {
+      return this["return"](this.client.getAsync("/products?$top=" + TOP + "&$skip=" + skip + "&$filter=IsArchived%20eq%20false")).then((function(_this) {
         return function(obj) {
           var products;
           products = obj.results;
