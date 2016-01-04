@@ -37,7 +37,7 @@ class ProductecaApi
 
   _getProductsPageByPage: (skip = 0) =>
     TOP = 500
-    @return(@client.getAsync "/products?$top=#{TOP}&$skip=#{skip}").then (obj) =>
+    @return(@client.getAsync "/products?$top=#{TOP}&$skip=#{skip}&$filter=IsArchived%20eq%20false").then (obj) =>
       products = obj.results
       return products if products.length < TOP
       @_getProductsPageByPage(skip + TOP).then (moreProducts) ->
