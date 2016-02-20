@@ -39,15 +39,6 @@
           sku: "A"
         });
       });
-      it("should return the only variation it has without checking the parameter because it's a single product", function() {
-        var product;
-        product = createProductWithVariations({
-          sku: "A"
-        });
-        return product.findVariationBySku("C").should.be.eql({
-          sku: "A"
-        });
-      });
       return it("should return undefined when product has variation and the variation was not found", function() {
         var product;
         product = createProductWithVariations({

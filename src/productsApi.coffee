@@ -65,6 +65,7 @@ class ProductsApi extends ProductecaApi
   _findOne: (oDataQuery) =>
     (@respondMany @client.getAsync "/products/?$filter=#{encodeURIComponent oDataQuery}")
       .then (products) =>
+        throw new Error("product not found") if _.isEmpty products
         firstMatch = _.first products
         new Product(@_convertDeprecatedToNew firstMatch)
 

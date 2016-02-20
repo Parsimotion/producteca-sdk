@@ -1,4 +1,6 @@
-should = require("chai").should()
+chai = require("chai")
+should = chai.should()
+chai.use(require("chai-as-promised"))
 nock = require("nock")
 ProductsApi = require("./productsApi")
 Product = require("./models/product")
@@ -65,6 +67,11 @@ describe "ProductsApi", ->
       havePropertiesEqual product, anotherproductWithoutVariations.new
       product.should.be.an.instanceof Product
 
+  it "when findByCode is called should throw if no product was found", ->
+    oDataQuery = "sku eq 'calcetines'"
+    get = nockProductecaApi "/products/?$filter=#{encodeURIComponent oDataQuery}", results: []
+    api.findByCode("calcetines").should.be.rejectedWith Error, "The product with code=calcetines wasn't found"
+
   describe "when findByVariationSku is called", ->
     get = null
     product = null
@@ -81,6 +88,11 @@ describe "ProductsApi", ->
     it "should return the first product", ->
       havePropertiesEqual product, productWithMoreThanOneVariations.new
       product.should.be.an.instanceof Product
+
+  it "when findByVariationSku is called should throw if no product was found", ->
+    oDataQuery = "variations/any(variation variation/barcode eq 'c')"
+    nockProductecaApi "/products/?$filter=#{encodeURIComponent oDataQuery}", results: []
+    api.findByVariationSku("c").should.be.rejectedWith Error, "The product with sku=c wasn't found"
 
   describe "when create is called", ->
     it "should create a product", ->

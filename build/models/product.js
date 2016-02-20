@@ -19,9 +19,6 @@
     };
 
     Product.prototype.findVariationBySku = function(sku) {
-      if (!this.hasVariations()) {
-        return this.firstVariation();
-      }
       return _.find(this.variations, {
         sku: sku
       });
