@@ -71,6 +71,11 @@ describe "SalesOrders", ->
       nockProductecaApi "/salesorders/1/shipments/42"
       api.getShipment 1, 42
 
+  describe "when getMultipleShipments is called", ->
+    it "should return the shipments with the given ids", ->
+      nockProductecaApi "/shipments?ids=41,42"
+      api.getMultipleShipments "41,42"
+
   describe "when createShipment is called", ->
     it "should create a shipment for the salesOrder with id=1", ->
       nockProductecaApi "/salesorders/1/shipments", {}, "post", { id: 30 }
