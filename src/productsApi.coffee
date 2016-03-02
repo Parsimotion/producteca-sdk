@@ -70,6 +70,7 @@ class ProductsApi extends ProductecaApi
 
     (@respondMany @client.getAsync "/products/#{query}")
       .then (products) =>
+        throw new Error("product not found") if _.isEmpty products
         firstMatch = _.first products
         new Product(@_convertDeprecatedToNew firstMatch)
 

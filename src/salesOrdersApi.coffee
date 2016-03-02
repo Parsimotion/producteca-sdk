@@ -37,6 +37,9 @@ class SalesOrdersApi extends ProductecaApi
   getShipment: (salesOrderId, shipmentId) =>
     @respond @client.getAsync "/salesorders/#{salesOrderId}/shipments/#{shipmentId}"
 
+  getMultipleShipments: (shipmentIds) =>
+    @respond @client.getAsync "/shipments?ids=#{shipmentIds}"
+
   createShipment: (salesOrderId, shipment) =>
     @respond @client.postAsync "/salesorders/#{salesOrderId}/shipments", shipment
 

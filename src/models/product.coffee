@@ -9,9 +9,6 @@ class Product
     _.size(@variations) > 1
 
   findVariationBySku: (sku) =>
-    if not @hasVariations()
-      return @firstVariation()
-
     _.find @variations, { sku }
 
   firstVariation: =>

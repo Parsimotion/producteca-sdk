@@ -118,6 +118,9 @@
       return (this.respondMany(this.client.getAsync("/products/?$filter=" + (encodeURIComponent(oDataQuery))))).then((function(_this) {
         return function(products) {
           var firstMatch;
+          if (_.isEmpty(products)) {
+            throw new Error("product not found");
+          }
           firstMatch = _.first(products);
           return new Product(_this._convertDeprecatedToNew(firstMatch));
         };
