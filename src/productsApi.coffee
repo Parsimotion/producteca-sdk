@@ -20,13 +20,13 @@ class ProductsApi extends ProductecaApi
       .then @_convertJsonToProducts
 
   # Find a product by code (currently "sku" - IT NEEDS TO BE CHANGED)
-  findByCode: (code) =>
-    @_findOne("sku eq '#{code}'")
+  findByCode: (code, $select) =>
+    @_findOne("sku eq '#{code}'", $select)
       .catch => throw new Error("The product with code=#{code} wasn't found")
 
   # Find a product by the variation SKU (currently "barcode" - IT NEEDS TO BE CHANGED)
-  findByVariationSku: (sku) =>
-    @_findOne("variations/any(variation variation/barcode eq '#{sku}')")
+  findByVariationSku: (sku, $select) =>
+    @_findOne("variations/any(variation variation/barcode eq '#{sku}')", $select)
       .catch => throw new Error("The product with sku=#{sku} wasn't found")
 
   # Creates a product
@@ -62,8 +62,13 @@ class ProductsApi extends ProductecaApi
       @_getProductsPageByPage(skip + TOP).then (moreProducts) ->
         products.concat moreProducts
 
-  _findOne: (oDataQuery) =>
-    (@respondMany @client.getAsync "/products/?$filter=#{encodeURIComponent oDataQuery}")
+  _findOne: ($filter, $select = "") =>
+    query = "?$filter=#{encodeURIComponent $filter}"
+
+    if $select isnt ""
+      query += "&$select=#{encodeURIComponent $select}"
+
+    (@respondMany @client.getAsync "/products/#{query}")
       .then (products) =>
         firstMatch = _.first products
         new Product(@_convertDeprecatedToNew firstMatch)

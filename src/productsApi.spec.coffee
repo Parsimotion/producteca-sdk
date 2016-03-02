@@ -30,7 +30,7 @@ describe "ProductsApi", ->
   productWithOneVariations = createProduct 1, "pantalon", [ { sku: "a" } ]
   productWithMoreThanOneVariations = createProduct 2, "remera", [ { sku: "b" }, { sku: "c" }, { sku: "d" } ]
   productWithoutVariations = createProduct 3, "campera"
-  anotherproductWithoutVariations = createProduct 4, "calcetines"
+  anotherProductWithoutVariations = createProduct 4, "calcetines"
 
   beforeEach ->
     nock.cleanAll()
@@ -43,7 +43,7 @@ describe "ProductsApi", ->
 
   describe "when getMany is called", ->
     it "should send a GET to the api with the given string of ids", ->
-      products = [ productWithMoreThanOneVariations.old, productWithoutVariations.old, anotherproductWithoutVariations.old ]
+      products = [ productWithMoreThanOneVariations.old, productWithoutVariations.old, anotherProductWithoutVariations.old ]
       nockProductecaApi "/products?ids=2,3,4", products
       get = api.getMany("2,3,4").then ->
         get.done()
@@ -52,18 +52,30 @@ describe "ProductsApi", ->
     get = null
     product = null
 
-    beforeEach ->
-      oDataQuery = "sku eq 'calcetines'"
-      get = nockProductecaApi "/products/?$filter=#{encodeURIComponent oDataQuery}", results: [ anotherproductWithoutVariations.old ]
-      api.findByCode("calcetines").then (result) ->
-        product = result
+    describe "without $select", ->
+      beforeEach ->
+        oDataQuery = "sku eq 'calcetines'"
+        get = nockProductecaApi "/products/?$filter=#{encodeURIComponent oDataQuery}", results: [ anotherProductWithoutVariations.old ]
+        api.findByCode("calcetines").then (result) ->
+          product = result
 
-    it "should send a GET to the api with an oData query to filter products with code='calcetines'", ->
-      get.done()
+      it "should send a GET to the api with an oData query to filter products with code='calcetines'", ->
+        get.done()
 
-    it "should return the first product", ->
-      havePropertiesEqual product, anotherproductWithoutVariations.new
-      product.should.be.an.instanceof Product
+      it "should return the first product", ->
+        havePropertiesEqual product, anotherProductWithoutVariations.new
+        product.should.be.an.instanceof Product
+
+    describe "with $select", ->
+      beforeEach ->
+        $filter = "sku eq 'calcetines'"
+        $select = "id"
+        get = nockProductecaApi "/products/?$filter=#{encodeURIComponent $filter}&$select=#{encodeURIComponent $select}", results: [ anotherProductWithoutVariations.old ]
+        api.findByCode("calcetines", $select).then (result) ->
+          product = result
+
+      it "should send a GET to the api with an oData query to filter products with code='calcetines' and the $select's projections", ->
+        get.done()
 
   describe "when findByVariationSku is called", ->
     get = null
@@ -84,8 +96,8 @@ describe "ProductsApi", ->
 
   describe "when create is called", ->
     it "should create a product", ->
-      nockProductecaApi "/products", {}, "post", anotherproductWithoutVariations.old
-      api.create new Product(anotherproductWithoutVariations.old)
+      nockProductecaApi "/products", {}, "post", anotherProductWithoutVariations.old
+      api.create new Product(anotherProductWithoutVariations.old)
 
   describe "when createVariations is called", ->
     it "should create variations", ->
