@@ -49,16 +49,16 @@
       return this.respond(this.client.getAsync("/products?ids=" + ids)).then(this._convertJsonToProducts);
     };
 
-    ProductsApi.prototype.findByCode = function(code) {
-      return this._findOne("sku eq '" + code + "'")["catch"]((function(_this) {
+    ProductsApi.prototype.findByCode = function(code, $select) {
+      return this._findOne("sku eq '" + code + "'", $select)["catch"]((function(_this) {
         return function() {
           throw new Error("The product with code=" + code + " wasn't found");
         };
       })(this));
     };
 
-    ProductsApi.prototype.findByVariationSku = function(sku) {
-      return this._findOne("variations/any(variation variation/barcode eq '" + sku + "')")["catch"]((function(_this) {
+    ProductsApi.prototype.findByVariationSku = function(sku, $select) {
+      return this._findOne("variations/any(variation variation/barcode eq '" + sku + "')", $select)["catch"]((function(_this) {
         return function() {
           throw new Error("The product with sku=" + sku + " wasn't found");
         };
@@ -114,8 +114,16 @@
       })(this));
     };
 
-    ProductsApi.prototype._findOne = function(oDataQuery) {
-      return (this.respondMany(this.client.getAsync("/products/?$filter=" + (encodeURIComponent(oDataQuery))))).then((function(_this) {
+    ProductsApi.prototype._findOne = function($filter, $select) {
+      var query;
+      if ($select == null) {
+        $select = "";
+      }
+      query = "?$filter=" + (encodeURIComponent($filter));
+      if ($select !== "") {
+        query += "&$select=" + (encodeURIComponent($select));
+      }
+      return (this.respondMany(this.client.getAsync("/products/" + query))).then((function(_this) {
         return function(products) {
           var firstMatch;
           if (_.isEmpty(products)) {

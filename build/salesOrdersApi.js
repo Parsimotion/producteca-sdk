@@ -18,6 +18,7 @@
       this.updateShipmentStatus = __bind(this.updateShipmentStatus, this);
       this.updateShipment = __bind(this.updateShipment, this);
       this.createShipment = __bind(this.createShipment, this);
+      this.getMultipleShipments = __bind(this.getMultipleShipments, this);
       this.getShipment = __bind(this.getShipment, this);
       this.update = __bind(this.update, this);
       this.getWithFullProducts = __bind(this.getWithFullProducts, this);
@@ -61,6 +62,10 @@
 
     SalesOrdersApi.prototype.getShipment = function(salesOrderId, shipmentId) {
       return this.respond(this.client.getAsync("/salesorders/" + salesOrderId + "/shipments/" + shipmentId));
+    };
+
+    SalesOrdersApi.prototype.getMultipleShipments = function(shipmentIds) {
+      return this.respond(this.client.getAsync("/shipments?ids=" + shipmentIds));
     };
 
     SalesOrdersApi.prototype.createShipment = function(salesOrderId, shipment) {
