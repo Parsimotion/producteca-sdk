@@ -6,18 +6,15 @@ module.exports =
 class ProductsApi extends ProductecaApi
   # Returns a product by id
   get: (id) =>
-    (@respond @client.getAsync("/products/#{id}")).then (json) =>
-      new Product @_convertDeprecatedToNew json
+    (@respond @client.getAsync("/products/#{id}")).then @_convertJsonToProduct
 
   # Returns all the products
   getAll: =>
-    @_getProductsPageByPage()
-      .then @_convertJsonToProducts
+    @_getProductsPageByPage().then @_convertJsonToProducts
 
   # Returns multiple products by their comma separated ids
   getMany: (ids) =>
-    @respond(@client.getAsync "/products?ids=#{ids}")
-      .then @_convertJsonToProducts
+    @respond(@client.getAsync "/products?ids=#{ids}").then @_convertJsonToProducts
 
   # Find a product by code (currently "sku" - IT NEEDS TO BE CHANGED)
   findByCode: (code, $select) =>
@@ -25,8 +22,9 @@ class ProductsApi extends ProductecaApi
       .catch => throw new Error("The product with code=#{code} wasn't found")
 
   # Find a product by the variation SKU (currently "barcode" - IT NEEDS TO BE CHANGED)
-  findByVariationSku: (sku, $select) =>
-    @_findOne("variations/any(variation variation/barcode eq '#{sku}')", $select)
+  findByVariationSku: (sku) =>
+    (@respond @client.getAsync("/products/bysku/#{sku}"))
+      .then @_convertJsonToProduct
       .catch => throw new Error("The product with sku=#{sku} wasn't found")
 
   # Creates a product
@@ -72,10 +70,13 @@ class ProductsApi extends ProductecaApi
       .then (products) =>
         throw new Error("product not found") if _.isEmpty products
         firstMatch = _.first products
-        new Product(@_convertDeprecatedToNew firstMatch)
+        @_convertJsonToProduct firstMatch
 
   _convertJsonToProducts: (products) =>
-    products.map (it) => new Product @_convertDeprecatedToNew it
+    products.map @_convertJsonToProduct
+
+  _convertJsonToProduct: (json) =>
+    new Product @_convertDeprecatedToNew json
 
   # ---
   # DEPRECATED PROPERTIES

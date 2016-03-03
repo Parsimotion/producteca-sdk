@@ -88,23 +88,25 @@ describe "ProductsApi", ->
     get = null
     product = null
 
-    beforeEach ->
-      oDataQuery = "variations/any(variation variation/barcode eq 'c')"
-      nockProductecaApi "/products/?$filter=#{encodeURIComponent oDataQuery}", results: [ productWithMoreThanOneVariations.old ]
-      get = api.findByVariationSku("c").then (result) ->
-        product = result
+    describe "when the product exists", ->
 
-    it "should send a GET to the api with an oData query to filter products containing a variation with sku='c'", ->
-      get.done()
+      beforeEach ->
+        nockProductecaApi "/products/bysku/c", productWithMoreThanOneVariations.old
+        get = api.findByVariationSku("c").then (result) ->
+          product = result
 
-    it "should return the first product", ->
-      havePropertiesEqual product, productWithMoreThanOneVariations.new
-      product.should.be.an.instanceof Product
+      it "should send a GET to the api with an oData query to filter products containing a variation with sku='c'", ->
+        get.done()
 
-  it "when findByVariationSku is called should throw if no product was found", ->
-    oDataQuery = "variations/any(variation variation/barcode eq 'c')"
-    nockProductecaApi "/products/?$filter=#{encodeURIComponent oDataQuery}", results: []
-    api.findByVariationSku("c").should.be.rejectedWith Error, "The product with sku=c wasn't found"
+      it "should return the product", ->
+        havePropertiesEqual product, productWithMoreThanOneVariations.new
+        product.should.be.an.instanceof Product
+
+    describe "when the product doesn't exist", ->
+
+      it "should throw if no product was found", ->
+        nockProductecaApi "/products/bysku/c", undefined, "get", undefined, 404
+        api.findByVariationSku("c").should.be.rejectedWith Error, "The product with sku=c wasn't found"
 
   describe "when create is called", ->
     it "should create a product", ->
@@ -170,5 +172,5 @@ describe "ProductsApi", ->
         api._convertNewToDeprecated(newProduct)
           .should.eql deprecatedProduct
 
-nockProductecaApi = (resource, entity, verb = "get", expectedBody) ->
-  nock(PRODUCTECA_API_URL)[verb](resource, expectedBody).reply 200, entity
+nockProductecaApi = (resource, entity, verb = "get", expectedBody, statusCode = 200) ->
+  nock(PRODUCTECA_API_URL)[verb](resource, expectedBody).reply statusCode, entity
