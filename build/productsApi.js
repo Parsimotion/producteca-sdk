@@ -17,6 +17,7 @@
       this._convert = __bind(this._convert, this);
       this._convertNewToDeprecated = __bind(this._convertNewToDeprecated, this);
       this._convertDeprecatedToNew = __bind(this._convertDeprecatedToNew, this);
+      this._convertJsonToProduct = __bind(this._convertJsonToProduct, this);
       this._convertJsonToProducts = __bind(this._convertJsonToProducts, this);
       this._findOne = __bind(this._findOne, this);
       this._getProductsPageByPage = __bind(this._getProductsPageByPage, this);
@@ -34,11 +35,7 @@
     }
 
     ProductsApi.prototype.get = function(id) {
-      return (this.respond(this.client.getAsync("/products/" + id))).then((function(_this) {
-        return function(json) {
-          return new Product(_this._convertDeprecatedToNew(json));
-        };
-      })(this));
+      return (this.respond(this.client.getAsync("/products/" + id))).then(this._convertJsonToProduct);
     };
 
     ProductsApi.prototype.getAll = function() {
@@ -57,8 +54,8 @@
       })(this));
     };
 
-    ProductsApi.prototype.findByVariationSku = function(sku, $select) {
-      return this._findOne("variations/any(variation variation/barcode eq '" + sku + "')", $select)["catch"]((function(_this) {
+    ProductsApi.prototype.findByVariationSku = function(sku) {
+      return (this.respond(this.client.getAsync("/products/bysku/" + sku))).then(this._convertJsonToProduct)["catch"]((function(_this) {
         return function() {
           throw new Error("The product with sku=" + sku + " wasn't found");
         };
@@ -130,17 +127,17 @@
             throw new Error("product not found");
           }
           firstMatch = _.first(products);
-          return new Product(_this._convertDeprecatedToNew(firstMatch));
+          return _this._convertJsonToProduct(firstMatch);
         };
       })(this));
     };
 
     ProductsApi.prototype._convertJsonToProducts = function(products) {
-      return products.map((function(_this) {
-        return function(it) {
-          return new Product(_this._convertDeprecatedToNew(it));
-        };
-      })(this));
+      return products.map(this._convertJsonToProduct);
+    };
+
+    ProductsApi.prototype._convertJsonToProduct = function(json) {
+      return new Product(this._convertDeprecatedToNew(json));
     };
 
     ProductsApi.prototype._convertDeprecatedToNew = function(product) {
