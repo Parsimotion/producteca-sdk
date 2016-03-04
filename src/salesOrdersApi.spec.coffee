@@ -91,5 +91,10 @@ describe "SalesOrders", ->
       nockProductecaApi "/salesorders/1/shipments/42/status", {}, "put", { status: "arrived" }
       api.updateShipmentStatus 1, 42, { status: "arrived" }
 
+  describe "when updateShipmentStatusById is called", ->
+    it "should update shipment(id=42) status", ->
+      nockProductecaApi "/shipments/42/status", {}, "put", { status: "arrived" }
+      api.updateShipmentStatusById 42, { status: "arrived" }
+
 nockProductecaApi = (resource, entity, verb = "get", expectedBody) ->
   nock(PRODUCTECA_API_URL)[verb](resource, expectedBody).reply 200, entity

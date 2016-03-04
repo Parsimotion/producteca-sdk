@@ -15,6 +15,7 @@
 
     function SalesOrdersApi(endpoint) {
       this._buildSalesOrdersFilters = __bind(this._buildSalesOrdersFilters, this);
+      this.updateShipmentStatusById = __bind(this.updateShipmentStatusById, this);
       this.updateShipmentStatus = __bind(this.updateShipmentStatus, this);
       this.updateShipment = __bind(this.updateShipment, this);
       this.createShipment = __bind(this.createShipment, this);
@@ -78,6 +79,10 @@
 
     SalesOrdersApi.prototype.updateShipmentStatus = function(salesOrderId, shipmentId, statusDto) {
       return this.respond(this.client.putAsync("/salesorders/" + salesOrderId + "/shipments/" + shipmentId + "/status", statusDto));
+    };
+
+    SalesOrdersApi.prototype.updateShipmentStatusById = function(shipmentId, statusDto) {
+      return this.respond(this.client.putAsync("/shipments/" + shipmentId + "/status", statusDto));
     };
 
     SalesOrdersApi.prototype._buildSalesOrdersFilters = function(filters) {

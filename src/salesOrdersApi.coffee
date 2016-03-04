@@ -49,6 +49,9 @@ class SalesOrdersApi extends ProductecaApi
   updateShipmentStatus: (salesOrderId, shipmentId, statusDto) =>
     @respond @client.putAsync "/salesorders/#{salesOrderId}/shipments/#{shipmentId}/status", statusDto
 
+  updateShipmentStatusById: (shipmentId, statusDto) =>
+    @respond @client.putAsync "/shipments/#{shipmentId}/status", statusDto
+
   #---
 
   _buildSalesOrdersFilters: (filters) =>
