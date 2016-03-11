@@ -30,6 +30,10 @@ class SalesOrdersApi extends ProductecaApi
         @productsApi.getMany(productIds).then (products) ->
           { salesOrder, products }
 
+  #Creates a sales order
+  create: (salesOrder) =>
+    @respond @client.postAsync "/salesorders", salesOrder
+
   #Updates a sales order by id
   update: (id, update) =>
     @respond @client.putAsync "/salesorders/#{id}", update

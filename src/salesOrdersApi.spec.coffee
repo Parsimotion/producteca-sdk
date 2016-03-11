@@ -61,10 +61,15 @@ describe "SalesOrders", ->
       api.getWithFullProducts(1).then (salesOrderWithProducts) ->
         havePropertiesEqual salesOrderWithProducts, { salesOrder, products }
 
+  describe "when create is called", ->
+    it "should create a salesOrder", ->
+      nockProductecaApi "/salesorders", {}, "post", { un_json: 1 }
+      api.create { un_json: 1 }
+
   describe "when update is called", ->
     it "should update a salesOrder", ->
       nockProductecaApi "/salesorders/1", {}, "put", { id: 1 }
-      api.update 1, { id: 1}
+      api.update 1, { id: 1 }
 
   describe "when getShipment is called", ->
     it "should return a shipment with id=42 from the orderSales with id=1", ->

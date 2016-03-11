@@ -22,6 +22,7 @@
       this.getMultipleShipments = __bind(this.getMultipleShipments, this);
       this.getShipment = __bind(this.getShipment, this);
       this.update = __bind(this.update, this);
+      this.create = __bind(this.create, this);
       this.getWithFullProducts = __bind(this.getWithFullProducts, this);
       this.get = __bind(this.get, this);
       this.getAll = __bind(this.getAll, this);
@@ -55,6 +56,10 @@
           });
         };
       })(this));
+    };
+
+    SalesOrdersApi.prototype.create = function(salesOrder) {
+      return this.respond(this.client.postAsync("/salesorders", salesOrder));
     };
 
     SalesOrdersApi.prototype.update = function(id, update) {
