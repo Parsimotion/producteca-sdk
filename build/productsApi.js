@@ -19,7 +19,7 @@
       this._convertDeprecatedToNew = __bind(this._convertDeprecatedToNew, this);
       this._convertJsonToProduct = __bind(this._convertJsonToProduct, this);
       this._convertJsonToProducts = __bind(this._convertJsonToProducts, this);
-      this._findOne = __bind(this._findOne, this);
+      this._findMany = __bind(this._findMany, this);
       this._getProductsPageByPage = __bind(this._getProductsPageByPage, this);
       this.update = __bind(this.update, this);
       this.updateVariationPictures = __bind(this.updateVariationPictures, this);
@@ -47,11 +47,7 @@
     };
 
     ProductsApi.prototype.findByCode = function(code, $select) {
-      return this._findOne("sku eq '" + code + "'", $select)["catch"]((function(_this) {
-        return function() {
-          throw new Error("The product with code=" + code + " wasn't found");
-        };
-      })(this));
+      return this._findMany("sku eq '" + code + "'", $select);
     };
 
     ProductsApi.prototype.findByVariationSku = function(sku) {
@@ -107,7 +103,7 @@
       })(this));
     };
 
-    ProductsApi.prototype._findOne = function($filter, $select) {
+    ProductsApi.prototype._findMany = function($filter, $select) {
       var query;
       if ($select == null) {
         $select = "";
@@ -116,16 +112,7 @@
       if ($select !== "") {
         query += "&$select=" + (encodeURIComponent($select));
       }
-      return (this.respondMany(this.client.getAsync("/products/" + query))).then((function(_this) {
-        return function(products) {
-          var firstMatch;
-          if (_.isEmpty(products)) {
-            throw new Error("product not found");
-          }
-          firstMatch = _.first(products);
-          return _this._convertJsonToProduct(firstMatch);
-        };
-      })(this));
+      return (this.respondMany(this.client.getAsync("/products/" + query))).then(this._convertJsonToProducts);
     };
 
     ProductsApi.prototype._convertJsonToProducts = function(products) {

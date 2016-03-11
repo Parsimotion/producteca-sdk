@@ -52,37 +52,31 @@ describe "ProductsApi", ->
 
   describe "when findByCode is called", ->
     get = null
-    product = null
+    products = null
 
     describe "without $select", ->
       beforeEach ->
         oDataQuery = "sku eq 'calcetines'"
         get = nockProductecaApi "/products/?$filter=#{encodeURIComponent oDataQuery}", results: [ anotherProductWithoutVariations.old ]
         api.findByCode("calcetines").then (result) ->
-          product = result
+          products = result
 
       it "should send a GET to the api with an oData query to filter products with code='calcetines'", ->
         get.done()
 
-      it "should return the first product", ->
-        havePropertiesEqual product, anotherProductWithoutVariations.new
-        product.should.be.an.instanceof Product
+      it "should return the products", ->
+        havePropertiesEqual products, [anotherProductWithoutVariations.new]
+        products[0].should.be.an.instanceof Product
 
     describe "with $select", ->
       beforeEach ->
         $filter = "sku eq 'calcetines'"
         $select = "id"
         get = nockProductecaApi "/products/?$filter=#{encodeURIComponent $filter}&$select=#{encodeURIComponent $select}", results: [ anotherProductWithoutVariations.old ]
-        api.findByCode("calcetines", $select).then (result) ->
-          product = result
+        api.findByCode "calcetines", $select
 
       it "should send a GET to the api with an oData query to filter products with code='calcetines' and the $select's projections", ->
         get.done()
-
-  it "when findByCode is called should throw if no product was found", ->
-    oDataQuery = "sku eq 'calcetines'"
-    get = nockProductecaApi "/products/?$filter=#{encodeURIComponent oDataQuery}", results: []
-    api.findByCode("calcetines").should.be.rejectedWith Error, "The product with code=calcetines wasn't found"
 
   describe "when findByVariationSku is called", ->
     get = null

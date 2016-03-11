@@ -16,10 +16,9 @@ class ProductsApi extends ProductecaApi
   getMany: (ids) =>
     (@respond @client.getAsync("/products?ids=#{ids}")).then @_convertJsonToProducts
 
-  # Find a product by code (currently "sku" - IT NEEDS TO BE CHANGED)
+  # Find products by code (currently "sku" - IT NEEDS TO BE CHANGED)
   findByCode: (code, $select) =>
-    @_findOne("sku eq '#{code}'", $select)
-      .catch => throw new Error("The product with code=#{code} wasn't found")
+    @_findMany "sku eq '#{code}'", $select
 
   # Find products by a variation SKU (currently "barcode" - IT NEEDS TO BE CHANGED)
   findByVariationSku: (sku) =>
@@ -58,17 +57,13 @@ class ProductsApi extends ProductecaApi
       @_getProductsPageByPage(skip + TOP).then (moreProducts) ->
         products.concat moreProducts
 
-  _findOne: ($filter, $select = "") =>
+  _findMany: ($filter, $select = "") =>
     query = "?$filter=#{encodeURIComponent $filter}"
 
     if $select isnt ""
       query += "&$select=#{encodeURIComponent $select}"
 
-    (@respondMany @client.getAsync "/products/#{query}")
-      .then (products) =>
-        throw new Error("product not found") if _.isEmpty products
-        firstMatch = _.first products
-        @_convertJsonToProduct firstMatch
+    (@respondMany @client.getAsync "/products/#{query}").then @_convertJsonToProducts
 
   _convertJsonToProducts: (products) =>
     products.map @_convertJsonToProduct
