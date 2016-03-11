@@ -14,18 +14,16 @@ class ProductsApi extends ProductecaApi
 
   # Returns multiple products by their comma separated ids
   getMany: (ids) =>
-    @respond(@client.getAsync "/products?ids=#{ids}").then @_convertJsonToProducts
+    (@respond @client.getAsync("/products?ids=#{ids}")).then @_convertJsonToProducts
 
   # Find a product by code (currently "sku" - IT NEEDS TO BE CHANGED)
   findByCode: (code, $select) =>
     @_findOne("sku eq '#{code}'", $select)
       .catch => throw new Error("The product with code=#{code} wasn't found")
 
-  # Find a product by the variation SKU (currently "barcode" - IT NEEDS TO BE CHANGED)
+  # Find products by a variation SKU (currently "barcode" - IT NEEDS TO BE CHANGED)
   findByVariationSku: (sku) =>
-    (@respond @client.getAsync("/products/bysku/#{sku}"))
-      .then @_convertJsonToProduct
-      .catch => throw new Error("The product with sku=#{sku} wasn't found")
+    (@respond @client.getAsync("/products/bysku/#{sku}")).then @_convertJsonToProducts
 
   # Creates a product
   create: (product) =>

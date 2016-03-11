@@ -86,27 +86,27 @@ describe "ProductsApi", ->
 
   describe "when findByVariationSku is called", ->
     get = null
-    product = null
+    products = null
 
     describe "when the product exists", ->
 
       beforeEach ->
-        nockProductecaApi "/products/bysku/c", productWithMoreThanOneVariations.old
+        nockProductecaApi "/products/bysku/c", [productWithMoreThanOneVariations.old]
         get = api.findByVariationSku("c").then (result) ->
-          product = result
+          products = result
 
       it "should send a GET to the api with an oData query to filter products containing a variation with sku='c'", ->
         get.done()
 
-      it "should return the product", ->
-        havePropertiesEqual product, productWithMoreThanOneVariations.new
-        product.should.be.an.instanceof Product
+      it "should return the products", ->
+        havePropertiesEqual products, [productWithMoreThanOneVariations.new]
+        products[0].should.be.an.instanceof Product
 
     describe "when the product doesn't exist", ->
 
       it "should throw if no product was found", ->
-        nockProductecaApi "/products/bysku/c", undefined, "get", undefined, 404
-        api.findByVariationSku("c").should.be.rejectedWith Error, "The product with sku=c wasn't found"
+        nockProductecaApi "/products/bysku/c", []
+        api.findByVariationSku("c").then (products) -> products.should.be.eql []
 
   describe "when create is called", ->
     it "should create a product", ->

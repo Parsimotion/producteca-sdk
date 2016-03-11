@@ -43,7 +43,7 @@
     };
 
     ProductsApi.prototype.getMany = function(ids) {
-      return this.respond(this.client.getAsync("/products?ids=" + ids)).then(this._convertJsonToProducts);
+      return (this.respond(this.client.getAsync("/products?ids=" + ids))).then(this._convertJsonToProducts);
     };
 
     ProductsApi.prototype.findByCode = function(code, $select) {
@@ -55,11 +55,7 @@
     };
 
     ProductsApi.prototype.findByVariationSku = function(sku) {
-      return (this.respond(this.client.getAsync("/products/bysku/" + sku))).then(this._convertJsonToProduct)["catch"]((function(_this) {
-        return function() {
-          throw new Error("The product with sku=" + sku + " wasn't found");
-        };
-      })(this));
+      return (this.respond(this.client.getAsync("/products/bysku/" + sku))).then(this._convertJsonToProducts);
     };
 
     ProductsApi.prototype.create = function(product) {
