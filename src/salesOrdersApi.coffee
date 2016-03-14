@@ -22,6 +22,14 @@ class SalesOrdersApi extends ProductecaApi
   get: (id) =>
     @respond @client.getAsync "/salesorders/#{id}"
 
+  #Returns a sales order by integration
+  getByIntegration: ({ integrationId, app }) =>
+    oDataQuery = encodeURIComponent "integrations/any(integration integration/integrationId eq #{integrationId} and integration/app eq #{app})"
+    (@respondMany @client.getAsync "/salesorders?$filter=#{oDataQuery}").then (results) =>
+      if _.isEmpty results
+        throw new Error("The sales orders with integrationId: #{integrationId} and app: #{app} wasn't found.")
+      _.first results
+
   #Returns a sales order by id and all the products in its lines
   getWithFullProducts: (id) =>
     @get(id)

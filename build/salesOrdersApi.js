@@ -24,6 +24,7 @@
       this.update = __bind(this.update, this);
       this.create = __bind(this.create, this);
       this.getWithFullProducts = __bind(this.getWithFullProducts, this);
+      this.getByIntegration = __bind(this.getByIntegration, this);
       this.get = __bind(this.get, this);
       this.getAll = __bind(this.getAll, this);
       this.productsApi = new ProductsApi(endpoint);
@@ -41,6 +42,20 @@
 
     SalesOrdersApi.prototype.get = function(id) {
       return this.respond(this.client.getAsync("/salesorders/" + id));
+    };
+
+    SalesOrdersApi.prototype.getByIntegration = function(_arg) {
+      var app, integrationId, oDataQuery;
+      integrationId = _arg.integrationId, app = _arg.app;
+      oDataQuery = encodeURIComponent("integrations/any(integration integration/integrationId eq " + integrationId + " and integration/app eq " + app + ")");
+      return (this.respondMany(this.client.getAsync("/salesorders?$filter=" + oDataQuery))).then((function(_this) {
+        return function(results) {
+          if (_.isEmpty(results)) {
+            throw new Error("The sales orders with integrationId: " + integrationId + " and app: " + app + " wasn't found.");
+          }
+          return _.first(results);
+        };
+      })(this));
     };
 
     SalesOrdersApi.prototype.getWithFullProducts = function(id) {

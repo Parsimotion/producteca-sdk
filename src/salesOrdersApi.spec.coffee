@@ -47,6 +47,26 @@ describe "SalesOrders", ->
       api.get(1).then (salesOrder) ->
         salesOrder.should.be.eql id: 1
 
+  describe "when getByIntegration is called", ->
+    it "should return the sales order that matches", ->
+      oDataQuery = encodeURIComponent "integrations/any(integration integration/integrationId eq 123 and integration/app eq 2)"
+      nockProductecaApi "/salesorders?$filter=#{oDataQuery}",
+        count: 1
+        results: [una_orden: true]
+
+      api.getByIntegration({ integrationId: 123, app: 2 }).then (salesOrder) ->
+        salesOrder.should.eql una_orden: true
+
+    it "should throw an error if no sales orders match", (done) ->
+      oDataQuery = encodeURIComponent "integrations/any(integration integration/integrationId eq 123 and integration/app eq 2)"
+      nockProductecaApi "/salesorders?$filter=#{oDataQuery}",
+        count: 0
+        results: []
+
+      api.getByIntegration({ integrationId: 123, app: 2 }).catch (error) =>
+        error.message.should.eql "The sales orders with integrationId: 123 and app: 2 wasn't found."
+        done()
+
   describe "when getWithFullProducts is called", ->
     it "should return the salesOrder and all its products", ->
       product31 = id: 31 ; product32 = id: 32
