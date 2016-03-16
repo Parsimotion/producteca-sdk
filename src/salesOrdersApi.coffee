@@ -71,7 +71,7 @@ class SalesOrdersApi extends ProductecaApi
     @respond @client.delAsync "/salesorders/#{salesOrderId}/shipments/#{shipmentId}"
 
   deletePayment: (salesOrderId, paymentId) =>
-    @respond @client.delAsync "/salesorders/#{salesOrderId}/payments/#{payments}"
+    @respond @client.delAsync "/salesorders/#{salesOrderId}/payments/#{paymentId}"
 
   #---
 

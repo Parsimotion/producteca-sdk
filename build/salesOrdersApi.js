@@ -15,6 +15,9 @@
 
     function SalesOrdersApi(endpoint) {
       this._buildSalesOrdersFilters = __bind(this._buildSalesOrdersFilters, this);
+      this.deletePayment = __bind(this.deletePayment, this);
+      this.deleteShipment = __bind(this.deleteShipment, this);
+      this.createPayment = __bind(this.createPayment, this);
       this.updateShipmentStatusById = __bind(this.updateShipmentStatusById, this);
       this.updateShipmentStatus = __bind(this.updateShipmentStatus, this);
       this.updateShipment = __bind(this.updateShipment, this);
@@ -103,6 +106,18 @@
 
     SalesOrdersApi.prototype.updateShipmentStatusById = function(shipmentId, statusDto) {
       return this.respond(this.client.putAsync("/shipments/" + shipmentId + "/status", statusDto));
+    };
+
+    SalesOrdersApi.prototype.createPayment = function(salesOrderId, payment) {
+      return this.respond(this.client.postAsync("/salesorders/" + salesOrderId + "/payments", payment));
+    };
+
+    SalesOrdersApi.prototype.deleteShipment = function(salesOrderId, shipmentId) {
+      return this.respond(this.client.delAsync("/salesorders/" + salesOrderId + "/shipments/" + shipmentId));
+    };
+
+    SalesOrdersApi.prototype.deletePayment = function(salesOrderId, paymentId) {
+      return this.respond(this.client.delAsync("/salesorders/" + salesOrderId + "/payments/" + paymentId));
     };
 
     SalesOrdersApi.prototype._buildSalesOrdersFilters = function(filters) {

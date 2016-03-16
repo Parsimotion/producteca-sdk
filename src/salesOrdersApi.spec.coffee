@@ -134,10 +134,22 @@ describe "SalesOrders", ->
       api.updateShipmentStatusById 42, { status: "arrived" }
       req.isDone().should.be.ok
 
+  describe "when createPayment is called", ->
+    it "should create a payment for the salesOrder with id=1", ->
+      req = nockProductecaApi "/salesorders/1/payments", {}, "post", { id: 30 }
+      api.createPayment 1, { id: 30 }
+      req.isDone().should.be.ok
+
   describe "when deleteShipment is called", ->
     it "should send a DELETE to the shipment", ->
       req = nockProductecaApi "/salesorders/1/shipments/2", {}, "delete"
       api.deleteShipment 1, 2
+      req.isDone().should.be.ok
+
+  describe "when deletePayment is called", ->
+    it "should send a DELETE to the payment", ->
+      req = nockProductecaApi "/salesorders/1/payments/2", {}, "delete"
+      api.deletePayment 1, 2
       req.isDone().should.be.ok
 
 nockProductecaApi = (resource, entity, verb = "get", expectedBody) ->
