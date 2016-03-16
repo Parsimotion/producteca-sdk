@@ -89,7 +89,7 @@ describe "ProductsApi", ->
         get = api.findByVariationSku("c").then (result) ->
           products = result
 
-      it "should send a GET to the api with an oData query to filter products containing a variation with sku='c'", ->
+      it "should send a GET to the api", ->
         get.done()
 
       it "should return the products", ->
@@ -101,6 +101,13 @@ describe "ProductsApi", ->
       it "should throw if no product was found", ->
         nockProductecaApi "/products/bysku/c", []
         api.findByVariationSku("c").then (products) -> products.should.be.eql []
+
+    it "should send a GET to the api urlEncoding the SKU", ->
+      nockProductecaApi "/products/bysku/with%20spaces", [productWithMoreThanOneVariations.old]
+      get = api.findByVariationSku("with spaces").then (result) ->
+        products = result
+
+      get.done()
 
   describe "when create is called", ->
     it "should create a product", ->
