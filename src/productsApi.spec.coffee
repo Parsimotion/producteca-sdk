@@ -104,36 +104,36 @@ describe "ProductsApi", ->
 
   describe "when create is called", ->
     it "should create a product", ->
-      nockProductecaApi "/products", {}, "post", anotherProductWithoutVariations.old
+      req = nockProductecaApi "/products", {}, "post", anotherProductWithoutVariations.old
       api.create new Product(anotherProductWithoutVariations.old)
+      req.isDone().should.be.ok
 
   describe "when createVariations is called", ->
     it "should create variations", ->
-      nockProductecaApi "/products/3/variations", {}, "post", variations.old
-
+      req = nockProductecaApi "/products/3/variations", {}, "post", variations.old
       api.createVariations 3, variations.new
+      req.isDone().should.be.ok
 
   describe "when updateVariationStocks is called", ->
     it "should update stock from variation", ->
       stocks = [ { warehouse: "Default", quantity: 2 } ]
-      nockProductecaApi "/products/1/stocks", {}, "put", stocks
-
+      req = nockProductecaApi "/products/1/stocks", {}, "put", stocks
       api.updateVariationStocks 1, stocks
+      req.isDone().should.be.ok
 
     describe "when updateVariationPictures is called", ->
       it "should update pictures from variation", ->
         pictures = [ { url: "mediaTostada.jpg" } ]
-        nockProductecaApi "/products/1/pictures", {}, "post", pictures
-
+        req = nockProductecaApi "/products/1/pictures", {}, "post", pictures
         api.updateVariationPictures 1, pictures
+        req.isDone().should.be.ok
 
     describe "when update is called", ->
       it "should update a product", ->
-        product =
-          notes: "actualizo la nota!"
-        nockProductecaApi "/products/1", {}, "put", product
-
+        product = notes: "actualizo la nota!"
+        req = nockProductecaApi "/products/1", {}, "put", product
         api.update 1, product
+        req.isDone().should.be.ok
 
   describe "Deprecated names of properties", ->
     deprecatedProduct =
