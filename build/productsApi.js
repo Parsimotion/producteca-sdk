@@ -51,7 +51,7 @@
     };
 
     ProductsApi.prototype.findByVariationSku = function(sku) {
-      return (this.respond(this.client.getAsync("/products/bysku/" + sku))).then(this._convertJsonToProducts);
+      return (this.respond(this.client.getAsync("/products/bysku/" + (encodeURIComponent(sku))))).then(this._convertJsonToProducts);
     };
 
     ProductsApi.prototype.create = function(product) {
