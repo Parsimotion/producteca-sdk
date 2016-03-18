@@ -21,6 +21,7 @@
       this._convertJsonToProducts = __bind(this._convertJsonToProducts, this);
       this._findMany = __bind(this._findMany, this);
       this._getProductsPageByPage = __bind(this._getProductsPageByPage, this);
+      this.createWarehouse = __bind(this.createWarehouse, this);
       this.update = __bind(this.update, this);
       this.updateVariationPictures = __bind(this.updateVariationPictures, this);
       this.updateVariationStocks = __bind(this.updateVariationStocks, this);
@@ -81,6 +82,12 @@
 
     ProductsApi.prototype.update = function(id, update) {
       return this.respond(this.client.putAsync("/products/" + id, this._convertNewToDeprecated(update)));
+    };
+
+    ProductsApi.prototype.createWarehouse = function(name) {
+      return this.respond(this.client.postAsync("/warehouses", {
+        name: name
+      }));
     };
 
     ProductsApi.prototype._getProductsPageByPage = function(skip) {

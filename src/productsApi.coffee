@@ -49,6 +49,10 @@ class ProductsApi extends ProductecaApi
   update: (id, update) =>
     @respond @client.putAsync "/products/#{id}", @_convertNewToDeprecated(update)
 
+  # Creates a warehouse
+  createWarehouse: (name) =>
+    @respond @client.postAsync "/warehouses", { name }
+
   _getProductsPageByPage: (skip = 0) =>
     TOP = 500
     @respond(@client.getAsync "/products?$top=#{TOP}&$skip=#{skip}").then (obj) =>
