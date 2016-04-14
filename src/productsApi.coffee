@@ -53,6 +53,10 @@ class ProductsApi extends ProductecaApi
   createWarehouse: (name) =>
     @respond @client.postAsync "/warehouses", { name }
 
+  # Retrieves all the pricelists
+  getPricelists: =>
+    @respond @client.getAsync "/pricelists"
+
   _getProductsPageByPage: (skip = 0) =>
     TOP = 500
     @respond(@client.getAsync "/products?$top=#{TOP}&$skip=#{skip}").then (obj) =>

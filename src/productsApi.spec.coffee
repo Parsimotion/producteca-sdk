@@ -142,6 +142,12 @@ describe "ProductsApi", ->
         api.update 1, product
         req.isDone().should.be.ok
 
+    describe "when getPricelists is called", ->
+      it "should send a get to /pricelists", ->
+        req = nockProductecaApi "/pricelists"
+        api.getPricelists()
+        req.isDone().should.be.ok
+
     describe "when createWarehouse is called", ->
       it "should send a post to /warehouses with the name", ->
         req = nockProductecaApi "/warehouses", {}, "post", { name: "piola" }
