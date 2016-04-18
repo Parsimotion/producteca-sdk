@@ -85,7 +85,7 @@ describe "ProductsApi", ->
     describe "when the product exists", ->
 
       beforeEach ->
-        nockProductecaApi "/products/bysku/c", [productWithMoreThanOneVariations.old]
+        nockProductecaApi "/products/bysku?sku=c", [productWithMoreThanOneVariations.old]
         get = api.findByVariationSku("c").then (result) ->
           products = result
 
@@ -99,11 +99,11 @@ describe "ProductsApi", ->
     describe "when the product doesn't exist", ->
 
       it "should throw if no product was found", ->
-        nockProductecaApi "/products/bysku/c", []
+        nockProductecaApi "/products/bysku?sku=c", []
         api.findByVariationSku("c").then (products) -> products.should.be.eql []
 
     it "should send a GET to the api urlEncoding the SKU", ->
-      nockProductecaApi "/products/bysku/with%20spaces", [productWithMoreThanOneVariations.old]
+      nockProductecaApi "/products/bysku?sku=with%20spaces", [productWithMoreThanOneVariations.old]
       get = api.findByVariationSku("with spaces").then (result) ->
         products = result
 
