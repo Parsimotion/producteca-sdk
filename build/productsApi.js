@@ -112,7 +112,7 @@
         skip = 0;
       }
       TOP = 500;
-      return this.getBatch(TOP, skip).then((function(_this) {
+      return this.getBatch(skip, TOP).then((function(_this) {
         return function(products) {
           if (products.length < TOP) {
             return products;

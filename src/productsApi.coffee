@@ -63,7 +63,7 @@ class ProductsApi extends ProductecaApi
 
   _getProductsPageByPage: (skip = 0) =>
     TOP = 500
-    @getBatch(TOP, skip).then (products) =>
+    @getBatch(skip, TOP).then (products) =>
       return products if products.length < TOP
       @_getProductsPageByPage(skip + TOP).then (moreProducts) ->
         products.concat moreProducts
