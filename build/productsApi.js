@@ -96,14 +96,17 @@
       return this.respond(this.client.getAsync("/pricelists"));
     };
 
-    ProductsApi.prototype.getBatch = function(skip, top) {
+    ProductsApi.prototype.getBatch = function(skip, top, moreQueryString) {
       if (skip == null) {
         skip = 0;
       }
       if (top == null) {
         top = 20;
       }
-      return this.respondMany(this.client.getAsync("/products?$top=" + top + "&$skip=" + skip));
+      if (moreQueryString == null) {
+        moreQueryString = "";
+      }
+      return this.respondMany(this.client.getAsync("/products?$top=" + top + "&$skip=" + skip + "&" + moreQueryString));
     };
 
     ProductsApi.prototype._getProductsPageByPage = function(skip) {
