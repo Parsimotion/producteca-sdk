@@ -21,6 +21,7 @@
       this._convertJsonToProducts = __bind(this._convertJsonToProducts, this);
       this._findMany = __bind(this._findMany, this);
       this._getProductsPageByPage = __bind(this._getProductsPageByPage, this);
+      this.getBatch = __bind(this.getBatch, this);
       this.getPricelists = __bind(this.getPricelists, this);
       this.createWarehouse = __bind(this.createWarehouse, this);
       this.update = __bind(this.update, this);
@@ -95,16 +96,24 @@
       return this.respond(this.client.getAsync("/pricelists"));
     };
 
+    ProductsApi.prototype.getBatch = function(skip, top) {
+      if (skip == null) {
+        skip = 0;
+      }
+      if (top == null) {
+        top = 20;
+      }
+      return this.respondMany(this.client.getAsync("/products?$top=" + top + "&$skip=" + skip));
+    };
+
     ProductsApi.prototype._getProductsPageByPage = function(skip) {
       var TOP;
       if (skip == null) {
         skip = 0;
       }
       TOP = 500;
-      return this.respond(this.client.getAsync("/products?$top=" + TOP + "&$skip=" + skip)).then((function(_this) {
-        return function(obj) {
-          var products;
-          products = obj.results;
+      return this.getBatch(TOP, skip).then((function(_this) {
+        return function(products) {
           if (products.length < TOP) {
             return products;
           }

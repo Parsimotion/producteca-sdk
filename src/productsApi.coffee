@@ -57,10 +57,13 @@ class ProductsApi extends ProductecaApi
   getPricelists: =>
     @respond @client.getAsync "/pricelists"
 
+  # Retrieves a chunk of products
+  getBatch: (skip = 0, top = 20) =>
+    @respondMany @client.getAsync "/products?$top=#{top}&$skip=#{skip}"
+
   _getProductsPageByPage: (skip = 0) =>
     TOP = 500
-    @respond(@client.getAsync "/products?$top=#{TOP}&$skip=#{skip}").then (obj) =>
-      products = obj.results
+    @getBatch(TOP, skip).then (products) =>
       return products if products.length < TOP
       @_getProductsPageByPage(skip + TOP).then (moreProducts) ->
         products.concat moreProducts

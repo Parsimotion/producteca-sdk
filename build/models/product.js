@@ -19,8 +19,9 @@
     };
 
     Product.prototype.findVariationBySku = function(sku) {
-      return _.find(this.variations, {
-        sku: sku
+      return _.find(this.variations, function(variation) {
+        var _ref;
+        return ((_ref = variation.sku) != null ? _ref.toUpperCase() : void 0) === (sku != null ? sku.toUpperCase() : void 0);
       });
     };
 

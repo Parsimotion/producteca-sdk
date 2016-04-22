@@ -28,14 +28,14 @@
       });
     });
     describe("when findVariationBySku is called", function() {
-      it("should return the variation where the sku is equal", function() {
+      it("should return the variation where the sku is equal (case insensitive)", function() {
         var product;
         product = createProductWithVariations({
           sku: "A"
         }, {
           sku: "B"
         });
-        return product.findVariationBySku("A").should.be.eql({
+        return product.findVariationBySku("a").should.be.eql({
           sku: "A"
         });
       });
