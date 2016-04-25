@@ -22,6 +22,7 @@
       this._findMany = __bind(this._findMany, this);
       this._getProductsPageByPage = __bind(this._getProductsPageByPage, this);
       this.getBatch = __bind(this.getBatch, this);
+      this.getWarehouses = __bind(this.getWarehouses, this);
       this.getPricelists = __bind(this.getPricelists, this);
       this.createWarehouse = __bind(this.createWarehouse, this);
       this.update = __bind(this.update, this);
@@ -94,6 +95,10 @@
 
     ProductsApi.prototype.getPricelists = function() {
       return this.respond(this.client.getAsync("/pricelists"));
+    };
+
+    ProductsApi.prototype.getWarehouses = function() {
+      return this.respond(this.client.getAsync("/warehouses"));
     };
 
     ProductsApi.prototype.getBatch = function(skip, top, moreQueryString) {

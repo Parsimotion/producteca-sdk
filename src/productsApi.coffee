@@ -57,6 +57,10 @@ class ProductsApi extends ProductecaApi
   getPricelists: =>
     @respond @client.getAsync "/pricelists"
 
+  # Retrieves all the warehouses
+  getWarehouses: =>
+    @respond @client.getAsync "/warehouses"
+
   # Retrieves a chunk of products
   getBatch: (skip = 0, top = 20, moreQueryString = "") =>
     @respondMany @client.getAsync "/products?$top=#{top}&$skip=#{skip}&#{moreQueryString}"
