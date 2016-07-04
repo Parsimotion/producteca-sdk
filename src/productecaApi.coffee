@@ -48,7 +48,7 @@ class ProductecaApi
     @asyncClient = new Client(@_makeUrlAsync endpoint.url, endpoint.accessToken)
 
   respondMany: (promise) =>
-    promise.then (obj) -> obj.results
+    promise.then ({ results }) -> results
 
   _makeUrlAsync: (url) =>
     parts = url.split "." ; parts[0] += "-async" ; parts.join "."
