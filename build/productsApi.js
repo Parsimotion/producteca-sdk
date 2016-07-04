@@ -39,7 +39,7 @@
     }
 
     ProductsApi.prototype.get = function(id) {
-      return (this.respond(this.client.getAsync("/products/" + id))).then(this._convertJsonToProduct);
+      return (this.client.getAsync("/products/" + id)).then(this._convertJsonToProduct);
     };
 
     ProductsApi.prototype.getAll = function() {
@@ -47,7 +47,7 @@
     };
 
     ProductsApi.prototype.getMany = function(ids) {
-      return (this.respond(this.client.getAsync("/products?ids=" + ids))).then(this._convertJsonToProducts);
+      return (this.client.getAsync("/products?ids=" + ids)).then(this._convertJsonToProducts);
     };
 
     ProductsApi.prototype.findByCode = function(code, $select) {
@@ -55,11 +55,11 @@
     };
 
     ProductsApi.prototype.findByVariationSku = function(sku) {
-      return (this.respond(this.client.getAsync("/products/bysku?sku=" + (encodeURIComponent(sku))))).then(this._convertJsonToProducts);
+      return (this.client.getAsync("/products/bysku?sku=" + (encodeURIComponent(sku)))).then(this._convertJsonToProducts);
     };
 
     ProductsApi.prototype.create = function(product) {
-      return this.respond(this.client.postAsync("/products", this._convertNewToDeprecated(product)));
+      return this.client.postAsync("/products", this._convertNewToDeprecated(product));
     };
 
     ProductsApi.prototype.createVariations = function(productId, variations) {
@@ -68,37 +68,37 @@
       variations = (this._convertNewToDeprecated({
         variations: variations
       })).variations;
-      return this.respond(this.client.postAsync(url, variations));
+      return this.client.postAsync(url, variations);
     };
 
     ProductsApi.prototype.updateVariationStocks = function(productId, adjustments) {
       var url;
       url = "/products/" + productId + "/stocks";
-      return this.respond(this.client.putAsync(url, adjustments));
+      return this.client.putAsync(url, adjustments);
     };
 
     ProductsApi.prototype.updateVariationPictures = function(productId, pictures) {
       var url;
       url = "/products/" + productId + "/pictures";
-      return this.respond(this.client.postAsync(url, pictures));
+      return this.client.postAsync(url, pictures);
     };
 
     ProductsApi.prototype.update = function(id, update) {
-      return this.respond(this.client.putAsync("/products/" + id, this._convertNewToDeprecated(update)));
+      return this.client.putAsync("/products/" + id, this._convertNewToDeprecated(update));
     };
 
     ProductsApi.prototype.createWarehouse = function(name) {
-      return this.respond(this.client.postAsync("/warehouses", {
+      return this.client.postAsync("/warehouses", {
         name: name
-      }));
+      });
     };
 
     ProductsApi.prototype.getPricelists = function() {
-      return this.respond(this.client.getAsync("/pricelists"));
+      return this.client.getAsync("/pricelists");
     };
 
     ProductsApi.prototype.getWarehouses = function() {
-      return this.respond(this.client.getAsync("/warehouses"));
+      return this.client.getAsync("/warehouses");
     };
 
     ProductsApi.prototype.getBatch = function(skip, top, moreQueryString) {

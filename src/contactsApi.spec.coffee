@@ -3,6 +3,7 @@ nock = require("nock")
 ContactsApi = require("./contactsApi")
 PRODUCTECA_API_URL = "http://api.producteca.com"
 havePropertiesEqual = require("./helpers/havePropertiesEqual")
+nockProductecaApi = require("./helpers/nockProductecaApi")
 
 describe "ContactsApi", ->
   api = new ContactsApi(
@@ -26,6 +27,3 @@ describe "ContactsApi", ->
       put = nockProductecaApi "/contacts", {}, "put", contact
       api.update(contact).then ->
         put.done()
-
-nockProductecaApi = (resource, entity, verb = "get", expectedBody) ->
-  nock(PRODUCTECA_API_URL)[verb](resource, expectedBody).reply 200, entity

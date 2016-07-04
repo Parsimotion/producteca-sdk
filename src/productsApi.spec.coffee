@@ -6,6 +6,7 @@ ProductsApi = require("./productsApi")
 Product = require("./models/product")
 PRODUCTECA_API_URL = "http://api.producteca.com"
 havePropertiesEqual = require("./helpers/havePropertiesEqual")
+nockProductecaApi = require("./helpers/nockProductecaApi")
 
 createProduct = (id, code, variations = []) ->
   old:
@@ -57,6 +58,7 @@ describe "ProductsApi", ->
     describe "without $select", ->
       beforeEach ->
         oDataQuery = "sku eq 'calcetines'"
+
         get = nockProductecaApi "/products/?$filter=#{encodeURIComponent oDataQuery}", results: [ anotherProductWithoutVariations.old ]
         api.findByCode("calcetines").then (result) ->
           products = result
@@ -112,53 +114,53 @@ describe "ProductsApi", ->
   describe "when create is called", ->
     it "should create a product", ->
       req = nockProductecaApi "/products", {}, "post", anotherProductWithoutVariations.old
-      api.create new Product(anotherProductWithoutVariations.old)
-      req.isDone().should.be.ok
+      api.create(new Product(anotherProductWithoutVariations.old)).then ->
+        req.done()
 
   describe "when createVariations is called", ->
     it "should create variations", ->
       req = nockProductecaApi "/products/3/variations", {}, "post", variations.old
-      api.createVariations 3, variations.new
-      req.isDone().should.be.ok
+      api.createVariations(3, variations.new).then ->
+        req.done()
 
   describe "when updateVariationStocks is called", ->
     it "should update stock from variation", ->
       stocks = [ { warehouse: "Default", quantity: 2 } ]
       req = nockProductecaApi "/products/1/stocks", {}, "put", stocks
-      api.updateVariationStocks 1, stocks
-      req.isDone().should.be.ok
+      api.updateVariationStocks(1, stocks).then ->
+        req.done()
 
     describe "when updateVariationPictures is called", ->
       it "should update pictures from variation", ->
         pictures = [ { url: "mediaTostada.jpg" } ]
         req = nockProductecaApi "/products/1/pictures", {}, "post", pictures
-        api.updateVariationPictures 1, pictures
-        req.isDone().should.be.ok
+        api.updateVariationPictures(1, pictures).then ->
+          req.done()
 
     describe "when update is called", ->
       it "should update a product", ->
         product = notes: "actualizo la nota!"
         req = nockProductecaApi "/products/1", {}, "put", product
-        api.update 1, product
-        req.isDone().should.be.ok
+        api.update(1, product).then ->
+          req.done()
 
     describe "when getPricelists is called", ->
       it "should send a get to /pricelists", ->
         req = nockProductecaApi "/pricelists"
-        api.getPricelists()
-        req.isDone().should.be.ok
+        api.getPricelists().then ->
+          req.done()
 
     describe "when getWarehouses is called", ->
       it "should send a get to /warehouses", ->
         req = nockProductecaApi "/warehouses"
-        api.getWarehouses()
-        req.isDone().should.be.ok
+        api.getWarehouses().then ->
+          req.done()
 
     describe "when createWarehouse is called", ->
       it "should send a post to /warehouses with the name", ->
         req = nockProductecaApi "/warehouses", {}, "post", { name: "piola" }
-        api.createWarehouse "piola"
-        req.isDone().should.be.ok
+        api.createWarehouse("piola").then ->
+          req.done()
 
   describe "Deprecated names of properties", ->
     deprecatedProduct =
@@ -190,6 +192,3 @@ describe "ProductsApi", ->
       it "should map the properties ok", ->
         api._convertNewToDeprecated(newProduct)
           .should.eql deprecatedProduct
-
-nockProductecaApi = (resource, entity, verb = "get", expectedBody, statusCode = 200) ->
-  nock(PRODUCTECA_API_URL)[verb](resource, expectedBody).reply statusCode, entity

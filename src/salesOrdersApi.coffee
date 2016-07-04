@@ -20,7 +20,7 @@ class SalesOrdersApi extends ProductecaApi
 
   #Returns a sales order by id
   get: (id) =>
-    @respond @client.getAsync "/salesorders/#{id}"
+    @client.getAsync "/salesorders/#{id}"
 
   #Returns a sales order by integration
   getByIntegration: ({ integrationId, app }) =>
@@ -40,38 +40,38 @@ class SalesOrdersApi extends ProductecaApi
 
   #Creates a sales order
   create: (salesOrder) =>
-    @respond @client.postAsync "/salesorders", salesOrder
+    @client.postAsync "/salesorders", salesOrder
 
   #Updates a sales order by id
   update: (id, update) =>
-    @respond @client.putAsync "/salesorders/#{id}", update
+    @client.putAsync "/salesorders/#{id}", update
 
   getShipment: (salesOrderId, shipmentId) =>
-    @respond @client.getAsync "/salesorders/#{salesOrderId}/shipments/#{shipmentId}"
+    @client.getAsync "/salesorders/#{salesOrderId}/shipments/#{shipmentId}"
 
   getMultipleShipments: (shipmentIds) =>
-    @respond @client.getAsync "/shipments?ids=#{shipmentIds}"
+    @client.getAsync "/shipments?ids=#{shipmentIds}"
 
   createShipment: (salesOrderId, shipment) =>
-    @respond @client.postAsync "/salesorders/#{salesOrderId}/shipments", shipment
+    @client.postAsync "/salesorders/#{salesOrderId}/shipments", shipment
 
   updateShipment: (salesOrderId, shipmentId, shipmentUpdate) =>
-    @respond @client.putAsync "/salesorders/#{salesOrderId}/shipments/#{shipmentId}", shipmentUpdate
+    @client.putAsync "/salesorders/#{salesOrderId}/shipments/#{shipmentId}", shipmentUpdate
 
   updateShipmentStatus: (salesOrderId, shipmentId, statusDto) =>
-    @respond @client.putAsync "/salesorders/#{salesOrderId}/shipments/#{shipmentId}/status", statusDto
+    @client.putAsync "/salesorders/#{salesOrderId}/shipments/#{shipmentId}/status", statusDto
 
   updateShipmentStatusById: (shipmentId, statusDto) =>
-    @respond @client.putAsync "/shipments/#{shipmentId}/status", statusDto
+    @client.putAsync "/shipments/#{shipmentId}/status", statusDto
 
   createPayment: (salesOrderId, payment) =>
-    @respond @client.postAsync "/salesorders/#{salesOrderId}/payments", payment
+    @client.postAsync "/salesorders/#{salesOrderId}/payments", payment
 
   deleteShipment: (salesOrderId, shipmentId) =>
-    @respond @client.delAsync "/salesorders/#{salesOrderId}/shipments/#{shipmentId}"
+    @client.delAsync "/salesorders/#{salesOrderId}/shipments/#{shipmentId}"
 
   deletePayment: (salesOrderId, paymentId) =>
-    @respond @client.delAsync "/salesorders/#{salesOrderId}/payments/#{paymentId}"
+    @client.delAsync "/salesorders/#{salesOrderId}/payments/#{paymentId}"
 
   #---
 

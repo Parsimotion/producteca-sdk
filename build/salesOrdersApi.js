@@ -44,7 +44,7 @@
     };
 
     SalesOrdersApi.prototype.get = function(id) {
-      return this.respond(this.client.getAsync("/salesorders/" + id));
+      return this.client.getAsync("/salesorders/" + id);
     };
 
     SalesOrdersApi.prototype.getByIntegration = function(_arg) {
@@ -77,47 +77,47 @@
     };
 
     SalesOrdersApi.prototype.create = function(salesOrder) {
-      return this.respond(this.client.postAsync("/salesorders", salesOrder));
+      return this.client.postAsync("/salesorders", salesOrder);
     };
 
     SalesOrdersApi.prototype.update = function(id, update) {
-      return this.respond(this.client.putAsync("/salesorders/" + id, update));
+      return this.client.putAsync("/salesorders/" + id, update);
     };
 
     SalesOrdersApi.prototype.getShipment = function(salesOrderId, shipmentId) {
-      return this.respond(this.client.getAsync("/salesorders/" + salesOrderId + "/shipments/" + shipmentId));
+      return this.client.getAsync("/salesorders/" + salesOrderId + "/shipments/" + shipmentId);
     };
 
     SalesOrdersApi.prototype.getMultipleShipments = function(shipmentIds) {
-      return this.respond(this.client.getAsync("/shipments?ids=" + shipmentIds));
+      return this.client.getAsync("/shipments?ids=" + shipmentIds);
     };
 
     SalesOrdersApi.prototype.createShipment = function(salesOrderId, shipment) {
-      return this.respond(this.client.postAsync("/salesorders/" + salesOrderId + "/shipments", shipment));
+      return this.client.postAsync("/salesorders/" + salesOrderId + "/shipments", shipment);
     };
 
     SalesOrdersApi.prototype.updateShipment = function(salesOrderId, shipmentId, shipmentUpdate) {
-      return this.respond(this.client.putAsync("/salesorders/" + salesOrderId + "/shipments/" + shipmentId, shipmentUpdate));
+      return this.client.putAsync("/salesorders/" + salesOrderId + "/shipments/" + shipmentId, shipmentUpdate);
     };
 
     SalesOrdersApi.prototype.updateShipmentStatus = function(salesOrderId, shipmentId, statusDto) {
-      return this.respond(this.client.putAsync("/salesorders/" + salesOrderId + "/shipments/" + shipmentId + "/status", statusDto));
+      return this.client.putAsync("/salesorders/" + salesOrderId + "/shipments/" + shipmentId + "/status", statusDto);
     };
 
     SalesOrdersApi.prototype.updateShipmentStatusById = function(shipmentId, statusDto) {
-      return this.respond(this.client.putAsync("/shipments/" + shipmentId + "/status", statusDto));
+      return this.client.putAsync("/shipments/" + shipmentId + "/status", statusDto);
     };
 
     SalesOrdersApi.prototype.createPayment = function(salesOrderId, payment) {
-      return this.respond(this.client.postAsync("/salesorders/" + salesOrderId + "/payments", payment));
+      return this.client.postAsync("/salesorders/" + salesOrderId + "/payments", payment);
     };
 
     SalesOrdersApi.prototype.deleteShipment = function(salesOrderId, shipmentId) {
-      return this.respond(this.client.delAsync("/salesorders/" + salesOrderId + "/shipments/" + shipmentId));
+      return this.client.delAsync("/salesorders/" + salesOrderId + "/shipments/" + shipmentId);
     };
 
     SalesOrdersApi.prototype.deletePayment = function(salesOrderId, paymentId) {
-      return this.respond(this.client.delAsync("/salesorders/" + salesOrderId + "/payments/" + paymentId));
+      return this.client.delAsync("/salesorders/" + salesOrderId + "/payments/" + paymentId);
     };
 
     SalesOrdersApi.prototype._buildSalesOrdersFilters = function(filters) {
