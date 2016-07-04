@@ -5,14 +5,13 @@
     "type": "git",
     "url": "git://github.com/Parsimotion/producteca-sdk.git"
   },
-  "version": "1.12.2",
+  "version": "1.12.3",
   "main": "build/sdk.js",
   "dependencies": {
-    "bluebird": "^2.3.11",
+    "bluebird": "^3.4.1",
     "lodash": "^4.13.1",
     "q": "~1.0.1",
-    "request": "^2.72.0",
-    "sinon": "^1.17.4"
+    "request": "^2.72.0"
   },
   "devDependencies": {
     "chai-as-promised": "^5.2.0",
@@ -23,6 +22,7 @@
     "grunt-contrib-coffee": "^0.10.1",
     "grunt-mocha-test": "~0.10.2",
     "nock": "^8.0.0",
+    "sinon": "^1.17.4",
     "sinon-chai": "^2.5.0"
   },
   "engines": {

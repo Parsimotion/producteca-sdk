@@ -25,7 +25,7 @@ class Client
       json: true
       body: body
 
-    request["#{verb}Async"](options).then ([res]) =>
+    request["#{verb}Async"](options).then (res) ->
       throw new Error(res.body) if res.statusCode > 400
       res.body
 

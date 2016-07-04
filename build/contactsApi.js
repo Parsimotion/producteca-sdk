@@ -16,11 +16,11 @@
     }
 
     ContactsApi.prototype.create = function(contact) {
-      return this.respond(this.client.postAsync("/contacts", contact));
+      return this.client.postAsync("/contacts", contact);
     };
 
     ContactsApi.prototype.update = function(contact) {
-      return this.respond(this.client.putAsync("/contacts", contact));
+      return this.client.putAsync("/contacts", contact);
     };
 
     return ContactsApi;

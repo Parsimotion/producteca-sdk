@@ -18,21 +18,21 @@
     }
 
     BrandsApi.prototype.get = function(id) {
-      return this.respond(this.client.getAsync("/brands/" + id));
+      return this.client.getAsync("/brands/" + id);
     };
 
     BrandsApi.prototype.getAll = function() {
-      return this.respond(this.client.getAsync("/brands"));
+      return this.client.getAsync("/brands");
     };
 
     BrandsApi.prototype.createByName = function(brandName) {
-      return this.respond(this.client.postAsync("/brands", {
+      return this.client.postAsync("/brands", {
         name: brandName
-      }));
+      });
     };
 
     BrandsApi.prototype["delete"] = function(id) {
-      return this.respond(this.client.delAsync("/brands/" + id));
+      return this.client.delAsync("/brands/" + id);
     };
 
     return BrandsApi;
