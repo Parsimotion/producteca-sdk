@@ -39,21 +39,14 @@ module.exports =
 #    [url]: "Url of the api"
 #  }
 class ProductecaApi
+  constructor: (endpoint = {}) ->
+    @initializeClients endpoint
+
   initializeClients: (endpoint) =>
     endpoint.url = endpoint.url || "http://api.producteca.com"
 
-    createClient = (url) =>
-      Promise.promisifyAll Restify.createJSONClient
-        url: url
-        agent: false
-        headers:
-          Authorization: "Bearer #{endpoint.accessToken}"
-
-    @client = createClient endpoint.url
-    @asyncClient = createClient @_makeUrlAsync endpoint.url
-
-  constructor: (endpoint = {}) ->
-    @initializeClients endpoint
+    @client = new Client(endpoint.url, endpoint.accessToken)
+    @asyncClient = new Client(@_makeUrlAsync endpoint.url, endpoint.accessToken)
 
   respond: (promise) =>
     promise.spread (req, res, obj) -> obj
