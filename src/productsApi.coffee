@@ -6,7 +6,7 @@ module.exports =
 class ProductsApi extends ProductecaApi
   # Returns a product by id
   get: (id) =>
-    (@respond @client.getAsync("/products/#{id}")).then @_convertJsonToProduct
+    (@client.getAsync("/products/#{id}")).then @_convertJsonToProduct
 
   # Returns all the products
   getAll: =>
@@ -14,7 +14,7 @@ class ProductsApi extends ProductecaApi
 
   # Returns multiple products by their comma separated ids
   getMany: (ids) =>
-    (@respond @client.getAsync("/products?ids=#{ids}")).then @_convertJsonToProducts
+    (@client.getAsync("/products?ids=#{ids}")).then @_convertJsonToProducts
 
   # Find products by code (currently "sku" - IT NEEDS TO BE CHANGED)
   findByCode: (code, $select) =>
@@ -22,44 +22,44 @@ class ProductsApi extends ProductecaApi
 
   # Find products by a variation SKU (currently "barcode" - IT NEEDS TO BE CHANGED)
   findByVariationSku: (sku) =>
-    (@respond @client.getAsync("/products/bysku?sku=#{encodeURIComponent(sku)}")).then @_convertJsonToProducts
+    (@client.getAsync("/products/bysku?sku=#{encodeURIComponent(sku)}")).then @_convertJsonToProducts
 
   # Creates a product
   create: (product) =>
-    @respond @client.postAsync "/products", @_convertNewToDeprecated(product)
+    @client.postAsync "/products", @_convertNewToDeprecated(product)
 
   # Creates one or more variations of a product definition
   createVariations: (productId, variations) =>
     url = "/products/#{productId}/variations"
 
     variations = (@_convertNewToDeprecated { variations }).variations
-    @respond @client.postAsync url, variations
+    @client.postAsync url, variations
 
   # Updates the stocks of one or more variations
   updateVariationStocks: (productId, adjustments) =>
     url = "/products/#{productId}/stocks"
-    @respond @client.putAsync url, adjustments
+    @client.putAsync url, adjustments
 
   # Updates the pictures of one or more variations
   updateVariationPictures: (productId, pictures) =>
     url = "/products/#{productId}/pictures"
-    @respond @client.postAsync url, pictures
+    @client.postAsync url, pictures
 
   # Updates a product
   update: (id, update) =>
-    @respond @client.putAsync "/products/#{id}", @_convertNewToDeprecated(update)
+    @client.putAsync "/products/#{id}", @_convertNewToDeprecated(update)
 
   # Creates a warehouse
   createWarehouse: (name) =>
-    @respond @client.postAsync "/warehouses", { name }
+    @client.postAsync "/warehouses", { name }
 
   # Retrieves all the pricelists
   getPricelists: =>
-    @respond @client.getAsync "/pricelists"
+    @client.getAsync "/pricelists"
 
   # Retrieves all the warehouses
   getWarehouses: =>
-    @respond @client.getAsync "/warehouses"
+    @client.getAsync "/warehouses"
 
   # Retrieves a chunk of products
   getBatch: (skip = 0, top = 20, moreQueryString = "") =>

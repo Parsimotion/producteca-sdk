@@ -47,10 +47,6 @@ class ProductecaApi
     @client = new Client(endpoint.url, endpoint.accessToken)
     @asyncClient = new Client(@_makeUrlAsync endpoint.url, endpoint.accessToken)
 
-  respond: (promise) =>
-    promise
-    # // TODO: Borrar el @respond de todas las llamadas
-
   respondMany: (promise) =>
     promise.then (obj) -> obj.results
 
