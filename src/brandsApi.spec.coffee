@@ -3,6 +3,7 @@ nock = require("nock")
 BrandsApi = require("./brandsApi")
 PRODUCTECA_API_URL = "http://api.producteca.com"
 havePropertiesEqual = require("./helpers/havePropertiesEqual")
+nockProductecaApi = require("./helpers/nockProductecaApi")
 
 describe "BrandsApi", ->
   api = new BrandsApi(
@@ -39,6 +40,3 @@ describe "BrandsApi", ->
       deletion = nockProductecaApi "/brands/1", {}, "delete"
       api.delete(1).then ->
         deletion.done()
-
-nockProductecaApi = (resource, entity, verb = "get", expectedBody) ->
-  nock(PRODUCTECA_API_URL)[verb](resource, expectedBody).reply 200, entity
