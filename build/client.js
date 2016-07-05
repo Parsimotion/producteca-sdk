@@ -1,10 +1,16 @@
 (function() {
-  var Client, Promise, request,
+  var Client, Promise, RESPONSE_ELEMENT, request,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
   Promise = require("bluebird");
 
-  request = Promise.promisifyAll(require("request"));
+  request = require("request");
+
+  Promise.promisifyAll(request, {
+    multiArgs: true
+  });
+
+  RESPONSE_ELEMENT = 0;
 
   module.exports = Client = (function() {
     function Client(url, accessToken) {
@@ -44,7 +50,7 @@
         json: true,
         body: body
       };
-      return request["" + verb + "Async"](options).then(function(res) {
+      return request["" + verb + "Async"](options).get(RESPONSE_ELEMENT).then(function(res) {
         if (res.statusCode > 400) {
           throw new Error(res.body);
         }
