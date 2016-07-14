@@ -3,7 +3,8 @@
     Api: require("./productecaApi"),
     ProductsApi: require("./productsApi"),
     SalesOrdersApi: require("./salesOrdersApi"),
-    ContactsApi: require("./contactsApi")
+    ContactsApi: require("./contactsApi"),
+    OAuthApi: require("./oauthApi")
   };
 
 }).call(this);
