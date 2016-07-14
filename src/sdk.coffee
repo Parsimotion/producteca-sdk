@@ -3,3 +3,4 @@ module.exports =
   ProductsApi: require("./productsApi")
   SalesOrdersApi: require("./salesOrdersApi")
   ContactsApi: require("./contactsApi")
+  OAuthApi: require("./oauthApi")
