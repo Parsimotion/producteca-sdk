@@ -4,7 +4,7 @@ request = Promise.promisifyAll require("request"), multiArgs: true
 BODY = 1
 
 class OAuthApi
-  constructor: (@accessToken, @url) ->
+  constructor: ({ @accessToken, @url }) ->
   me: =>
     request.getAsync
       url: @url
