@@ -21,10 +21,12 @@ class SalesOrdersApi extends ProductecaApi
   #Returns a sales order by id
   get: (id) =>
     @client.getAsync("/salesorders/#{id}").then (salesOrder) =>
-      salesOrder.lines.map (it) =>
-        it.product = @_convertDeprecatedToNew product
-        @_convert it.variation, "barcode", "sku"
+      salesOrder.lines?.map (it) =>
+        # HORRIBLE HACKS FOR DEPRECATION
+        it.product = @_convertDeprecatedToNew it.product
+        @_convert it.variation, "barcode", "sku" if it.variation?
         it
+      salesOrder
 
   #Returns a sales order by integration
   getByIntegration: ({ integrationId, app }) =>
