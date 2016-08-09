@@ -14,9 +14,6 @@
     __extends(SalesOrdersApi, _super);
 
     function SalesOrdersApi(endpoint) {
-      this._convert = __bind(this._convert, this);
-      this._convertNewToDeprecated = __bind(this._convertNewToDeprecated, this);
-      this._convertDeprecatedToNew = __bind(this._convertDeprecatedToNew, this);
       this._buildSalesOrdersFilters = __bind(this._buildSalesOrdersFilters, this);
       this.deletePayment = __bind(this.deletePayment, this);
       this.deleteShipment = __bind(this.deleteShipment, this);
@@ -47,21 +44,7 @@
     };
 
     SalesOrdersApi.prototype.get = function(id) {
-      return this.client.getAsync("/salesorders/" + id).then((function(_this) {
-        return function(salesOrder) {
-          var _ref;
-          if ((_ref = salesOrder.lines) != null) {
-            _ref.map(function(it) {
-              it.product = _this._convertDeprecatedToNew(it.product);
-              if (it.variation != null) {
-                _this._convert(it.variation, "barcode", "sku");
-              }
-              return it;
-            });
-          }
-          return salesOrder;
-        };
-      })(this));
+      return this.client.getAsync("/salesorders/" + id);
     };
 
     SalesOrdersApi.prototype.getByIntegration = function(_arg) {
@@ -162,49 +145,6 @@
         addAnd(filters.other);
       }
       return encodeURIComponent(querystring);
-    };
-
-    SalesOrdersApi.prototype._convertDeprecatedToNew = function(product) {
-      var _ref;
-      if (product == null) {
-        return;
-      }
-      product = _.cloneDeep(product);
-      this._convert(product, "sku", "code");
-      this._convert(product, "description", "name");
-      if ((_ref = product.variations) != null) {
-        _ref.forEach((function(_this) {
-          return function(variation) {
-            return _this._convert(variation, "barcode", "sku");
-          };
-        })(this));
-      }
-      return product;
-    };
-
-    SalesOrdersApi.prototype._convertNewToDeprecated = function(product) {
-      var _ref;
-      if (product == null) {
-        return;
-      }
-      product = _.cloneDeep(product);
-      this._convert(product, "code", "sku");
-      this._convert(product, "name", "description");
-      if ((_ref = product.variations) != null) {
-        _ref.forEach((function(_this) {
-          return function(variation) {
-            return _this._convert(variation, "sku", "barcode");
-          };
-        })(this));
-      }
-      return product;
-    };
-
-    SalesOrdersApi.prototype._convert = function(obj, oldProperty, newProperty) {
-      if ((obj[newProperty] == null) && obj[oldProperty]) {
-        obj[newProperty] = obj[oldProperty];
-        return delete obj[oldProperty];
-      }
     };
 
     return SalesOrdersApi;
