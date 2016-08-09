@@ -20,13 +20,7 @@ class SalesOrdersApi extends ProductecaApi
 
   #Returns a sales order by id
   get: (id) =>
-    @client.getAsync("/salesorders/#{id}").then (salesOrder) =>
-      salesOrder.lines?.map (it) =>
-        # HORRIBLE HACKS FOR DEPRECATION
-        it.product = @_convertDeprecatedToNew it.product
-        @_convert it.variation, "barcode", "sku" if it.variation?
-        it
-      salesOrder
+    @client.getAsync "/salesorders/#{id}"
 
   #Returns a sales order by integration
   getByIntegration: ({ integrationId, app }) =>
@@ -98,36 +92,3 @@ class SalesOrdersApi extends ProductecaApi
       addAnd filters.other
 
     encodeURIComponent querystring
-
-  # ---
-  # DEPRECATED PROPERTIES
-  # ---
-
-  _convertDeprecatedToNew: (product) =>
-    if not product? then return
-    product = _.cloneDeep product
-
-    @_convert product, "sku", "code"
-    @_convert product, "description", "name"
-
-    product.variations?.forEach (variation) =>
-      @_convert variation, "barcode", "sku"
-
-    product
-
-  _convertNewToDeprecated: (product) =>
-    if not product? then return
-    product = _.cloneDeep product
-
-    @_convert product, "code", "sku"
-    @_convert product, "name", "description"
-
-    product.variations?.forEach (variation) =>
-      @_convert variation, "sku", "barcode"
-
-    product
-
-  _convert: (obj, oldProperty, newProperty) =>
-    if not obj[newProperty]? and obj[oldProperty]
-      obj[newProperty] = obj[oldProperty]
-      delete obj[oldProperty]
