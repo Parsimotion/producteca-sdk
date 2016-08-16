@@ -29,7 +29,7 @@ class Client
       body: body
 
     request["#{verb}Async"](options).get(RESPONSE_ELEMENT).then (res) ->
-      throw new Error(res.body) if res.statusCode > 400
+      throw res.body if res.statusCode > 400
       res.body
 
   _makeUrl: (path) =>

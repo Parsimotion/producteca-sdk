@@ -14,9 +14,6 @@
     __extends(ProductsApi, _super);
 
     function ProductsApi() {
-      this._convert = __bind(this._convert, this);
-      this._convertNewToDeprecated = __bind(this._convertNewToDeprecated, this);
-      this._convertDeprecatedToNew = __bind(this._convertDeprecatedToNew, this);
       this._convertJsonToProduct = __bind(this._convertJsonToProduct, this);
       this._convertJsonToProducts = __bind(this._convertJsonToProducts, this);
       this._findMany = __bind(this._findMany, this);
@@ -51,7 +48,7 @@
     };
 
     ProductsApi.prototype.findByCode = function(code, $select) {
-      return this._findMany("sku eq '" + code + "'", $select);
+      return this._findMany("code eq '" + code + "'", $select);
     };
 
     ProductsApi.prototype.findByVariationSku = function(sku) {
@@ -59,15 +56,12 @@
     };
 
     ProductsApi.prototype.create = function(product) {
-      return this.client.postAsync("/products", this._convertNewToDeprecated(product));
+      return this.client.postAsync("/products", product);
     };
 
     ProductsApi.prototype.createVariations = function(productId, variations) {
       var url;
       url = "/products/" + productId + "/variations";
-      variations = (this._convertNewToDeprecated({
-        variations: variations
-      })).variations;
       return this.client.postAsync(url, variations);
     };
 
@@ -84,7 +78,7 @@
     };
 
     ProductsApi.prototype.update = function(id, update) {
-      return this.client.putAsync("/products/" + id, this._convertNewToDeprecated(update));
+      return this.client.putAsync("/products/" + id, update);
     };
 
     ProductsApi.prototype.createWarehouse = function(name) {
@@ -149,50 +143,7 @@
     };
 
     ProductsApi.prototype._convertJsonToProduct = function(json) {
-      return new Product(this._convertDeprecatedToNew(json));
-    };
-
-    ProductsApi.prototype._convertDeprecatedToNew = function(product) {
-      var _ref;
-      if (product == null) {
-        return;
-      }
-      product = _.cloneDeep(product);
-      this._convert(product, "sku", "code");
-      this._convert(product, "description", "name");
-      if ((_ref = product.variations) != null) {
-        _ref.forEach((function(_this) {
-          return function(variation) {
-            return _this._convert(variation, "barcode", "sku");
-          };
-        })(this));
-      }
-      return product;
-    };
-
-    ProductsApi.prototype._convertNewToDeprecated = function(product) {
-      var _ref;
-      if (product == null) {
-        return;
-      }
-      product = _.cloneDeep(product);
-      this._convert(product, "code", "sku");
-      this._convert(product, "name", "description");
-      if ((_ref = product.variations) != null) {
-        _ref.forEach((function(_this) {
-          return function(variation) {
-            return _this._convert(variation, "sku", "barcode");
-          };
-        })(this));
-      }
-      return product;
-    };
-
-    ProductsApi.prototype._convert = function(obj, oldProperty, newProperty) {
-      if ((obj[newProperty] == null) && obj[oldProperty]) {
-        obj[newProperty] = obj[oldProperty];
-        return delete obj[oldProperty];
-      }
+      return new Product(json);
     };
 
     return ProductsApi;

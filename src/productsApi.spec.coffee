@@ -9,20 +9,11 @@ havePropertiesEqual = require("./helpers/havePropertiesEqual")
 nockProductecaApi = require("./helpers/nockProductecaApi")
 
 createProduct = (id, code, variations = []) ->
-  old:
-    id: id
-    sku: code
-    variations: variations.map (it) -> barcode: it.sku
-  new:
-    id: id
-    variations: variations
-    code: code
+  id: id
+  variations: variations
+  code: code
 
-variations =
-  old:
-    [ { barcode: "b" }, { barcode: "c" }, { barcode: "d" } ]
-  new:
-    [ { sku: "b" }, { sku: "c" }, { sku: "d" } ]
+variations = [ { sku: "b" }, { sku: "c" }, { sku: "d" } ]
 
 describe "ProductsApi", ->
   api = new ProductsApi(
@@ -40,13 +31,13 @@ describe "ProductsApi", ->
 
   describe "when get is called", ->
     it "should send a GET to the api with the given id", ->
-      get = nockProductecaApi "/products/1", productWithOneVariations.old
+      get = nockProductecaApi "/products/1", productWithOneVariations
       api.get(1).then ->
         get.done()
 
   describe "when getMany is called", ->
     it "should send a GET to the api with the given string of ids", ->
-      products = [ productWithMoreThanOneVariations.old, productWithoutVariations.old, anotherProductWithoutVariations.old ]
+      products = [ productWithMoreThanOneVariations, productWithoutVariations, anotherProductWithoutVariations ]
       nockProductecaApi "/products?ids=2,3,4", products
       get = api.getMany("2,3,4").then ->
         get.done()
@@ -57,9 +48,9 @@ describe "ProductsApi", ->
 
     describe "without $select", ->
       beforeEach ->
-        oDataQuery = "sku eq 'calcetines'"
+        oDataQuery = "code eq 'calcetines'"
 
-        get = nockProductecaApi "/products/?$filter=#{encodeURIComponent oDataQuery}", results: [ anotherProductWithoutVariations.old ]
+        get = nockProductecaApi "/products/?$filter=#{encodeURIComponent oDataQuery}", results: [ anotherProductWithoutVariations ]
         api.findByCode("calcetines").then (result) ->
           products = result
 
@@ -67,14 +58,14 @@ describe "ProductsApi", ->
         get.done()
 
       it "should return the products", ->
-        havePropertiesEqual products, [anotherProductWithoutVariations.new]
+        havePropertiesEqual products, [anotherProductWithoutVariations]
         products[0].should.be.an.instanceof Product
 
     describe "with $select", ->
       beforeEach ->
-        $filter = "sku eq 'calcetines'"
+        $filter = "code eq 'calcetines'"
         $select = "id"
-        get = nockProductecaApi "/products/?$filter=#{encodeURIComponent $filter}&$select=#{encodeURIComponent $select}", results: [ anotherProductWithoutVariations.old ]
+        get = nockProductecaApi "/products/?$filter=#{encodeURIComponent $filter}&$select=#{encodeURIComponent $select}", results: [ anotherProductWithoutVariations ]
         api.findByCode "calcetines", $select
 
       it "should send a GET to the api with an oData query to filter products with code='calcetines' and the $select's projections", ->
@@ -87,7 +78,7 @@ describe "ProductsApi", ->
     describe "when the product exists", ->
 
       beforeEach ->
-        nockProductecaApi "/products/bysku?sku=c", [productWithMoreThanOneVariations.old]
+        nockProductecaApi "/products/bysku?sku=c", [productWithMoreThanOneVariations]
         get = api.findByVariationSku("c").then (result) ->
           products = result
 
@@ -95,7 +86,7 @@ describe "ProductsApi", ->
         get.done()
 
       it "should return the products", ->
-        havePropertiesEqual products, [productWithMoreThanOneVariations.new]
+        havePropertiesEqual products, [productWithMoreThanOneVariations]
         products[0].should.be.an.instanceof Product
 
     describe "when the product doesn't exist", ->
@@ -105,7 +96,7 @@ describe "ProductsApi", ->
         api.findByVariationSku("c").then (products) -> products.should.be.eql []
 
     it "should send a GET to the api urlEncoding the SKU", ->
-      nockProductecaApi "/products/bysku?sku=with%20spaces", [productWithMoreThanOneVariations.old]
+      nockProductecaApi "/products/bysku?sku=with%20spaces", [productWithMoreThanOneVariations]
       get = api.findByVariationSku("with spaces").then (result) ->
         products = result
 
@@ -113,14 +104,14 @@ describe "ProductsApi", ->
 
   describe "when create is called", ->
     it "should create a product", ->
-      req = nockProductecaApi "/products", {}, "post", anotherProductWithoutVariations.old
-      api.create(new Product(anotherProductWithoutVariations.old)).then ->
+      req = nockProductecaApi "/products", {}, "post", anotherProductWithoutVariations
+      api.create(new Product(anotherProductWithoutVariations)).then ->
         req.done()
 
   describe "when createVariations is called", ->
     it "should create variations", ->
-      req = nockProductecaApi "/products/3/variations", {}, "post", variations.old
-      api.createVariations(3, variations.new).then ->
+      req = nockProductecaApi "/products/3/variations", {}, "post", variations
+      api.createVariations(3, variations).then ->
         req.done()
 
   describe "when updateVariationStocks is called", ->
@@ -161,34 +152,3 @@ describe "ProductsApi", ->
         req = nockProductecaApi "/warehouses", {}, "post", { name: "piola" }
         api.createWarehouse("piola").then ->
           req.done()
-
-  describe "Deprecated names of properties", ->
-    deprecatedProduct =
-      description: "Cosa"
-      sku: "COSA"
-      variations: [
-        {
-          barcode: "COSAVERDE"
-          primaryColor: "Verde"
-        }
-      ]
-
-    newProduct =
-      name: "Cosa"
-      code: "COSA"
-      variations: [
-        {
-          sku: "COSAVERDE"
-          primaryColor: "Verde"
-        }
-      ]
-
-    describe "_convertDeprecatedToNew", ->
-      it "should map the properties ok", ->
-        api._convertDeprecatedToNew(deprecatedProduct)
-          .should.eql newProduct
-
-    describe "_convertNewToDeprecated", ->
-      it "should map the properties ok", ->
-        api._convertNewToDeprecated(newProduct)
-          .should.eql deprecatedProduct

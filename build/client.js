@@ -52,7 +52,7 @@
       };
       return request["" + verb + "Async"](options).get(RESPONSE_ELEMENT).then(function(res) {
         if (res.statusCode > 400) {
-          throw new Error(res.body);
+          throw res.body;
         }
         return res.body;
       });

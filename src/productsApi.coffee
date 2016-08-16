@@ -16,23 +16,21 @@ class ProductsApi extends ProductecaApi
   getMany: (ids) =>
     (@client.getAsync("/products?ids=#{ids}")).then @_convertJsonToProducts
 
-  # Find products by code (currently "sku" - IT NEEDS TO BE CHANGED)
+  # Find products by code
   findByCode: (code, $select) =>
-    @_findMany "sku eq '#{code}'", $select
+    @_findMany "code eq '#{code}'", $select
 
-  # Find products by a variation SKU (currently "barcode" - IT NEEDS TO BE CHANGED)
+  # Find products by a variation SKU
   findByVariationSku: (sku) =>
     (@client.getAsync("/products/bysku?sku=#{encodeURIComponent(sku)}")).then @_convertJsonToProducts
 
   # Creates a product
   create: (product) =>
-    @client.postAsync "/products", @_convertNewToDeprecated(product)
+    @client.postAsync "/products", product
 
   # Creates one or more variations of a product definition
   createVariations: (productId, variations) =>
     url = "/products/#{productId}/variations"
-
-    variations = (@_convertNewToDeprecated { variations }).variations
     @client.postAsync url, variations
 
   # Updates the stocks of one or more variations
@@ -47,7 +45,7 @@ class ProductsApi extends ProductecaApi
 
   # Updates a product
   update: (id, update) =>
-    @client.putAsync "/products/#{id}", @_convertNewToDeprecated(update)
+    @client.putAsync "/products/#{id}", update
 
   # Creates a warehouse
   createWarehouse: (name) =>
@@ -84,37 +82,4 @@ class ProductsApi extends ProductecaApi
     products.map @_convertJsonToProduct
 
   _convertJsonToProduct: (json) =>
-    new Product @_convertDeprecatedToNew json
-
-  # ---
-  # DEPRECATED PROPERTIES
-  # ---
-
-  _convertDeprecatedToNew: (product) =>
-    if not product? then return
-    product = _.cloneDeep product
-
-    @_convert product, "sku", "code"
-    @_convert product, "description", "name"
-
-    product.variations?.forEach (variation) =>
-      @_convert variation, "barcode", "sku"
-
-    product
-
-  _convertNewToDeprecated: (product) =>
-    if not product? then return
-    product = _.cloneDeep product
-
-    @_convert product, "code", "sku"
-    @_convert product, "name", "description"
-
-    product.variations?.forEach (variation) =>
-      @_convert variation, "sku", "barcode"
-
-    product
-
-  _convert: (obj, oldProperty, newProperty) =>
-    if not obj[newProperty]? and obj[oldProperty]
-      obj[newProperty] = obj[oldProperty]
-      delete obj[oldProperty]
+    new Product json
