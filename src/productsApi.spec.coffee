@@ -121,10 +121,17 @@ describe "ProductsApi", ->
       api.updateVariationStocks(1, stocks).then ->
         req.done()
 
-    describe "when updateVariationPictures is called", ->
+    describe "when addVariationPictures is called", ->
       it "should update pictures from variation", ->
         pictures = [ { url: "mediaTostada.jpg" } ]
         req = nockProductecaApi "/products/1/pictures", {}, "post", pictures
+        api.addVariationPictures(1, pictures).then ->
+          req.done()
+
+    describe "when updateVariationPictures is called", ->
+      it "should update pictures from variation", ->
+        pictures = [ { url: "mediaTostada.jpg" } ]
+        req = nockProductecaApi "/products/1/pictures", {}, "put", pictures
         api.updateVariationPictures(1, pictures).then ->
           req.done()
 

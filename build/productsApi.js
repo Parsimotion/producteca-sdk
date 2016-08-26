@@ -24,6 +24,7 @@
       this.createWarehouse = __bind(this.createWarehouse, this);
       this.update = __bind(this.update, this);
       this.updateVariationPictures = __bind(this.updateVariationPictures, this);
+      this.addVariationPictures = __bind(this.addVariationPictures, this);
       this.updateVariationStocks = __bind(this.updateVariationStocks, this);
       this.createVariations = __bind(this.createVariations, this);
       this.create = __bind(this.create, this);
@@ -71,10 +72,16 @@
       return this.client.putAsync(url, adjustments);
     };
 
-    ProductsApi.prototype.updateVariationPictures = function(productId, pictures) {
+    ProductsApi.prototype.addVariationPictures = function(productId, pictures) {
       var url;
       url = "/products/" + productId + "/pictures";
       return this.client.postAsync(url, pictures);
+    };
+
+    ProductsApi.prototype.updateVariationPictures = function(productId, pictures) {
+      var url;
+      url = "/products/" + productId + "/pictures";
+      return this.client.putAsync(url, pictures);
     };
 
     ProductsApi.prototype.update = function(id, update) {
