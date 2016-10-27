@@ -1,13 +1,11 @@
 Promise = require("bluebird")
 request = require("request")
-Promise.promisifyAll request, multiArgs: true
-
-RESPONSE_ELEMENT = 0
+Promise.promisifyAll request
 
 module.exports =
 
 class Client
-  constructor: (@url, @accessToken) ->
+  constructor: (@url, @authMethod) ->
 
   getAsync: (path) =>
     @_doRequest "get", path
@@ -24,11 +22,11 @@ class Client
   _doRequest: (verb, path, body) =>
     options =
       url: @_makeUrl path
-      auth: bearer: @accessToken
+      auth: @authMethod
       json: true
       body: body
 
-    request["#{verb}Async"](options).get(RESPONSE_ELEMENT).then (res) ->
+    request["#{verb}Async"](options).then (res) ->
       throw res.body if res.statusCode > 400
       res.body
 

@@ -1,21 +1,17 @@
 (function() {
-  var Client, Promise, RESPONSE_ELEMENT, request,
+  var Client, Promise, request,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
   Promise = require("bluebird");
 
   request = require("request");
 
-  Promise.promisifyAll(request, {
-    multiArgs: true
-  });
-
-  RESPONSE_ELEMENT = 0;
+  Promise.promisifyAll(request);
 
   module.exports = Client = (function() {
-    function Client(url, accessToken) {
+    function Client(url, authMethod) {
       this.url = url;
-      this.accessToken = accessToken;
+      this.authMethod = authMethod;
       this._makeUrl = __bind(this._makeUrl, this);
       this._doRequest = __bind(this._doRequest, this);
       this.delAsync = __bind(this.delAsync, this);
@@ -44,13 +40,11 @@
       var options;
       options = {
         url: this._makeUrl(path),
-        auth: {
-          bearer: this.accessToken
-        },
+        auth: this.authMethod,
         json: true,
         body: body
       };
-      return request["" + verb + "Async"](options).get(RESPONSE_ELEMENT).then(function(res) {
+      return request["" + verb + "Async"](options).then(function(res) {
         if (res.statusCode > 400) {
           throw res.body;
         }
