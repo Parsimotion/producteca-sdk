@@ -1,14 +1,10 @@
 (function() {
-  var BODY, OAuthApi, Promise, request,
+  var OAuthApi, Promise, request,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
   Promise = require("bluebird");
 
-  request = Promise.promisifyAll(require("request"), {
-    multiArgs: true
-  });
-
-  BODY = 1;
+  request = Promise.promisifyAll(require("request"));
 
   OAuthApi = (function() {
     function OAuthApi(_arg) {
@@ -23,13 +19,15 @@
         auth: {
           bearer: this.accessToken
         }
-      }).tap(function(_arg) {
-        var res;
-        res = _arg[0];
+      }).tap(function(res) {
         if (res.statusCode > 400) {
           throw new Error(res.body);
         }
-      }).get(BODY);
+      }).then(function(_arg) {
+        var body;
+        body = _arg.body;
+        return body;
+      });
     };
 
     return OAuthApi;

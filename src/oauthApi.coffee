@@ -1,7 +1,5 @@
 Promise = require("bluebird")
-request = Promise.promisifyAll require("request"), multiArgs: true
-
-BODY = 1
+request = Promise.promisifyAll require("request")
 
 class OAuthApi
   constructor: ({ @accessToken, @url }) ->
@@ -10,7 +8,7 @@ class OAuthApi
       url: @url
       json: true
       auth: bearer: @accessToken
-    .tap ([res]) -> throw new Error(res.body) if res.statusCode > 400
-    .get(BODY)
+    .tap (res) -> throw new Error(res.body) if res.statusCode > 400
+    .then ({ body }) -> body
 
 module.exports = OAuthApi
