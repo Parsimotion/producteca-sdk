@@ -73,6 +73,26 @@ describe "SalesOrders", ->
         error.message.should.eql "The sales orders with integrationId: 123 and app: 2 wasn't found."
         done()
 
+  describe "when getByInvoiceIntegration is called", ->
+    it "should return the sales order that matches", ->
+      oDataQuery = encodeURIComponent "invoiceIntegration/integrationId eq 8787 and invoiceIntegration/app eq 8)"
+      nockProductecaApi "/salesorders?$filter=#{oDataQuery}",
+        count: 1
+        results: [una_orden: true]
+
+      api.getByInvoiceIntegration({ invoiceIntegrationId: 8787, app: 8 }).then (salesOrder) ->
+        salesOrder.should.eql una_orden: true
+
+    it "should throw an error if no sales orders match", (done) ->
+      oDataQuery = encodeURIComponent "invoiceIntegration/integrationId eq 8787 and invoiceIntegration/app eq 8)"
+      nockProductecaApi "/salesorders?$filter=#{oDataQuery}",
+        count: 0
+        results: []
+
+      api.getByInvoiceIntegration({ invoiceIntegrationId: 8787, app: 8 }).catch (error) =>
+        error.message.should.eql "The sales orders with invoiceIntegrationId: 8787 and app: 8 wasn't found."
+        done()
+
   describe "when getWithFullProducts is called", ->
     it "should return the salesOrder and all its products", ->
       product31 = id: 31 ; product32 = id: 32
