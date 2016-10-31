@@ -24,10 +24,21 @@ class SalesOrdersApi extends ProductecaApi
 
   #Returns a sales order by integration
   getByIntegration: ({ integrationId, app }) =>
-    oDataQuery = encodeURIComponent "integrations/any(integration integration/integrationId eq #{integrationId} and integration/app eq #{app})"
-    (@respondMany @client.getAsync "/salesorders?$filter=#{oDataQuery}").then (results) =>
+    query = "integrations/any(integration integration/integrationId eq #{integrationId} and integration/app eq #{app})"
+    propertiesNotFound = "integrationId: #{integrationId} and app: #{app}"
+    @_findSalesOrder query, propertiesNotFound
+
+  #Returns a sales order by its invoice integration
+  getByInvoiceIntegration: ({ invoiceIntegrationId, app }) =>
+    query = "invoiceIntegration/integrationId eq #{invoiceIntegrationId} and invoiceIntegration/app eq #{app})"
+    propertiesNotFound = "invoiceIntegrationId: #{invoiceIntegrationId} and app: #{app}"
+    @_findSalesOrder query, propertiesNotFound
+
+  _findSalesOrder: (query, propertiesNotFound) =>
+    oDataQuery = encodeURIComponent query
+    (@respondMany @client.getAsync "/salesorders/?$filter=#{oDataQuery}").then (results) =>
       if _.isEmpty results
-        throw new Error("The sales orders with integrationId: #{integrationId} and app: #{app} wasn't found.")
+        throw new Error("The sales orders with #{propertiesNotFound} wasn't found.")
       _.first results
 
   #Returns a sales order by id and all the products in its lines
