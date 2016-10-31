@@ -27,6 +27,8 @@
       this.update = __bind(this.update, this);
       this.create = __bind(this.create, this);
       this.getWithFullProducts = __bind(this.getWithFullProducts, this);
+      this._findSalesOrder = __bind(this._findSalesOrder, this);
+      this.getByInvoiceIntegration = __bind(this.getByInvoiceIntegration, this);
       this.getByIntegration = __bind(this.getByIntegration, this);
       this.get = __bind(this.get, this);
       this.getAll = __bind(this.getAll, this);
@@ -48,13 +50,28 @@
     };
 
     SalesOrdersApi.prototype.getByIntegration = function(_arg) {
-      var app, integrationId, oDataQuery;
+      var app, integrationId, propertiesNotFound, query;
       integrationId = _arg.integrationId, app = _arg.app;
-      oDataQuery = encodeURIComponent("integrations/any(integration integration/integrationId eq " + integrationId + " and integration/app eq " + app + ")");
-      return (this.respondMany(this.client.getAsync("/salesorders?$filter=" + oDataQuery))).then((function(_this) {
+      query = "integrations/any(integration integration/integrationId eq " + integrationId + " and integration/app eq " + app + ")";
+      propertiesNotFound = "integrationId: " + integrationId + " and app: " + app;
+      return this._findSalesOrder(query, propertiesNotFound);
+    };
+
+    SalesOrdersApi.prototype.getByInvoiceIntegration = function(_arg) {
+      var app, invoiceIntegrationId, propertiesNotFound, query;
+      invoiceIntegrationId = _arg.invoiceIntegrationId, app = _arg.app;
+      query = "invoiceIntegration/integrationId eq " + invoiceIntegrationId + " and invoiceIntegration/app eq " + app + ")";
+      propertiesNotFound = "invoiceIntegrationId: " + invoiceIntegrationId + " and app: " + app;
+      return this._findSalesOrder(query, propertiesNotFound);
+    };
+
+    SalesOrdersApi.prototype._findSalesOrder = function(query, propertiesNotFound) {
+      var oDataQuery;
+      oDataQuery = encodeURIComponent(query);
+      return (this.respondMany(this.client.getAsync("/salesorders/?$filter=" + oDataQuery))).then((function(_this) {
         return function(results) {
           if (_.isEmpty(results)) {
-            throw new Error("The sales orders with integrationId: " + integrationId + " and app: " + app + " wasn't found.");
+            throw new Error("The sales orders with " + propertiesNotFound + " wasn't found.");
           }
           return _.first(results);
         };
