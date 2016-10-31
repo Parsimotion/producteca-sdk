@@ -36,7 +36,7 @@ class SalesOrdersApi extends ProductecaApi
 
   _findSalesOrder: (query, propertiesNotFound) =>
     oDataQuery = encodeURIComponent query
-    (@respondMany @client.getAsync "/salesorders?$filter=#{oDataQuery}").then (results) =>
+    (@respondMany @client.getAsync "/salesorders/?$filter=#{oDataQuery}").then (results) =>
       if _.isEmpty results
         throw new Error("The sales orders with #{propertiesNotFound} wasn't found.")
       _.first results

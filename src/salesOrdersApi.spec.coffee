@@ -11,38 +11,41 @@ describe "SalesOrders", ->
     url: PRODUCTECA_API_URL
   )
 
+  nockSalesOrderFilter = (oDataQuery, results) ->
+    nockProductecaApi "/salesorders/?$filter=#{encodeURIComponent oDataQuery}", results
+
   beforeEach ->
     nock.cleanAll()
 
   describe "when getAll is called", ->
     it "should return all the opened salesOrders without filters", ->
       oDataQuery = "(IsOpen eq true) and (IsCanceled eq false)"
-      req = nockProductecaApi "/salesorders/?$filter=#{encodeURIComponent oDataQuery}", results: []
+      req = nockSalesOrderFilter oDataQuery, results: []
       api.getAll().then ->
         req.done()
 
     describe "when filtering...", ->
       it "should return all the paid salesOrders", ->
         oDataQuery = "(IsOpen eq true) and (IsCanceled eq false) and (PaymentStatus eq 'Approved')"
-        req = nockProductecaApi "/salesorders/?$filter=#{encodeURIComponent oDataQuery}", results: []
+        req = nockSalesOrderFilter oDataQuery, results: []
         api.getAll(paid: true).then ->
           req.done()
 
       it "should return all the salesOrders of a brand", ->
         oDataQuery = "(IsOpen eq true) and (IsCanceled eq false) and ((Lines/any(line:line/Variation/Definition/Brand/Id eq 3)) or (Lines/any(line:line/Variation/Definition/Brand/Id eq 4)))"
-        req = nockProductecaApi "/salesorders/?$filter=#{encodeURIComponent oDataQuery}", results: []
+        req = nockSalesOrderFilter oDataQuery, results: []
         api.getAll(brands: [ 3, 4 ]).then ->
           req.done()
 
       it "should return all the salesOrders for a property/inner", ->
         oDataQuery = "(IsOpen eq true) and (IsCanceled eq false) and (property/inner eq 'string')"
-        req = nockProductecaApi "/salesorders/?$filter=#{encodeURIComponent oDataQuery}", results: []
+        req = nockSalesOrderFilter oDataQuery, results: []
         api.getAll(other: "property/inner eq 'string'").then ->
           req.done()
 
       it "should be able to combine filters", ->
         oDataQuery = "(IsOpen eq true) and (IsCanceled eq false) and (PaymentStatus eq 'Approved') and (property/inner eq 'string')"
-        req = nockProductecaApi "/salesorders/?$filter=#{encodeURIComponent oDataQuery}", results: []
+        req = nockSalesOrderFilter oDataQuery, results: []
         api.getAll(paid: true, other: "property/inner eq 'string'").then ->
           req.done()
 
@@ -55,17 +58,17 @@ describe "SalesOrders", ->
 
   describe "when getByIntegration is called", ->
     it "should return the sales order that matches", ->
-      oDataQuery = encodeURIComponent "integrations/any(integration integration/integrationId eq 123 and integration/app eq 2)"
-      nockProductecaApi "/salesorders?$filter=#{oDataQuery}",
-        count: 1
+      oDataQuery = "integrations/any(integration integration/integrationId eq 123 and integration/app eq 2)"
+      nockSalesOrderFilter oDataQuery,
         results: [una_orden: true]
+        count: 1
 
       api.getByIntegration({ integrationId: 123, app: 2 }).then (salesOrder) ->
         salesOrder.should.eql una_orden: true
 
     it "should throw an error if no sales orders match", (done) ->
-      oDataQuery = encodeURIComponent "integrations/any(integration integration/integrationId eq 123 and integration/app eq 2)"
-      nockProductecaApi "/salesorders?$filter=#{oDataQuery}",
+      oDataQuery = "integrations/any(integration integration/integrationId eq 123 and integration/app eq 2)"
+      nockSalesOrderFilter oDataQuery,
         count: 0
         results: []
 
@@ -75,8 +78,8 @@ describe "SalesOrders", ->
 
   describe "when getByInvoiceIntegration is called", ->
     it "should return the sales order that matches", ->
-      oDataQuery = encodeURIComponent "invoiceIntegration/integrationId eq 8787 and invoiceIntegration/app eq 8)"
-      nockProductecaApi "/salesorders?$filter=#{oDataQuery}",
+      oDataQuery = "invoiceIntegration/integrationId eq 8787 and invoiceIntegration/app eq 8)"
+      nockSalesOrderFilter oDataQuery,
         count: 1
         results: [una_orden: true]
 
@@ -84,8 +87,8 @@ describe "SalesOrders", ->
         salesOrder.should.eql una_orden: true
 
     it "should throw an error if no sales orders match", (done) ->
-      oDataQuery = encodeURIComponent "invoiceIntegration/integrationId eq 8787 and invoiceIntegration/app eq 8)"
-      nockProductecaApi "/salesorders?$filter=#{oDataQuery}",
+      oDataQuery = "invoiceIntegration/integrationId eq 8787 and invoiceIntegration/app eq 8)"
+      nockSalesOrderFilter oDataQuery,
         count: 0
         results: []
 
