@@ -68,6 +68,10 @@ class ProductsApi extends ProductecaApi
   getBatch: (skip = 0, top = 20, moreQueryString = "") =>
     @respondMany @client.getAsync "/products?$top=#{top}&$skip=#{skip}&#{moreQueryString}"
 
+  # Retrieves a chunk of skus
+  getSkus: (skip = 0, top = 20, moreQueryString = "") =>
+    @respondMany @client.getAsync "/products/skus?$top=#{top}&$skip=#{skip}&#{moreQueryString}"
+
   _getProductsPageByPage: (skip = 0) =>
     TOP = 500
     @getBatch(skip, TOP).then (products) =>
