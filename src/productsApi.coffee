@@ -70,7 +70,7 @@ class ProductsApi extends ProductecaApi
 
   # Retrieves a chunk of skus
   getSkus: (skip = 0, top = 20, moreQueryString = "") =>
-    @respondMany @client.getAsync "/products/skus?$top=#{top}&$skip=#{skip}&#{moreQueryString}"
+    @client.getAsync "/products/skus?$top=#{top}&$skip=#{skip}&#{moreQueryString}"
 
   _getProductsPageByPage: (skip = 0) =>
     TOP = 500
