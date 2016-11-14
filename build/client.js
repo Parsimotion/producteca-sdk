@@ -4,9 +4,7 @@
 
   Promise = require("bluebird");
 
-  request = require("request");
-
-  Promise.promisifyAll(request);
+  request = Promise.promisify(require("request"));
 
   module.exports = Client = (function() {
     function Client(url, authMethod) {
@@ -21,30 +19,31 @@
     }
 
     Client.prototype.getAsync = function(path) {
-      return this._doRequest("get", path);
+      return this._doRequest("GET", path);
     };
 
     Client.prototype.postAsync = function(path, body) {
-      return this._doRequest("post", path, body);
+      return this._doRequest("POST", path, body);
     };
 
     Client.prototype.putAsync = function(path, body) {
-      return this._doRequest("put", path, body);
+      return this._doRequest("PUT", path, body);
     };
 
     Client.prototype.delAsync = function(path) {
-      return this._doRequest("del", path);
+      return this._doRequest("DELETE", path);
     };
 
     Client.prototype._doRequest = function(verb, path, body) {
       var options;
       options = {
+        method: verb,
         url: this._makeUrl(path),
         auth: this.authMethod,
         json: true,
         body: body
       };
-      return request["" + verb + "Async"](options).then(function(res) {
+      return request(options).then(function(res) {
         if (res.statusCode > 400) {
           throw res.body;
         }

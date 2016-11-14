@@ -126,7 +126,7 @@
       if (moreQueryString == null) {
         moreQueryString = "";
       }
-      return this.respondMany(this.client.getAsync("/products/skus?$top=" + top + "&$skip=" + skip + "&" + moreQueryString));
+      return this.client.getAsync("/products/skus?$top=" + top + "&$skip=" + skip + "&" + moreQueryString);
     };
 
     ProductsApi.prototype._getProductsPageByPage = function(skip) {
