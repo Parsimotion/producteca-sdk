@@ -27,6 +27,7 @@
       this.updateVariationPictures = __bind(this.updateVariationPictures, this);
       this.addVariationPictures = __bind(this.addVariationPictures, this);
       this.updateVariationStocks = __bind(this.updateVariationStocks, this);
+      this.updateVariation = __bind(this.updateVariation, this);
       this.createVariations = __bind(this.createVariations, this);
       this.create = __bind(this.create, this);
       this.findByVariationSku = __bind(this.findByVariationSku, this);
@@ -65,6 +66,12 @@
       var url;
       url = "/products/" + productId + "/variations";
       return this.client.postAsync(url, variations);
+    };
+
+    ProductsApi.prototype.updateVariation = function(productId, variations) {
+      var url;
+      url = "/products/" + productId + "/variations";
+      return this.client.putAsync(url, variations);
     };
 
     ProductsApi.prototype.updateVariationStocks = function(productId, adjustments) {

@@ -33,6 +33,11 @@ class ProductsApi extends ProductecaApi
     url = "/products/#{productId}/variations"
     @client.postAsync url, variations
 
+  # Updates one or more variations of a product definition
+  updateVariation: (productId, variations) =>
+    url = "/products/#{productId}/variations"
+    @client.putAsync url, variations
+
   # Updates the stocks of one or more variations
   updateVariationStocks: (productId, adjustments) =>
     url = "/products/#{productId}/stocks"
