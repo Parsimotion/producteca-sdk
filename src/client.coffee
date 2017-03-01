@@ -1,3 +1,4 @@
+_ = require("lodash")
 Promise = require("bluebird")
 request = Promise.promisify require("request")
 
@@ -6,25 +7,26 @@ module.exports =
 class Client
   constructor: (@url, @authMethod) ->
 
-  getAsync: (path) =>
-    @_doRequest "GET", path
+  getAsync: (path, opts) =>
+    @_doRequest {verb: "GET", path}, opts
 
-  postAsync: (path, body) =>
-    @_doRequest "POST", path, body
+  postAsync: (path, body, opts) =>
+    @_doRequest {verb: "POST", path, body}, opts
 
-  putAsync: (path, body) =>
-    @_doRequest "PUT", path, body
+  putAsync: (path, body, opts) =>
+    @_doRequest {verb: "PUT", path, body}, opts
 
   delAsync: (path) =>
-    @_doRequest "DELETE", path
+    @_doRequest {verb: "DELETE", path}
 
-  _doRequest: (verb, path, body) =>
+  _doRequest: ({verb, path, body}, {raw = false} = {}) =>
     options =
       method: verb
       url: @_makeUrl path
-      auth: @authMethod
-      json: true
       body: body
+
+    _.assign options: auth: @authMethod unless _.isEmpty @authMethod
+    _.assign options, json: true unless raw
 
     request(options).then (res) ->
       throw res.body if res.statusCode > 400

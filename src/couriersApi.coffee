@@ -10,4 +10,5 @@ class CouriersApi
 
   getZplOf: ({ id: salesOrderId }, { id: shipmentId }) ->
     jwttoken = jwt.encode [ { salesOrderId, shipmentId } ], @jsonWebTokenSecret
-    @client.getAsync "/couriers/shipments/label?shipments=#{jwttoken}&type=zpl2&access_token=#{@productecaToken}"
+    url = "/couriers/shipments/label?shipments=#{jwttoken}&type=zpl2&access_token=#{@productecaToken}"
+    @client.getAsync url, raw: true
