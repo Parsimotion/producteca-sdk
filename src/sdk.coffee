@@ -4,3 +4,4 @@ module.exports =
   SalesOrdersApi: require("./salesOrdersApi")
   ContactsApi: require("./contactsApi")
   OAuthApi: require("./oauthApi")
+  CouriersApi: require("./couriersApi")

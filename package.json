@@ -9,17 +9,18 @@
   "main": "build/sdk.js",
   "dependencies": {
     "bluebird": "^3.4.1",
+    "jwt-simple": "^0.5.1",
     "lodash": "^4.13.1",
     "q": "~1.0.1",
     "request": "^2.72.0"
   },
   "devDependencies": {
     "chai-as-promised": "^5.2.0",
-    "coffee-script": "^1.8.0",
+    "coffee-script": "^1.12.4",
     "grunt": "~0.4.4",
     "grunt-bump": "^0.3.1",
     "grunt-contrib-clean": "~0.5.0",
-    "grunt-contrib-coffee": "^0.10.1",
+    "grunt-contrib-coffee": "^1.0.0",
     "grunt-mocha-test": "~0.10.2",
     "nock": "^8.0.0",
     "sinon": "^1.17.4",
