@@ -25,7 +25,7 @@ class Client
       url: @_makeUrl path
       body: body
 
-    _.assign options: auth: @authMethod unless _.isEmpty @authMethod
+    _.assign options, auth: @authMethod unless _.isEmpty @authMethod
     _.assign options, json: true unless raw
 
     request(options).then (res) ->
