@@ -146,18 +146,6 @@ describe "SalesOrders", ->
       api.updateShipment(1, 42, { Date: "14/07/2016 11:15:00" }).then ->
         req.done()
 
-  describe "when updateShipmentStatus is called", ->
-    it "should update shipment(id=42) status from the salesOrder with id=1", ->
-      req = nockProductecaApi "/salesorders/1/shipments/42/status", {}, "put", { status: "arrived" }
-      api.updateShipmentStatus(1, 42, { status: "arrived" }).then ->
-        req.done()
-
-  describe "when updateShipmentStatusById is called", ->
-    it "should update shipment(id=42) status", ->
-      req = nockProductecaApi "/shipments/42/status", {}, "put", { status: "arrived" }
-      api.updateShipmentStatusById(42, { status: "arrived" }).then ->
-        req.done()
-
   describe "when createPayment is called", ->
     it "should create a payment for the salesOrder with id=1", ->
       req = nockProductecaApi "/salesorders/1/payments", {}, "post", { id: 30 }
