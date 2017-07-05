@@ -27,7 +27,8 @@
     "sinon-chai": "^2.5.0"
   },
   "engines": {
-    "node": ">=0.10.0"
+    "node": ">=0.10.0",
+    "npm": "3.7.3"
   },
   "scripts": {
     "test": "grunt test",
