@@ -15,6 +15,7 @@
     "request": "^2.72.0"
   },
   "devDependencies": {
+    "chai": "^2.1.2",
     "chai-as-promised": "^5.2.0",
     "coffee-script": "^1.12.4",
     "grunt": "~0.4.4",
