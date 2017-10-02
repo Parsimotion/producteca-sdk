@@ -29,7 +29,7 @@ class Client
     _.assign options, json: true unless raw
 
     request(options).then (res) ->
-      throw res.body if res.statusCode > 400
+      throw res.body if res.statusCode >= 400
       res.body
 
   _makeUrl: (path) =>
