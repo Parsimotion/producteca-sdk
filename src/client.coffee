@@ -20,10 +20,11 @@ class Client
     @_doRequest { verb: "DELETE", path }
 
   _doRequest: ({ verb, path, body }, { raw = false } = {}) =>
-    options =
+    options = {
       method: verb
       url: @_makeUrl path
-      body: { body }
+      body
+    }
 
     _.assign options, auth: @authMethod unless _.isEmpty @authMethod
     _.assign options, json: true unless raw
