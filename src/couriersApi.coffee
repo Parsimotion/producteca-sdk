@@ -8,7 +8,9 @@ class CouriersApi
   constructor: ({ @productecaToken, @jsonWebTokenSecret, url }) ->
     @client = new Client url, {}
 
-  getZplOf: ({ id: salesOrderId }, { id: shipmentId }) ->
+  getDownloadLink: ({ id: salesOrderId }, { id: shipmentId }, type = "pdf") ->
     jwttoken = jwt.encode [ { salesOrderId, shipmentId } ], @jsonWebTokenSecret
-    url = "/couriers/shipments/label?shipments=#{jwttoken}&type=zpl2&access_token=#{@productecaToken}"
-    @client.getAsync url, raw: true
+    "/couriers/shipments/label?shipments=#{jwttoken}&type=#{type}&access_token=#{@productecaToken}"
+
+  getZplOf: (order, shipment) ->
+    @client.getAsync getDownloadLink(order, shipment, "zpl2"), raw: true
