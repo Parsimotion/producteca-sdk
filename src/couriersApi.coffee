@@ -13,4 +13,4 @@ class CouriersApi
     "/couriers/shipments/label?shipments=#{jwttoken}&type=#{type}&access_token=#{@productecaToken}"
 
   getZplOf: (order, shipment) ->
-    @client.getAsync getDownloadLink(order, shipment, "zpl2"), raw: true
+    @client.getAsync @getDownloadLink(order, shipment, "zpl2"), raw: true
