@@ -5,8 +5,11 @@ module.exports =
 
 class CouriersApi
 
-  constructor: ({ @productecaToken, @jsonWebTokenSecret, url }) ->
-    @client = new Client url, {}
+  constructor: ({ @productecaToken, @jsonWebTokenSecret, @url }) ->
+    @client = new Client @url, {}
+
+  getFullDownloadLink: (salesOrder, shipment, type) ->
+    "#{@url}#{@_getDownloadLink(salesOrder, shipment, type)}"
 
   getDownloadLink: ({ id: salesOrderId }, { id: shipmentId }, type = "pdf") ->
     jwttoken = jwt.encode [ { salesOrderId, shipmentId } ], @jsonWebTokenSecret
