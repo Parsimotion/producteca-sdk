@@ -61,6 +61,10 @@ class ProductsApi extends ProductecaApi
   createWarehouse: (name) =>
     @client.postAsync "/warehouses", { name }
 
+  # Creates a full warehouse
+  createWarehouseWithIntegration: (warehouse) =>
+    @client.postAsync "/warehouses", warehouse
+
   # Retrieves all the pricelists
   getPricelists: =>
     @client.getAsync "/pricelists"
