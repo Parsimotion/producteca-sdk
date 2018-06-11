@@ -11,9 +11,9 @@ class CouriersApi
   getFullDownloadLink: (salesOrder, shipment, type) =>
     "#{@url}#{@getDownloadLink(salesOrder, shipment, type)}"
 
-  getDownloadLink: ({ id: salesOrderId }, { id: shipmentId }, type = "pdf", raw = false) =>
+  getDownloadLink: ({ id: salesOrderId }, { id: shipmentId }, type = "pdf") =>
     jwttoken = jwt.encode [ { salesOrderId, shipmentId } ], @jsonWebTokenSecret
-    "/couriers/shipments/label?shipments=#{jwttoken}&type=#{type}&access_token=#{@productecaToken}&raw=#{raw}"
+    "/couriers/shipments/label?shipments=#{jwttoken}&type=#{type}&access_token=#{@productecaToken}&raw=true"
 
-  getZplOf: (order, shipment, { raw  } = {}) =>
-    @client.getAsync @getDownloadLink(order, shipment, "zpl2", raw), raw: true
+  getZplOf: (order, shipment) =>
+    @client.getAsync @getDownloadLink(order, shipment, "zpl2"), raw: true
