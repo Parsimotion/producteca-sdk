@@ -14,38 +14,41 @@ describe "SalesOrders", ->
   nockSalesOrderFilter = (oDataQuery, results) ->
     nockProductecaApi "/salesorders/?$filter=#{encodeURIComponent oDataQuery}", results
 
+  nockGetAll = (oDataQuery, results) ->
+    nockProductecaApi "/salesorders?$top=500&$skip=0&$filter=#{encodeURIComponent oDataQuery}", results
+
   beforeEach ->
     nock.cleanAll()
 
   describe "when getAll is called", ->
     it "should return all the opened salesOrders without filters", ->
       oDataQuery = "(IsOpen eq true) and (IsCanceled eq false)"
-      req = nockSalesOrderFilter oDataQuery, results: []
+      req = nockGetAll oDataQuery, results: []
       api.getAll().then ->
         req.done()
 
     describe "when filtering...", ->
       it "should return all the paid salesOrders", ->
         oDataQuery = "(IsOpen eq true) and (IsCanceled eq false) and (PaymentStatus eq 'Approved')"
-        req = nockSalesOrderFilter oDataQuery, results: []
+        req = nockGetAll oDataQuery, results: []
         api.getAll(paid: true).then ->
           req.done()
 
       it "should return all the salesOrders of a brand", ->
         oDataQuery = "(IsOpen eq true) and (IsCanceled eq false) and ((Lines/any(line:line/Variation/Definition/Brand/Id eq 3)) or (Lines/any(line:line/Variation/Definition/Brand/Id eq 4)))"
-        req = nockSalesOrderFilter oDataQuery, results: []
+        req = nockGetAll oDataQuery, results: []
         api.getAll(brands: [ 3, 4 ]).then ->
           req.done()
 
       it "should return all the salesOrders for a property/inner", ->
         oDataQuery = "(IsOpen eq true) and (IsCanceled eq false) and (property/inner eq 'string')"
-        req = nockSalesOrderFilter oDataQuery, results: []
+        req = nockGetAll oDataQuery, results: []
         api.getAll(other: "property/inner eq 'string'").then ->
           req.done()
 
       it "should be able to combine filters", ->
         oDataQuery = "(IsOpen eq true) and (IsCanceled eq false) and (PaymentStatus eq 'Approved') and (property/inner eq 'string')"
-        req = nockSalesOrderFilter oDataQuery, results: []
+        req = nockGetAll oDataQuery, results: []
         api.getAll(paid: true, other: "property/inner eq 'string'").then ->
           req.done()
 

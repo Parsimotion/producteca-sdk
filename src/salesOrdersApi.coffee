@@ -5,6 +5,7 @@ module.exports =
 
 class SalesOrdersApi extends ProductecaApi
   constructor: (endpoint) ->
+    @resource = "salesorders"
     @productsApi = new ProductsApi(endpoint)
     super endpoint
 
@@ -16,7 +17,7 @@ class SalesOrdersApi extends ProductecaApi
   # }
   getAll: (filters = {}) =>
     querystring = @_buildSalesOrdersFilters filters
-    @respondMany @client.getAsync "/salesorders/?$filter=#{querystring}"
+    @_getPageByPage(0, "$filter=#{querystring}")
 
   #Returns a sales order by id
   get: (id) =>
