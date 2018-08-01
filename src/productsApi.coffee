@@ -57,6 +57,10 @@ class ProductsApi extends ProductecaApi
     url = "/products/#{productId}/pictures"
     @client.putAsync url, pictures
 
+  # Updates product prices
+  updatePrices: (id, update) =>
+    @client.putAsync "/products/#{id}/prices", update
+
   # Updates a product
   update: (id, update) =>
     @client.putAsync "/products/#{id}", update

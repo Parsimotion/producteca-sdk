@@ -141,6 +141,13 @@ describe "ProductsApi", ->
         api.updateVariationPictures(1, pictures).then ->
           req.done()
 
+    describe "when updatePrices is called", ->
+      it "should update a prices", ->
+        prices = [{ priceList: "Default", amount: 1500, currency: "Local" }]
+        req = nockProductecaApi "/products/1/prices", {}, "put", prices
+        api.updatePrices(1, prices).then ->
+          req.done()
+
     describe "when update is called", ->
       it "should update a product", ->
         product = notes: "actualizo la nota!"
