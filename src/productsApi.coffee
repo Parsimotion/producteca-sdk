@@ -26,7 +26,8 @@ class ProductsApi extends ProductecaApi
 
   # Find products by a variation SKU
   findByVariationSku: (sku) =>
-    (@client.getAsync("/products/bysku?sku=#{encodeURIComponent(sku)}")).then @_convertJsonToProducts
+    opts = { qs: { sku } }
+    (@client.getAsync("/products/bysku", opts)).then @_convertJsonToProducts
 
   # Creates a product
   create: (product) =>

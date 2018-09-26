@@ -19,11 +19,12 @@ class Client
   delAsync: (path) =>
     @_doRequest { verb: "DELETE", path }
 
-  _doRequest: ({ verb, path, body }, { raw = false } = {}) =>
+  _doRequest: ({ verb, path, body }, { qs, raw = false } = {}) =>
     options = {
       method: verb
       url: @_makeUrl path
       body
+      qs
     }
 
     _.assign options, auth: @authMethod unless _.isEmpty @authMethod
