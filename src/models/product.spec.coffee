@@ -16,9 +16,9 @@ describe "Product", ->
 
   describe "when findVariationBySku is called", ->
 
-    it "should return the variation where the sku is equal (case insensitive)", ->
+    it "should return the variation where the sku is equal (case and trailing space insensitive)", ->
       product = createProductWithVariations { sku: "A" }, { sku: "B" }
-      product.findVariationBySku("a").should.be.eql { sku: "A" }
+      product.findVariationBySku("a  ").should.be.eql { sku: "A" }
 
     it "should return undefined when product has variation and the variation was not found", ->
       product = createProductWithVariations { sku: "A" }, { sku: "B" }

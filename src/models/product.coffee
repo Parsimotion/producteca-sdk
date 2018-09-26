@@ -9,7 +9,7 @@ class Product
     _.size(@variations) > 1
 
   findVariationBySku: (sku) =>
-    _.find @variations, (variation) -> variation.sku?.toUpperCase() is sku?.toUpperCase()
+    _.find @variations, (variation) -> variation.sku?.toUpperCase().trim() is sku?.toUpperCase().trim()
 
   firstVariation: =>
     _.head @variations
