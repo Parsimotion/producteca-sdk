@@ -20,9 +20,10 @@ class ProductsApi extends ProductecaApi
   getMany: (ids) =>
     (@client.getAsync("/products?ids=#{ids}")).then @_convertJsonToProducts
 
-  # Find products by code
-  findByCode: (code, $select) =>
-    @_findMany "code eq '#{code}'", $select
+  # Find products by code and optionally sku
+  findByCode: (code, sku, $select) =>
+    opts = { qs: { code, sku, $select: $select?.join() } }
+    (@client.getAsync("/products/bycode", opts)).then @_convertJsonToProducts
 
   # Find products by a variation SKU
   findByVariationSku: (sku, $select) =>

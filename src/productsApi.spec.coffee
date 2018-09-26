@@ -53,26 +53,42 @@ describe "ProductsApi", ->
     products = null
 
     describe "without $select", ->
-      beforeEach ->
-        oDataQuery = "code eq 'calcetines'"
 
-        get = nockProductecaApi "/products/?$filter=#{encodeURIComponent oDataQuery}", results: [ anotherProductWithoutVariations ]
-        api.findByCode("calcetines").then (result) ->
-          products = result
+      describe "with sku", ->
+        beforeEach ->
+          code = "calcetines"
+          sku = "Blanco-L"
 
-      it "should send a GET to the api with an oData query to filter products with code='calcetines'", ->
-        get.done()
+          get = nockProductecaApi "/products/bycode?code=#{encodeURIComponent code}&sku=#{encodeURIComponent sku}", [ anotherProductWithoutVariations ]
+          api.findByCode(code, sku).then (result) ->
+            products = result
 
-      it "should return the products", ->
-        havePropertiesEqual products, [anotherProductWithoutVariations]
-        products[0].should.be.an.instanceof Product
+        it "should send a GET to the api including code and sku but without $select", ->
+          get.done()
+
+        it "should return the products", ->
+          havePropertiesEqual products, [anotherProductWithoutVariations]
+          products[0].should.be.an.instanceof Product
+
+      describe "without sku", ->
+        beforeEach ->
+          code = "calcetines"
+
+          get = nockProductecaApi "/products/bycode?code=#{encodeURIComponent code}", [ anotherProductWithoutVariations ]
+          api.findByCode(code).then (result) ->
+            products = result
+
+        it "should send a GET to the api including code but without sku and $select", ->
+          get.done()
+
 
     describe "with $select", ->
       beforeEach ->
-        $filter = "code eq 'calcetines'"
-        $select = "id"
-        get = nockProductecaApi "/products/?$filter=#{encodeURIComponent $filter}&$select=#{encodeURIComponent $select}", results: [ anotherProductWithoutVariations ]
-        api.findByCode "calcetines", $select
+        code = "calcetines"
+        sku =  "Blanco-L"
+        $select = ["id","code","sku","name"]
+        get = nockProductecaApi "/products/bycode?code=#{encodeURIComponent code}&sku=#{encodeURIComponent sku}&#{encodeURIComponent "$select"}=#{encodeURIComponent "id,code,sku,name"}", [ anotherProductWithoutVariations ]
+        api.findByCode code, sku, $select
 
       it "should send a GET to the api with an oData query to filter products with code='calcetines' and the $select's projections", ->
         get.done()
