@@ -83,17 +83,27 @@ describe "ProductsApi", ->
 
     describe "when the product exists", ->
 
-      beforeEach ->
-        nockProductecaApi "/products/bysku?sku=c", [productWithMoreThanOneVariations]
-        get = api.findByVariationSku("c").then (result) ->
-          products = result
+      describe "and $select is not passed", ->
+        beforeEach -> 
+          nockProductecaApi "/products/bysku?sku=c", [productWithMoreThanOneVariations]
+          get = api.findByVariationSku("c").then (result) ->
+            products = result
 
-      it "should send a GET to the api", ->
-        get.done()
+        it "should send a GET to the api without $select in querystring", ->
+          get.done()
 
-      it "should return the products", ->
-        havePropertiesEqual products, [productWithMoreThanOneVariations]
-        products[0].should.be.an.instanceof Product
+        it "should return the products", ->
+          havePropertiesEqual products, [productWithMoreThanOneVariations]
+          products[0].should.be.an.instanceof Product
+
+      describe "and $select is passed as an array of properties", ->
+        beforeEach -> 
+          nockProductecaApi "/products/bysku?sku=c&#{encodeURIComponent("$select")}=#{encodeURIComponent("code,sku,stocks")}", [productWithMoreThanOneVariations]
+          get = api.findByVariationSku("c", ["code","sku","stocks"]).then (result) ->
+            products = result
+
+        it "should send a GET to the api with $select as comma speparated values", ->
+          get.done()
 
     describe "when the product doesn't exist", ->
 
