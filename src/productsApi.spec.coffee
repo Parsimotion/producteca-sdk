@@ -44,7 +44,7 @@ describe "ProductsApi", ->
   describe "when getMany is called", ->
     it "should send a GET to the api with the given string of ids", ->
       products = [ productWithMoreThanOneVariations, productWithoutVariations, anotherProductWithoutVariations ]
-      nockProductecaApi "/products?ids=2,3,4", products
+      nockProductecaApi "/products?ids=#{encodeURIComponent "2,3,4"}", products
       get = api.getMany("2,3,4").then ->
         get.done()
 

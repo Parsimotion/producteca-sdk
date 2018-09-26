@@ -108,7 +108,7 @@ describe "SalesOrders", ->
         lines: [ { product: product31 }, { product: product32 } ]
 
       nockProductecaApi "/salesorders/1", salesOrder
-      nockProductecaApi "/products?ids=31,32", products
+      nockProductecaApi "/products?ids=#{encodeURIComponent "31,32"}", products
 
       api.getWithFullProducts(1).then (salesOrderWithProducts) ->
         havePropertiesEqual salesOrderWithProducts, { salesOrder, products }

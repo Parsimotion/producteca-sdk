@@ -18,17 +18,15 @@ class ProductsApi extends ProductecaApi
 
   # Returns multiple products by their comma separated ids
   getMany: (ids) =>
-    (@client.getAsync("/products?ids=#{ids}")).then @_convertJsonToProducts
+    @_findMany "/products", { ids }
 
   # Find products by code and optionally sku
   findByCode: (code, sku, $select) =>
-    opts = { qs: { code, sku, $select: $select?.join() } }
-    (@client.getAsync("/products/bycode", opts)).then @_convertJsonToProducts
+    @_findMany "/products/bycode", { code, sku }, $select
 
   # Find products by a variation SKU
   findByVariationSku: (sku, $select) =>
-    opts = { qs: { sku, $select: $select?.join() } }
-    (@client.getAsync("/products/bysku", opts)).then @_convertJsonToProducts
+    @_findMany "/products/bysku", { sku }, $select
 
   # Creates a product
   create: (product) =>
@@ -91,13 +89,9 @@ class ProductsApi extends ProductecaApi
   getSkus: (skip = 0, top = 20, moreQueryString = "") =>
     @client.getAsync "/products/skus?$top=#{top}&$skip=#{skip}&#{moreQueryString}"
 
-  _findMany: ($filter, $select = "") =>
-    query = "?$filter=#{encodeURIComponent $filter}"
-
-    if $select isnt ""
-      query += "&$select=#{encodeURIComponent $select}"
-
-    (@respondMany @client.getAsync "/products/#{query}").then @_convertJsonToProducts
+  _findMany: (url, qs = {}, $select) =>
+    _.assign qs, { $select: $select?.join() }
+    (@client.getAsync(url, { qs })).then @_convertJsonToProducts
 
   _convertJsonToProducts: (products) =>
     products.map @_convertJsonToProduct
