@@ -174,6 +174,13 @@ describe "ProductsApi", ->
         api.updatePrices(1, prices).then ->
           req.done()
 
+    describe "when updateAttributes is called", ->
+      it "should update a attributes", ->
+        attributes = [{ key: "Potencia", value: "1500HP" }]
+        req = nockProductecaApi "/products/1/attributes", {}, "put", attributes
+        api.updateAttributes(1, attributes).then ->
+          req.done()
+
     describe "when update is called", ->
       it "should update a product", ->
         product = notes: "actualizo la nota!"
