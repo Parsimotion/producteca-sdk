@@ -70,11 +70,14 @@ class SalesOrdersApi extends ProductecaApi
   updateShipment: (salesOrderId, shipmentId, shipmentUpdate) =>
     @client.putAsync "/salesorders/#{salesOrderId}/shipments/#{shipmentId}", shipmentUpdate
 
+  deleteShipment: (salesOrderId, shipmentId) =>
+    @client.delAsync "/salesorders/#{salesOrderId}/shipments/#{shipmentId}"
+
   createPayment: (salesOrderId, payment) =>
     @client.postAsync "/salesorders/#{salesOrderId}/payments", payment
 
-  deleteShipment: (salesOrderId, shipmentId) =>
-    @client.delAsync "/salesorders/#{salesOrderId}/shipments/#{shipmentId}"
+  updatePayment: (salesOrderId, paymentId, paymentUpdate) =>
+    @client.putAsync "/salesorders/#{salesOrderId}/payments/#{paymentId}", paymentUpdate
 
   deletePayment: (salesOrderId, paymentId) =>
     @client.delAsync "/salesorders/#{salesOrderId}/payments/#{paymentId}"
