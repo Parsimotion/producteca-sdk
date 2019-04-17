@@ -25,9 +25,7 @@ class SalesOrdersApi extends ProductecaApi
 
   #Returns a sales order by integration
   getByIntegration: ({ integrationId, app }) =>
-    query = "integrations/any(integration integration/integrationId eq #{integrationId} and integration/app eq #{app})"
-    propertiesNotFound = "integrationId: #{integrationId} and app: #{app}"
-    @_findSalesOrder query, propertiesNotFound
+    @client.getAsync "/integrations/#{app}/salesorders/#{integrationId}"
 
   #Returns a sales order by its invoice integration
   getByInvoiceIntegration: ({ invoiceIntegrationId, app }) =>

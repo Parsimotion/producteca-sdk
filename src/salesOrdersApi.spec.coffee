@@ -61,22 +61,16 @@ describe "SalesOrders", ->
 
   describe "when getByIntegration is called", ->
     it "should return the sales order that matches", ->
-      oDataQuery = "integrations/any(integration integration/integrationId eq 123 and integration/app eq 2)"
-      nockSalesOrderFilter oDataQuery,
-        results: [una_orden: true]
-        count: 1
+      nockProductecaApi "/integrations/2/salesorders/123", id: 1
 
       api.getByIntegration({ integrationId: 123, app: 2 }).then (salesOrder) ->
-        salesOrder.should.eql una_orden: true
+        salesOrder.should.eql id: 1
 
     it "should throw an error if no sales orders match", (done) ->
-      oDataQuery = "integrations/any(integration integration/integrationId eq 123 and integration/app eq 2)"
-      nockSalesOrderFilter oDataQuery,
-        count: 0
-        results: []
+      nockProductecaApi "/integrations/2/salesorders/123", "The resource you are looking for has been removed, had its name changed, or is temporarily unavailable.", "get", undefined, 404
 
       api.getByIntegration({ integrationId: 123, app: 2 }).catch (error) =>
-        error.message.should.eql "The sales orders with integrationId: 123 and app: 2 wasn't found."
+        error.statusCode.should.eql 404
         done()
 
   describe "when getByInvoiceIntegration is called", ->
