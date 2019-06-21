@@ -27,3 +27,9 @@ describe "ContactsApi", ->
       put = nockProductecaApi "/contacts", {}, "put", contact
       api.update(contact).then ->
         put.done()
+
+  describe "when getByAppAndIntegrationId is called", ->
+    it "should send a GET to the api", ->
+      get = nockProductecaApi "/contacts", { results: [contact] }
+      api.getByAppAndIntegrationId(5, 123).then ->
+        get.done()
