@@ -11,5 +11,5 @@ class ContactsApi extends ProductecaApi
     @client.putAsync "/contacts", contact
 
   # Gets a contact by app and integrationId
-  getByAppAndIntegrationId: (app, integrationId) =>
+  getByIntegration: (app, integrationId) =>
     @client.getAsync "/contacts", { $filter: "profile/integrationId eq #{integrationId}&profile/app eq #{app}" }
