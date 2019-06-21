@@ -16,7 +16,7 @@ class Client
   putAsync: (path, body, opts) =>
     @_doRequest { verb: "PUT", path, body }, opts
 
-  delAsync: (path) =>
+  deleteAsync: (path) =>
     @_doRequest { verb: "DELETE", path }
 
   _doRequest: ({ verb, path, body }, { qs, raw = false } = {}) =>
