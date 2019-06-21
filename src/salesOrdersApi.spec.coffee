@@ -143,16 +143,22 @@ describe "SalesOrders", ->
       api.updateShipment(1, 42, { Date: "14/07/2016 11:15:00" }).then ->
         req.done()
 
+  describe "when deleteShipment is called", ->
+    it "should send a DELETE to the shipment", ->
+      req = nockProductecaApi "/salesorders/1/shipments/2", {}, "delete"
+      api.deleteShipment(1, 2).then ->
+        req.done()
+
   describe "when createPayment is called", ->
     it "should create a payment for the salesOrder with id=1", ->
       req = nockProductecaApi "/salesorders/1/payments", {}, "post", { id: 30 }
       api.createPayment(1, { id: 30 }).then ->
         req.done()
 
-  describe "when deleteShipment is called", ->
-    it "should send a DELETE to the shipment", ->
-      req = nockProductecaApi "/salesorders/1/shipments/2", {}, "delete"
-      api.deleteShipment(1, 2).then ->
+  describe "when updatePayment is called", ->
+    it "should update payment with id=42 from the salesOrder with id=1", ->
+      req = nockProductecaApi "/salesorders/1/payments/42", {}, "put", { Date: "14/07/2016 11:15:00" }
+      api.updatePayment(1, 42, { Date: "14/07/2016 11:15:00" }).then ->
         req.done()
 
   describe "when deletePayment is called", ->
