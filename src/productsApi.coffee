@@ -32,6 +32,16 @@ class ProductsApi extends ProductecaApi
   create: (product) =>
     @client.postAsync "/products", product
 
+  # Creates one integration of a product definition
+  createIntegration: (productId, integration) =>
+    url = "/products/#{productId}/integrations"
+    @client.postAsync url, integration
+
+  # Updates one integration of a product definition
+  updateIntegration: (productId, integration) =>
+    url = "/products/#{productId}/integrations"
+    @client.putAsync url, integration
+
   # Creates one or more variations of a product definition
   createVariations: (productId, variations) =>
     url = "/products/#{productId}/variations"

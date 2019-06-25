@@ -9,3 +9,7 @@ class ContactsApi extends ProductecaApi
   # Updates a contact by name
   update: (contact) =>
     @client.putAsync "/contacts", contact
+
+  # Gets a contact by app and integrationId
+  getByIntegration: (app, integrationId) =>
+    @client.getAsync "/contacts", { $filter: "profile/integrationId eq #{integrationId}&profile/app eq #{app}" }

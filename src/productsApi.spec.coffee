@@ -14,6 +14,7 @@ createProduct = (id, code, variations = []) ->
   code: code
 
 variations = [ { sku: "b" }, { sku: "c" }, { sku: "d" } ]
+integration = { app: 5, integrationId: 12345, status: "Active" }
 
 describe "ProductsApi", ->
   api = new ProductsApi(
@@ -100,7 +101,7 @@ describe "ProductsApi", ->
     describe "when the product exists", ->
 
       describe "and $select is not passed", ->
-        beforeEach -> 
+        beforeEach ->
           nockProductecaApi "/products/bysku?sku=c", [productWithMoreThanOneVariations]
           get = api.findByVariationSku("c").then (result) ->
             products = result
@@ -113,7 +114,7 @@ describe "ProductsApi", ->
           products[0].should.be.an.instanceof Product
 
       describe "and $select is passed as an array of properties", ->
-        beforeEach -> 
+        beforeEach ->
           nockProductecaApi "/products/bysku?sku=c&#{encodeURIComponent("$select")}=#{encodeURIComponent("code,sku,stocks")}", [productWithMoreThanOneVariations]
           get = api.findByVariationSku("c", ["code","sku","stocks"]).then (result) ->
             products = result
@@ -138,6 +139,19 @@ describe "ProductsApi", ->
     it "should create a product", ->
       req = nockProductecaApi "/products", {}, "post", anotherProductWithoutVariations
       api.create(new Product(anotherProductWithoutVariations)).then ->
+        req.done()
+
+  describe "when createIntegration is called", ->
+    it "should create integration", ->
+      req = nockProductecaApi "/products/3/integrations", {}, "post", integration
+      api.createIntegration(3, integration).then ->
+        req.done()
+
+  describe "when updateIntegration is called", ->
+    it "should update integration", ->
+      updatedIntegration = { status: "Paused" }
+      req = nockProductecaApi "/products/1/integrations", {}, "put", updatedIntegration
+      api.updateIntegration(1, updatedIntegration).then ->
         req.done()
 
   describe "when createVariations is called", ->
