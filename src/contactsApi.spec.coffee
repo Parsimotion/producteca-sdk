@@ -30,6 +30,9 @@ describe "ContactsApi", ->
 
   describe "when getByIntegration is called", ->
     it "should send a GET to the api", ->
-      get = nockProductecaApi "/contacts", { results: [contact] }
-      api.getByIntegration(5, 123).then ->
+      app = 5
+      integrationId = 123
+      qs = { key: "$filter", value: "profile/integrationId eq #{integrationId}&profile/app eq #{app}" }
+      get = nockProductecaApi "/contacts?#{encodeURIComponent qs.key}=#{encodeURIComponent qs.value}", { results: [contact] }
+      api.getByIntegration(app, integrationId).then ->
         get.done()
