@@ -41,7 +41,7 @@ class ProductsApi extends ProductecaApi
   updateIntegration: (productId, integration, appId) =>
     url = "/products/#{productId}/integrations"
     headers = { "x-app-id" : appId } if appId
-    @client.putAsync url, integration, headers
+    @client.putAsync url, integration, { headers }
 
   # Creates one or more variations of a product definition
   createVariations: (productId, variations) =>
