@@ -80,6 +80,9 @@ class SalesOrdersApi extends ProductecaApi
   deletePayment: (salesOrderId, paymentId) =>
     @client.deleteAsync "/salesorders/#{salesOrderId}/payments/#{paymentId}"
 
+  salesOrderCreated: (salesOrderId) =>
+    @client.postAsync "/salesorders/#{salesOrderId}/created"
+
   #---
 
   _buildSalesOrdersFilters: (filters) =>

@@ -166,3 +166,9 @@ describe "SalesOrders", ->
       req = nockProductecaApi "/salesorders/1/payments/2", {}, "delete"
       api.deletePayment(1, 2).then ->
         req.done()
+
+  describe "when salesOrderCreated is called", ->
+    it "should send a post notification", ->
+      req = nockProductecaApi "/salesorders/1/created", {}, "post"
+      api.salesOrderCreated(1).then ->
+        req.done()
