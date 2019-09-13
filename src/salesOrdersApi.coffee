@@ -55,6 +55,14 @@ class SalesOrdersApi extends ProductecaApi
   #Updates a sales order by id
   update: (id, update) =>
     @client.putAsync "/salesorders/#{id}", update
+    
+  #Closes a sales order by id
+  close: (id) =>
+    @client.postAsync "/salesorders/#{id}/close"
+
+  #Closes a sales order's shipments by id
+  closeShipments: (id) =>
+    @client.postAsync "/salesorders/#{id}/shipments/close"
 
   getShipment: (salesOrderId, shipmentId) =>
     @client.getAsync "/salesorders/#{salesOrderId}/shipments/#{shipmentId}"
