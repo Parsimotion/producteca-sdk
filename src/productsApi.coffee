@@ -29,8 +29,8 @@ class ProductsApi extends ProductecaApi
     @_findMany "/products/bysku", { sku }, $select
 
   # Creates a product
-  create: (product) =>
-    @client.postAsync "/products", product
+  create: (product, opts) =>
+    @client.postAsync "/products", product, opts
 
   # Creates one integration of a product definition
   createIntegration: (productId, integration) =>
