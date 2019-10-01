@@ -16,8 +16,8 @@ class Client
   putAsync: (path, body, opts) =>
     @_doRequest { verb: "PUT", path, body }, opts
 
-  deleteAsync: (path) =>
-    @_doRequest { verb: "DELETE", path }
+  deleteAsync: (path, opts) =>
+    @_doRequest { verb: "DELETE", path }, opts
 
   _doRequest: ({ verb, path, body }, { qs, raw = false, headers } = {}) =>
     options = {
@@ -27,7 +27,6 @@ class Client
       qs
       headers
     }
-
     _.assign options, auth: @authMethod unless _.isEmpty @authMethod
     _.assign options, json: true unless raw
 

@@ -48,6 +48,12 @@ class ProductsApi extends ProductecaApi
     url = "/products/#{productId}/variations"
     @client.postAsync url, variations, opts
 
+  # Deletes one or more variations of a product definition
+  deleteVariations: (productId, variationIds) =>
+    url = "/products/#{productId}/variations"
+    ids = variationIds.join(",");
+    @client.deleteAsync url, { qs: { ids } }
+
   # Updates one or more variations of a product definition
   updateVariation: (productId, variations) =>
     url = "/products/#{productId}/variations"
