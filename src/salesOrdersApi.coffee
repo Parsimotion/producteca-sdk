@@ -25,7 +25,7 @@ class SalesOrdersApi extends ProductecaApi
 
   #Returns a sales order by integration
   getByIntegration: ({ integrationId, app }) =>
-    @client.getAsync "/integrations/#{app}/salesorders/#{integrationId}"
+    @client.getAsync "/integrations/#{app}/salesorders/#{integrationId}?app=#{app}"
 
   #Returns a sales order by its invoice integration
   getByInvoiceIntegration: ({ invoiceIntegrationId, app }) =>

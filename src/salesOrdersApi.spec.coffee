@@ -61,13 +61,13 @@ describe "SalesOrders", ->
 
   describe "when getByIntegration is called", ->
     it "should return the sales order that matches", ->
-      nockProductecaApi "/integrations/2/salesorders/123", id: 1
+      nockProductecaApi "/integrations/2/salesorders/123?app=2", id: 1
 
       api.getByIntegration({ integrationId: 123, app: 2 }).then (salesOrder) ->
         salesOrder.should.eql id: 1
 
     it "should throw an error if no sales orders match", (done) ->
-      nockProductecaApi "/integrations/2/salesorders/123", "The resource you are looking for has been removed, had its name changed, or is temporarily unavailable.", "get", undefined, 404
+      nockProductecaApi "/integrations/2/salesorders/123?app=2", "The resource you are looking for has been removed, had its name changed, or is temporarily unavailable.", "get", undefined, 404
 
       api.getByIntegration({ integrationId: 123, app: 2 }).catch (error) =>
         error.statusCode.should.eql 404
