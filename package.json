@@ -5,7 +5,7 @@
     "type": "git",
     "url": "git://github.com/Parsimotion/producteca-sdk.git"
   },
-  "version": "7.5.3",
+  "version": "7.6.0",
   "main": "build/sdk.js",
   "dependencies": {
     "bluebird": "^3.4.1",
