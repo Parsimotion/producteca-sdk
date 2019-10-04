@@ -44,9 +44,10 @@ class ProductsApi extends ProductecaApi
     @client.putAsync url, integration, { headers }
 
   # Creates one or more variations of a product definition
-  createVariations: (productId, variations, opts) =>
+  createVariations: (productId, variations, appId) =>
     url = "/products/#{productId}/variations"
-    @client.postAsync url, variations, opts
+    headers = { "x-app-id" : appId } if appId
+    @client.postAsync url, variations, { headers }
 
   # Deletes one or more variations of a product definition
   deleteVariations: (productId, variationIds) =>
