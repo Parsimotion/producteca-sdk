@@ -169,14 +169,6 @@ describe "ProductsApi", ->
         nockProductecaApi "/products/byvariationintegartion?integrationId=c", []
         api.findByVariationIntegrationId("c").then (products) -> products.should.be.eql []
 
-    #TODO donde se hace el encoding?
-    it "should send a GET to the api urlEncoding the integrationId", ->
-      nockProductecaApi "/products/byvariationintegartion?integrationId=with%20spaces", [productWithMoreThanOneVariations]
-      get = api.findByVariationIntegrationId("with spaces").then (result) ->
-        products = result
-
-      get.done()
-
   describe "when create is called", ->
     it "should create a product", ->
       req = nockProductecaApi "/products", {}, "post", anotherProductWithoutVariations
