@@ -28,6 +28,10 @@ class ProductsApi extends ProductecaApi
   findByVariationSku: (sku, $select) =>
     @_findMany "/products/bysku", { sku }, $select
 
+  # Find products by a variation integrationId
+  findByVariationIntegrationId: (integrationId, $select) =>
+    @_findMany "/products/byvariationintegartion", { integrationId }, $select
+
   # Creates a product
   create: (product, opts) =>
     @client.postAsync "/products", product, opts

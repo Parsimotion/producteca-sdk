@@ -119,7 +119,7 @@ describe "ProductsApi", ->
           get = api.findByVariationSku("c", ["code","sku","stocks"]).then (result) ->
             products = result
 
-        it "should send a GET to the api with $select as comma speparated values", ->
+        it "should send a GET to the api with $select as comma separated values", ->
           get.done()
 
     describe "when the product doesn't exist", ->
@@ -131,6 +131,48 @@ describe "ProductsApi", ->
     it "should send a GET to the api urlEncoding the SKU", ->
       nockProductecaApi "/products/bysku?sku=with%20spaces", [productWithMoreThanOneVariations]
       get = api.findByVariationSku("with spaces").then (result) ->
+        products = result
+
+      get.done()
+
+  describe "when findByVariationIntegrationId is called", ->
+    get = null
+    products = null
+
+    describe "when the product exists", ->
+
+      describe "and $select is not passed", ->
+        beforeEach ->
+          nockProductecaApi "/products/byvariationintegartion?integrationId=c", [productWithMoreThanOneVariations]
+          get = api.findByVariationIntegrationId("c").then (result) ->
+            products = result
+
+        it "should send a GET to the api without $select in querystring", ->
+          get.done()
+
+        it "should return the products", ->
+          havePropertiesEqual products, [productWithMoreThanOneVariations]
+          products[0].should.be.an.instanceof Product
+
+      describe "and $select is passed as an array of properties", ->
+        beforeEach ->
+          nockProductecaApi "/products/byvariationintegartion?integrationId=c&#{encodeURIComponent("$select")}=#{encodeURIComponent("code,sku,stocks")}", [productWithMoreThanOneVariations]
+          get = api.findByVariationIntegrationId("c", ["code","sku","stocks"]).then (result) ->
+            products = result
+
+        it "should send a GET to the api with $select as comma separated values", ->
+          get.done()
+
+    describe "when the product doesn't exist", ->
+
+      it "should throw if no product was found", ->
+        nockProductecaApi "/products/byvariationintegartion?integrationId=c", []
+        api.findByVariationIntegrationId("c").then (products) -> products.should.be.eql []
+
+    #TODO donde se hace el encoding?
+    it "should send a GET to the api urlEncoding the integrationId", ->
+      nockProductecaApi "/products/byvariationintegartion?integrationId=with%20spaces", [productWithMoreThanOneVariations]
+      get = api.findByVariationIntegrationId("with spaces").then (result) ->
         products = result
 
       get.done()
