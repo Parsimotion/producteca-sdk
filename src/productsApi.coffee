@@ -24,6 +24,10 @@ class ProductsApi extends ProductecaApi
   findByCode: (code, sku, $select) =>
     @_findMany "/products/bycode", { code, sku }, $select
 
+  # Find products by integrationId
+  findByIntegrationId: (app, integrationId, $select) =>
+    @_findMany "/products/byintegration", { integrationId, app }, $select
+
   # Find products by a variation SKU
   findByVariationSku: (sku, $select) =>
     @_findMany "/products/bysku", { sku }, $select

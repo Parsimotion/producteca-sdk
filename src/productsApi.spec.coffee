@@ -82,17 +82,38 @@ describe "ProductsApi", ->
         it "should send a GET to the api including code but without sku and $select", ->
           get.done()
 
+    describe "when findByIntegrationId is called", ->
+      get = null
+      products = null
 
-    describe "with $select", ->
-      beforeEach ->
-        code = "calcetines"
-        sku =  "Blanco-L"
-        $select = ["id","code","sku","name"]
-        get = nockProductecaApi "/products/bycode?code=#{encodeURIComponent code}&sku=#{encodeURIComponent sku}&#{encodeURIComponent "$select"}=#{encodeURIComponent "id,code,sku,name"}", [ anotherProductWithoutVariations ]
-        api.findByCode code, sku, $select
+      describe "without $select", ->
 
-      it "should send a GET to the api with an oData query to filter products with code='calcetines' and the $select's projections", ->
-        get.done()
+        describe "with sku", ->
+          beforeEach ->
+            integrationId = "calcetines"
+            app = "100"
+
+            get = nockProductecaApi "/products/byintegration?integrationId=#{encodeURIComponent integrationId}&app=#{encodeURIComponent app}", [ anotherProductWithoutVariations ]
+            api.findByIntegrationId(app, integrationId).then (result) ->
+              products = result
+
+          it "should send a GET to the api including integrationId and app but without $select", ->
+            get.done()
+
+          it "should return the products", ->
+            havePropertiesEqual products, [anotherProductWithoutVariations]
+            products[0].should.be.an.instanceof Product
+
+      describe "with $select", ->
+        beforeEach ->
+          integrationId = "calcetines"
+          app =  "100"
+          $select = ["id","code","sku","name"]
+          get = nockProductecaApi "/products/byintegration?integrationId=#{encodeURIComponent integrationId}&app=#{encodeURIComponent app}&#{encodeURIComponent "$select"}=#{encodeURIComponent "id,code,sku,name"}", [ anotherProductWithoutVariations ]
+          api.findByIntegrationId app, integrationId, $select
+
+        it "should send a GET to the api with an oData query to filter products with integrationId='calcetines' and the $select's projections", ->
+          get.done()
 
   describe "when findByVariationSku is called", ->
     get = null
