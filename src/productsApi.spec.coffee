@@ -82,17 +82,38 @@ describe "ProductsApi", ->
         it "should send a GET to the api including code but without sku and $select", ->
           get.done()
 
+    describe "when findByIntegrationId is called", ->
+      get = null
+      products = null
 
-    describe "with $select", ->
-      beforeEach ->
-        code = "calcetines"
-        sku =  "Blanco-L"
-        $select = ["id","code","sku","name"]
-        get = nockProductecaApi "/products/bycode?code=#{encodeURIComponent code}&sku=#{encodeURIComponent sku}&#{encodeURIComponent "$select"}=#{encodeURIComponent "id,code,sku,name"}", [ anotherProductWithoutVariations ]
-        api.findByCode code, sku, $select
+      describe "without $select", ->
 
-      it "should send a GET to the api with an oData query to filter products with code='calcetines' and the $select's projections", ->
-        get.done()
+        describe "with sku", ->
+          beforeEach ->
+            integrationId = "calcetines"
+            app = "100"
+
+            get = nockProductecaApi "/products/byintegration?integrationId=#{encodeURIComponent integrationId}&app=#{encodeURIComponent app}", [ anotherProductWithoutVariations ]
+            api.findByIntegrationId(app, integrationId).then (result) ->
+              products = result
+
+          it "should send a GET to the api including integrationId and app but without $select", ->
+            get.done()
+
+          it "should return the products", ->
+            havePropertiesEqual products, [anotherProductWithoutVariations]
+            products[0].should.be.an.instanceof Product
+
+      describe "with $select", ->
+        beforeEach ->
+          integrationId = "calcetines"
+          app =  "100"
+          $select = ["id","code","sku","name"]
+          get = nockProductecaApi "/products/byintegration?integrationId=#{encodeURIComponent integrationId}&app=#{encodeURIComponent app}&#{encodeURIComponent "$select"}=#{encodeURIComponent "id,code,sku,name"}", [ anotherProductWithoutVariations ]
+          api.findByIntegrationId app, integrationId, $select
+
+        it "should send a GET to the api with an oData query to filter products with integrationId='calcetines' and the $select's projections", ->
+          get.done()
 
   describe "when findByVariationSku is called", ->
     get = null
@@ -119,7 +140,7 @@ describe "ProductsApi", ->
           get = api.findByVariationSku("c", ["code","sku","stocks"]).then (result) ->
             products = result
 
-        it "should send a GET to the api with $select as comma speparated values", ->
+        it "should send a GET to the api with $select as comma separated values", ->
           get.done()
 
     describe "when the product doesn't exist", ->
@@ -134,6 +155,40 @@ describe "ProductsApi", ->
         products = result
 
       get.done()
+
+  describe "when findByVariationIntegrationId is called", ->
+    get = null
+    products = null
+
+    describe "when the product exists", ->
+
+      describe "and $select is not passed", ->
+        beforeEach ->
+          nockProductecaApi "/products/byvariationintegration/c", [productWithMoreThanOneVariations]
+          get = api.findByVariationIntegrationId("c").then (result) ->
+            products = result
+
+        it "should send a GET to the api without $select in querystring", ->
+          get.done()
+
+        it "should return the products", ->
+          havePropertiesEqual products, [productWithMoreThanOneVariations]
+          products[0].should.be.an.instanceof Product
+
+      describe "and $select is passed as an array of properties", ->
+        beforeEach ->
+          nockProductecaApi "/products/byvariationintegration/c?#{encodeURIComponent("$select")}=#{encodeURIComponent("code,sku,stocks")}", [productWithMoreThanOneVariations]
+          get = api.findByVariationIntegrationId("c", ["code","sku","stocks"]).then (result) ->
+            products = result
+
+        it "should send a GET to the api with $select as comma separated values", ->
+          get.done()
+
+    describe "when the product doesn't exist", ->
+
+      it "should throw if no product was found", ->
+        nockProductecaApi "/products/byvariationintegration/c", []
+        api.findByVariationIntegrationId("c").then (products) -> products.should.be.eql []
 
   describe "when create is called", ->
     it "should create a product", ->
