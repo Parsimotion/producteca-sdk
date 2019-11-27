@@ -143,7 +143,7 @@ describe "ProductsApi", ->
 
       describe "and $select is not passed", ->
         beforeEach ->
-          nockProductecaApi "/products/byvariationintegration?integrationId=c", [productWithMoreThanOneVariations]
+          nockProductecaApi "/products/byvariationintegration/c", [productWithMoreThanOneVariations]
           get = api.findByVariationIntegrationId("c").then (result) ->
             products = result
 
@@ -156,7 +156,7 @@ describe "ProductsApi", ->
 
       describe "and $select is passed as an array of properties", ->
         beforeEach ->
-          nockProductecaApi "/products/byvariationintegration?integrationId=c&#{encodeURIComponent("$select")}=#{encodeURIComponent("code,sku,stocks")}", [productWithMoreThanOneVariations]
+          nockProductecaApi "/products/byvariationintegration/c?#{encodeURIComponent("$select")}=#{encodeURIComponent("code,sku,stocks")}", [productWithMoreThanOneVariations]
           get = api.findByVariationIntegrationId("c", ["code","sku","stocks"]).then (result) ->
             products = result
 
@@ -166,7 +166,7 @@ describe "ProductsApi", ->
     describe "when the product doesn't exist", ->
 
       it "should throw if no product was found", ->
-        nockProductecaApi "/products/byvariationintegration?integrationId=c", []
+        nockProductecaApi "/products/byvariationintegration/c", []
         api.findByVariationIntegrationId("c").then (products) -> products.should.be.eql []
 
   describe "when create is called", ->
