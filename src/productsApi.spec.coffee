@@ -84,36 +84,22 @@ describe "ProductsApi", ->
 
     describe "when findByIntegrationId is called", ->
       get = null
-      products = null
+      product = null
 
-      describe "without $select", ->
+      beforeEach ->
+        integrationId = "calcetines"
+        app = "100"
 
-        describe "with sku", ->
-          beforeEach ->
-            integrationId = "calcetines"
-            app = "100"
+        get = nockProductecaApi "/products/byintegration?app=#{encodeURIComponent app}&integrationId=#{encodeURIComponent integrationId}", anotherProductWithoutVariations
+        api.findByIntegrationId(app, integrationId).then (result) ->
+          product = result
 
-            get = nockProductecaApi "/products/byintegration?integrationId=#{encodeURIComponent integrationId}&app=#{encodeURIComponent app}", [ anotherProductWithoutVariations ]
-            api.findByIntegrationId(app, integrationId).then (result) ->
-              products = result
+      it "should send a GET to the api including integrationId and app", ->
+        get.done()
 
-          it "should send a GET to the api including integrationId and app but without $select", ->
-            get.done()
-
-          it "should return the products", ->
-            havePropertiesEqual products, [anotherProductWithoutVariations]
-            products[0].should.be.an.instanceof Product
-
-      describe "with $select", ->
-        beforeEach ->
-          integrationId = "calcetines"
-          app =  "100"
-          $select = ["id","code","sku","name"]
-          get = nockProductecaApi "/products/byintegration?integrationId=#{encodeURIComponent integrationId}&app=#{encodeURIComponent app}&#{encodeURIComponent "$select"}=#{encodeURIComponent "id,code,sku,name"}", [ anotherProductWithoutVariations ]
-          api.findByIntegrationId app, integrationId, $select
-
-        it "should send a GET to the api with an oData query to filter products with integrationId='calcetines' and the $select's projections", ->
-          get.done()
+      it "should return the reified products", ->
+        havePropertiesEqual product, anotherProductWithoutVariations
+        products[0].should.be.an.instanceof Product
 
   describe "when findByVariationSku is called", ->
     get = null
