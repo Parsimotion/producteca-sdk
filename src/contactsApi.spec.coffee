@@ -32,7 +32,7 @@ describe "ContactsApi", ->
     it "should send a GET to the api", ->
       app = 5
       integrationId = 123
-      qs = { key: "$filter", value: "profile/integrationId eq #{integrationId}&profile/app eq #{app}" }
+      qs = { key: "$filter", value: "profile/integrationId eq '#{integrationId}'&profile/app eq #{app}" }
       get = nockProductecaApi "/contacts?#{encodeURIComponent qs.key}=#{encodeURIComponent qs.value}", { results: [contact] }
       api.getByIntegration(app, integrationId).then ->
         get.done()
