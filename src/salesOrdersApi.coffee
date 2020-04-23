@@ -20,8 +20,8 @@ class SalesOrdersApi extends ProductecaApi
     @_getPageByPage(0, "$filter=#{querystring}")
 
   #Returns a sales order by id
-  get: (id) =>
-    @client.getAsync "/salesorders/#{id}"
+  get: (id, opts) =>
+    @client.getAsync "/salesorders/#{id}", opts
 
   #Returns a sales order by integration
   getByIntegration: ({ integrationId, app }, overrideApp) =>
