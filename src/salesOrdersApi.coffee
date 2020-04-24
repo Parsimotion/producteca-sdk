@@ -17,12 +17,12 @@ class SalesOrdersApi extends ProductecaApi
   getByIntegration: ({ integrationId, app }, overrideApp) =>
     qs = { integrationId }
     if overrideApp then _.assign qs, { app: overrideApp }
-    @client.getAsync "/byintegration", qs
+    @client.getAsync "/salesorders/byintegration", { qs }
 
   #Returns a sales order by its invoice integration
   getByInvoiceIntegration: ({ invoiceIntegrationId, app }) =>
     qs = { integrationId: invoiceIntegrationId, app }
-    @client.getAsync "/byinvoiceintegration", qs
+    @client.getAsync "/salesorders/byinvoiceintegration", { qs }
 
 
   #Returns a sales order by id and all the products in its lines
