@@ -20,38 +20,6 @@ describe "SalesOrders", ->
   beforeEach ->
     nock.cleanAll()
 
-  describe "when getAll is called", ->
-    it "should return all the opened salesOrders without filters", ->
-      oDataQuery = "(IsOpen eq true) and (IsCanceled eq false)"
-      req = nockGetAll oDataQuery, results: []
-      api.getAll().then ->
-        req.done()
-
-    describe "when filtering...", ->
-      it "should return all the paid salesOrders", ->
-        oDataQuery = "(IsOpen eq true) and (IsCanceled eq false) and (PaymentStatus eq 'Approved')"
-        req = nockGetAll oDataQuery, results: []
-        api.getAll(paid: true).then ->
-          req.done()
-
-      it "should return all the salesOrders of a brand", ->
-        oDataQuery = "(IsOpen eq true) and (IsCanceled eq false) and ((Lines/any(line:line/Variation/Definition/Brand/Id eq 3)) or (Lines/any(line:line/Variation/Definition/Brand/Id eq 4)))"
-        req = nockGetAll oDataQuery, results: []
-        api.getAll(brands: [ 3, 4 ]).then ->
-          req.done()
-
-      it "should return all the salesOrders for a property/inner", ->
-        oDataQuery = "(IsOpen eq true) and (IsCanceled eq false) and (property/inner eq 'string')"
-        req = nockGetAll oDataQuery, results: []
-        api.getAll(other: "property/inner eq 'string'").then ->
-          req.done()
-
-      it "should be able to combine filters", ->
-        oDataQuery = "(IsOpen eq true) and (IsCanceled eq false) and (PaymentStatus eq 'Approved') and (property/inner eq 'string')"
-        req = nockGetAll oDataQuery, results: []
-        api.getAll(paid: true, other: "property/inner eq 'string'").then ->
-          req.done()
-
   describe "when get is called", ->
     it "should return a SalesOrder with Id=1", ->
       nockProductecaApi "/salesorders/1", id: 1

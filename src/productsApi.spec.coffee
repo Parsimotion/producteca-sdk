@@ -36,16 +36,10 @@ describe "ProductsApi", ->
       api.get(1).then ->
         get.done()
 
-  describe "when get skus is called", ->
-    it "should send a GET to the skus endpoint", ->
-      get = nockProductecaApi "/products/skus?$top=20&$skip=10&", results: [ "1001", "1002" ]
-      api.getSkus(10, 20).then ->
-        get.done()
-
   describe "when getMany is called", ->
     it "should send a GET to the api with the given string of ids", ->
       products = [ productWithMoreThanOneVariations, productWithoutVariations, anotherProductWithoutVariations ]
-      nockProductecaApi "/products?ids=#{encodeURIComponent "2,3,4"}", products
+      nockProductecaApi "/products/multi?ids=#{encodeURIComponent "2,3,4"}", products
       get = api.getMany("2,3,4").then ->
         get.done()
 
@@ -150,7 +144,7 @@ describe "ProductsApi", ->
 
       describe "and $select is not passed", ->
         beforeEach ->
-          nockProductecaApi "/products/byvariationintegration/c", [productWithMoreThanOneVariations]
+          nockProductecaApi "/products/byvariationintegration?#{encodeURIComponent "integrationId"}=#{encodeURIComponent "c"}", [productWithMoreThanOneVariations]
           get = api.findByVariationIntegrationId("c").then (result) ->
             products = result
 
@@ -163,7 +157,7 @@ describe "ProductsApi", ->
 
       describe "and $select is passed as an array of properties", ->
         beforeEach ->
-          nockProductecaApi "/products/byvariationintegration/c?#{encodeURIComponent("$select")}=#{encodeURIComponent("code,sku,stocks")}", [productWithMoreThanOneVariations]
+          nockProductecaApi "/products/byvariationintegration?#{encodeURIComponent "integrationId"}=#{encodeURIComponent "c"}&#{encodeURIComponent("$select")}=#{encodeURIComponent("code,sku,stocks")}", [productWithMoreThanOneVariations]
           get = api.findByVariationIntegrationId("c", ["code","sku","stocks"]).then (result) ->
             products = result
 
@@ -173,7 +167,7 @@ describe "ProductsApi", ->
     describe "when the product doesn't exist", ->
 
       it "should throw if no product was found", ->
-        nockProductecaApi "/products/byvariationintegration/c", []
+        nockProductecaApi "/products/byvariationintegration?#{encodeURIComponent "integrationId"}=#{encodeURIComponent "c"}", []
         api.findByVariationIntegrationId("c").then (products) -> products.should.be.eql []
 
   describe "when create is called", ->
