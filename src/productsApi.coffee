@@ -12,10 +12,6 @@ class ProductsApi extends ProductecaApi
   get: (id) =>
     (@client.getAsync("/products/#{id}")).then @_convertJsonToProduct
 
-  # Returns all the products
-  getAll: =>
-    @_getPageByPage().then @_convertJsonToProducts
-
   # Returns multiple products by their comma separated ids
   getMany: (ids) =>
     @_findMany "/products", { ids }
