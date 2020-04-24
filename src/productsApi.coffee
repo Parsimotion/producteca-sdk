@@ -112,10 +112,6 @@ class ProductsApi extends ProductecaApi
   getWarehouses: =>
     @client.getAsync "/warehouses"
 
-  # Retrieves a chunk of skus
-  getSkus: (skip = 0, top = 20, moreQueryString = "") =>
-    @client.getAsync "/products/skus?$top=#{top}&$skip=#{skip}&#{moreQueryString}"
-
   _findMany: (url, qs = {}, $select) =>
     _.assign qs, { $select: $select?.join() }
     (@client.getAsync(url, { qs })).then @_convertJsonToProducts
