@@ -31,7 +31,7 @@ class ProductsApi extends ProductecaApi
 
   # Find products by a variation integrationId
   findByVariationIntegrationId: (integrationId, $select) =>
-    @_findMany "/products/byvariationintegration/#{integrationId}", {}, $select
+    @_findMany "/products/byvariationintegration", {integrationId}, $select
 
   # Creates a product
   create: (product, opts) =>
