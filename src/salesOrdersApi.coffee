@@ -9,16 +9,6 @@ class SalesOrdersApi extends ProductecaApi
     @productsApi = new ProductsApi(endpoint)
     super endpoint
 
-  #Returns all the opened the sales orders
-  # filters = {
-  #  paid: true or false,
-  #  brand: [id1, id2, id3]
-  #  other: "property/inner eq 'string'"
-  # }
-  getAll: (filters = {}) =>
-    querystring = @_buildSalesOrdersFilters filters
-    @_getPageByPage(0, "$filter=#{querystring}")
-
   #Returns a sales order by id
   get: (id, opts) =>
     @client.getAsync "/salesorders/#{id}", opts
@@ -96,22 +86,3 @@ class SalesOrdersApi extends ProductecaApi
   salesOrderCreated: (salesOrderId) =>
     @client.postAsync "/salesorders/#{salesOrderId}/created"
 
-  #---
-
-  _buildSalesOrdersFilters: (filters) =>
-    querystring = "(IsOpen eq true) and (IsCanceled eq false)"
-    addAnd = (condition) => querystring += " and (#{condition})"
-
-    brandsFilter = (brandIds) =>
-      brandIds
-        .map (id) => "(Lines/any(line:line/Variation/Definition/Brand/Id eq #{id}))"
-        .join " or "
-
-    if filters.paid?
-      addAnd "PaymentStatus eq 'Approved'"
-    if filters.brands?
-      addAnd brandsFilter(filters.brands)
-    if filters.other?
-      addAnd filters.other
-
-    encodeURIComponent querystring
