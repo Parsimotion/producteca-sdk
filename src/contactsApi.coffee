@@ -12,4 +12,4 @@ class ContactsApi extends ProductecaApi
 
   # Gets a contact by app and integrationId
   getByIntegration: (app, integrationId) =>
-    @client.getAsync "/contacts/byintegration", { qs: { integrationId } }
+    @client.getAsync "/contacts/byintegration", { qs: { integrationId, app } }
