@@ -14,7 +14,7 @@ class ProductsApi extends ProductecaApi
 
   # Returns multiple products by their comma separated ids
   getMany: (ids) =>
-    @_findMany "/products/multi", { ids: ids.join(",") }
+    @_findMany "/products/multi", { ids }
 
   # Find products by code and optionally sku
   findByCode: (code, sku, $select) =>
