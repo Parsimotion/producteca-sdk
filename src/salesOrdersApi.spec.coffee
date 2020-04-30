@@ -47,22 +47,17 @@ describe "SalesOrders", ->
         done()
 
   describe "when getByInvoiceIntegration is called", ->
-    it.skip "should return the sales order that matches", -> #ver qeu devuelve la api y armar bien
-      nockProductecaApi "/salesorders/byinvoiceintegration?integrationId=8787&app=8",
-        count: 1
-        results: [una_orden: true]
+    it "should return the sales order that matches", ->
+      nockProductecaApi "/salesorders/byinvoiceintegration?integrationId=8787&app=8", una_orden: true
 
       api.getByInvoiceIntegration({ invoiceIntegrationId: 8787, app: 8 }).then (salesOrder) ->
         salesOrder.should.eql una_orden: true
 
-    it.skip "should throw an error if no sales orders match", (done) -> #ver qeu devuelve la api y armar bien
-      oDataQuery = "invoiceIntegration/integrationId eq 8787 and invoiceIntegration/app eq 8)"
-      nockSalesOrderFilter oDataQuery,
-        count: 0
-        results: []
+    it "should throw an error if no sales orders match", (done) -> 
+      nockProductecaApi "/salesorders/byinvoiceintegration?integrationId=8787&app=8","The salesorder doesn't exist.", "get", undefined, 404
 
       api.getByInvoiceIntegration({ invoiceIntegrationId: 8787, app: 8 }).catch (error) =>
-        error.message.should.eql "The sales orders with invoiceIntegrationId: 8787 and app: 8 wasn't found."
+        error.message.should.eql "404 - \"The salesorder doesn't exist.\""
         done()
 
   describe "when getWithFullProducts is called", ->
