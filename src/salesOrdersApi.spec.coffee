@@ -40,7 +40,7 @@ describe "SalesOrders", ->
         salesOrder.should.eql id: 1
     
     it "should throw an error if no sales orders match", (done) ->
-      nockProductecaApi "/salesorders/byintegration?integrationId=123", "The resource you are looking for has been removed, had its name changed, or is temporarily unavailable.", "get", undefined, 404
+      nockProductecaApi "/salesorders/byintegration?integrationId=123", "The salesorder doesn't exist.", "get", undefined, 404
 
       api.getByIntegration({ integrationId: 123, app: 2 }).catch (error) =>
         error.statusCode.should.eql 404
