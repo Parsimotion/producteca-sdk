@@ -9,37 +9,21 @@ class SalesOrdersApi extends ProductecaApi
     @productsApi = new ProductsApi(endpoint)
     super endpoint
 
-  #Returns all the opened the sales orders
-  # filters = {
-  #  paid: true or false,
-  #  brand: [id1, id2, id3]
-  #  other: "property/inner eq 'string'"
-  # }
-  getAll: (filters = {}) =>
-    querystring = @_buildSalesOrdersFilters filters
-    @_getPageByPage(0, "$filter=#{querystring}")
-
   #Returns a sales order by id
   get: (id, opts) =>
     @client.getAsync "/salesorders/#{id}", opts
 
   #Returns a sales order by integration
   getByIntegration: ({ integrationId, app }, overrideApp) =>
-    qs = if overrideApp then { app: overrideApp }
-    @client.getAsync "/integrations/#{app}/salesorders/#{integrationId}", { qs }
+    qs = { integrationId }
+    if overrideApp then _.assign qs, { app: overrideApp }
+    @client.getAsync "/salesorders/byintegration", { qs }
 
   #Returns a sales order by its invoice integration
   getByInvoiceIntegration: ({ invoiceIntegrationId, app }) =>
-    query = "invoiceIntegration/integrationId eq #{invoiceIntegrationId} and invoiceIntegration/app eq #{app})"
-    propertiesNotFound = "invoiceIntegrationId: #{invoiceIntegrationId} and app: #{app}"
-    @_findSalesOrder query, propertiesNotFound
+    qs = { integrationId: invoiceIntegrationId, app }
+    @client.getAsync "/salesorders/byinvoiceintegration", { qs }
 
-  _findSalesOrder: (query, propertiesNotFound) =>
-    oDataQuery = encodeURIComponent query
-    (@respondMany @client.getAsync "/salesorders/?$filter=#{oDataQuery}").then (results) =>
-      if _.isEmpty results
-        throw new Error("The sales orders with #{propertiesNotFound} wasn't found.")
-      _.first results
 
   #Returns a sales order by id and all the products in its lines
   getWithFullProducts: (id) =>
@@ -96,22 +80,3 @@ class SalesOrdersApi extends ProductecaApi
   salesOrderCreated: (salesOrderId) =>
     @client.postAsync "/salesorders/#{salesOrderId}/created"
 
-  #---
-
-  _buildSalesOrdersFilters: (filters) =>
-    querystring = "(IsOpen eq true) and (IsCanceled eq false)"
-    addAnd = (condition) => querystring += " and (#{condition})"
-
-    brandsFilter = (brandIds) =>
-      brandIds
-        .map (id) => "(Lines/any(line:line/Variation/Definition/Brand/Id eq #{id}))"
-        .join " or "
-
-    if filters.paid?
-      addAnd "PaymentStatus eq 'Approved'"
-    if filters.brands?
-      addAnd brandsFilter(filters.brands)
-    if filters.other?
-      addAnd filters.other
-
-    encodeURIComponent querystring

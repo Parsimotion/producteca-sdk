@@ -13,7 +13,7 @@ class ProductecaApi
     @initializeClients endpoint
 
   initializeClients: (endpoint) =>
-    endpoint.url = endpoint.url || "http://api.producteca.com"
+    endpoint.url = endpoint.url || "http://apps.producteca.com/api"
 
     @client = new Client(endpoint.url, @_buildAuthMethod(endpoint))
     @asyncClient = new Client(@_makeUrlAsync endpoint.url, @_buildAuthMethod(endpoint))

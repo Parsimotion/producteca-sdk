@@ -20,38 +20,6 @@ describe "SalesOrders", ->
   beforeEach ->
     nock.cleanAll()
 
-  describe "when getAll is called", ->
-    it "should return all the opened salesOrders without filters", ->
-      oDataQuery = "(IsOpen eq true) and (IsCanceled eq false)"
-      req = nockGetAll oDataQuery, results: []
-      api.getAll().then ->
-        req.done()
-
-    describe "when filtering...", ->
-      it "should return all the paid salesOrders", ->
-        oDataQuery = "(IsOpen eq true) and (IsCanceled eq false) and (PaymentStatus eq 'Approved')"
-        req = nockGetAll oDataQuery, results: []
-        api.getAll(paid: true).then ->
-          req.done()
-
-      it "should return all the salesOrders of a brand", ->
-        oDataQuery = "(IsOpen eq true) and (IsCanceled eq false) and ((Lines/any(line:line/Variation/Definition/Brand/Id eq 3)) or (Lines/any(line:line/Variation/Definition/Brand/Id eq 4)))"
-        req = nockGetAll oDataQuery, results: []
-        api.getAll(brands: [ 3, 4 ]).then ->
-          req.done()
-
-      it "should return all the salesOrders for a property/inner", ->
-        oDataQuery = "(IsOpen eq true) and (IsCanceled eq false) and (property/inner eq 'string')"
-        req = nockGetAll oDataQuery, results: []
-        api.getAll(other: "property/inner eq 'string'").then ->
-          req.done()
-
-      it "should be able to combine filters", ->
-        oDataQuery = "(IsOpen eq true) and (IsCanceled eq false) and (PaymentStatus eq 'Approved') and (property/inner eq 'string')"
-        req = nockGetAll oDataQuery, results: []
-        api.getAll(paid: true, other: "property/inner eq 'string'").then ->
-          req.done()
-
   describe "when get is called", ->
     it "should return a SalesOrder with Id=1", ->
       nockProductecaApi "/salesorders/1", id: 1
@@ -61,19 +29,18 @@ describe "SalesOrders", ->
 
   describe "when getByIntegration is called", ->
     it "should return the sales order that matches", ->
-      nockProductecaApi "/integrations/2/salesorders/123", id: 1
-
+      nockProductecaApi "/salesorders/byintegration?#{encodeURIComponent "integrationId"}=#{encodeURIComponent 123}", id: 1
       api.getByIntegration({ integrationId: 123, app: 2 }).then (salesOrder) ->
         salesOrder.should.eql id: 1
     
     it "should return the sales order that matches overriding app", ->
-      nockProductecaApi "/integrations/2/salesorders/123?app=2", id: 1
+      nockProductecaApi "/salesorders/byintegration?integrationId=123&app=2", id: 1
 
       api.getByIntegration({ integrationId: 123, app: 2 },2).then (salesOrder) ->
         salesOrder.should.eql id: 1
     
     it "should throw an error if no sales orders match", (done) ->
-      nockProductecaApi "/integrations/2/salesorders/123", "The resource you are looking for has been removed, had its name changed, or is temporarily unavailable.", "get", undefined, 404
+      nockProductecaApi "/salesorders/byintegration?integrationId=123", "The salesorder doesn't exist.", "get", undefined, 404
 
       api.getByIntegration({ integrationId: 123, app: 2 }).catch (error) =>
         error.statusCode.should.eql 404
@@ -81,22 +48,16 @@ describe "SalesOrders", ->
 
   describe "when getByInvoiceIntegration is called", ->
     it "should return the sales order that matches", ->
-      oDataQuery = "invoiceIntegration/integrationId eq 8787 and invoiceIntegration/app eq 8)"
-      nockSalesOrderFilter oDataQuery,
-        count: 1
-        results: [una_orden: true]
+      nockProductecaApi "/salesorders/byinvoiceintegration?integrationId=8787&app=8", una_orden: true
 
       api.getByInvoiceIntegration({ invoiceIntegrationId: 8787, app: 8 }).then (salesOrder) ->
         salesOrder.should.eql una_orden: true
 
-    it "should throw an error if no sales orders match", (done) ->
-      oDataQuery = "invoiceIntegration/integrationId eq 8787 and invoiceIntegration/app eq 8)"
-      nockSalesOrderFilter oDataQuery,
-        count: 0
-        results: []
+    it "should throw an error if no sales orders match", (done) -> 
+      nockProductecaApi "/salesorders/byinvoiceintegration?integrationId=8787&app=8","The salesorder doesn't exist.", "get", undefined, 404
 
       api.getByInvoiceIntegration({ invoiceIntegrationId: 8787, app: 8 }).catch (error) =>
-        error.message.should.eql "The sales orders with invoiceIntegrationId: 8787 and app: 8 wasn't found."
+        error.message.should.eql "404 - \"The salesorder doesn't exist.\""
         done()
 
   describe "when getWithFullProducts is called", ->
@@ -108,7 +69,7 @@ describe "SalesOrders", ->
         lines: [ { product: product31 }, { product: product32 } ]
 
       nockProductecaApi "/salesorders/1", salesOrder
-      nockProductecaApi "/products?ids=#{encodeURIComponent "31,32"}", products
+      nockProductecaApi "/products/multi?ids=#{encodeURIComponent "31,32"}", products
 
       api.getWithFullProducts(1).then (salesOrderWithProducts) ->
         havePropertiesEqual salesOrderWithProducts, { salesOrder, products }

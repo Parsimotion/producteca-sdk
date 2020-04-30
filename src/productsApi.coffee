@@ -12,13 +12,9 @@ class ProductsApi extends ProductecaApi
   get: (id) =>
     (@client.getAsync("/products/#{id}")).then @_convertJsonToProduct
 
-  # Returns all the products
-  getAll: =>
-    @_getPageByPage().then @_convertJsonToProducts
-
   # Returns multiple products by their comma separated ids
   getMany: (ids) =>
-    @_findMany "/products", { ids }
+    @_findMany "/products/multi", { ids }
 
   # Find products by code and optionally sku
   findByCode: (code, sku, $select) =>
@@ -35,7 +31,7 @@ class ProductsApi extends ProductecaApi
 
   # Find products by a variation integrationId
   findByVariationIntegrationId: (integrationId, $select) =>
-    @_findMany "/products/byvariationintegration/#{integrationId}", {}, $select
+    @_findMany "/products/byvariationintegration", {integrationId}, $select
 
   # Creates a product
   create: (product, opts) =>
@@ -88,10 +84,6 @@ class ProductsApi extends ProductecaApi
   updatePrices: (id, update) =>
     @client.putAsync "/products/#{id}/prices", update
 
-  # Updates basic product properties
-  simpleUpdate: (id, update) =>
-    @client.putAsync "/products/#{id}/simple", update
-
   # Updates product attributes
   updateAttributes: (id, update) =>
     @client.putAsync "/products/#{id}/attributes", update
@@ -119,10 +111,6 @@ class ProductsApi extends ProductecaApi
   # Retrieves all the warehouses
   getWarehouses: =>
     @client.getAsync "/warehouses"
-
-  # Retrieves a chunk of skus
-  getSkus: (skip = 0, top = 20, moreQueryString = "") =>
-    @client.getAsync "/products/skus?$top=#{top}&$skip=#{skip}&#{moreQueryString}"
 
   _findMany: (url, qs = {}, $select) =>
     _.assign qs, { $select: $select?.join() }
