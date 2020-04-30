@@ -33,6 +33,6 @@ describe "ContactsApi", ->
       app = 5
       integrationId = 123
       qs = { key: "integrationId", value: integrationId.toString() }
-      get = nockProductecaApi "/contacts/byintegration?#{encodeURIComponent qs.key}=#{encodeURIComponent qs.value}&app=5", contact
+      get = nockProductecaApi "/contacts/byintegration?#{qs.key}=#{qs.value}&app=5", contact
       api.getByIntegration(app, integrationId).then ->
         get.done()
