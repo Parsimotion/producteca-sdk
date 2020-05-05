@@ -7,8 +7,8 @@ class ContactsApi extends ProductecaApi
     @client.postAsync "/contacts", contact
 
   # Updates a contact by name
-  update: (contact) =>
-    @client.putAsync "/contacts", contact
+  update: (id, contact) =>
+    @client.putAsync "/contacts/#{id}", contact
 
   # Gets a contact by app and integrationId
   getByIntegration: (app, integrationId) =>
