@@ -24,7 +24,6 @@ class SalesOrdersApi extends ProductecaApi
     qs = { integrationId: invoiceIntegrationId, app }
     @client.getAsync "/salesorders/byinvoiceintegration", { qs }
 
-
   #Returns a sales order by id and all the products in its lines
   getWithFullProducts: (id) =>
     @get(id)
@@ -40,6 +39,10 @@ class SalesOrdersApi extends ProductecaApi
   #Updates a sales order by id
   update: (id, update) =>
     @client.putAsync "/salesorders/#{id}", update
+
+  #Updates an invoice integration by sales order id
+  updateInvoiceIntegration: (id, invoiceIntegration) =>
+    @client.putAsync "/salesorders/#{id}/invoiceIntegration", invoiceIntegration
 
   #Cancel sales orders by id
   cancel: (ids) =>

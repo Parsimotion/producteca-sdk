@@ -24,8 +24,8 @@ describe "ContactsApi", ->
 
   describe "when update is called", ->
     it "should send a PUT to the api", ->
-      put = nockProductecaApi "/contacts", {}, "put", contact
-      api.update(contact).then ->
+      put = nockProductecaApi "/contacts/1", {}, "put", contact
+      api.update(1, contact).then ->
         put.done()
 
   describe "when getByIntegration is called", ->
