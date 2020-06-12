@@ -86,6 +86,13 @@ describe "SalesOrders", ->
       api.update(1, { id: 1 }).then ->
         req.done()
 
+  describe "when updateInvoiceIntegration is called", ->
+    it "should update an invoiceIntegration", ->
+      invoiceIntegration = app: 1, invoiceIntegrationId: "1", documentUrl: "https://document.url", decreaseStock: false
+      req = nockProductecaApi "/salesorders/1/invoiceIntegration", {}, "put", invoiceIntegration
+      api.updateInvoiceIntegration(1, invoiceIntegration).then ->
+        req.done()
+
   describe "when getShipment is called", ->
     it "should return a shipment with id=42 from the orderSales with id=1", ->
       req = nockProductecaApi "/salesorders/1/shipments/42"
