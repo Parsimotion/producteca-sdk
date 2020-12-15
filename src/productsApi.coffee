@@ -9,16 +9,16 @@ class ProductsApi extends ProductecaApi
     super endpoint
 
   # Returns a product by id
-  get: (id) =>
-    (@client.getAsync("/products/#{id}")).then @_convertJsonToProduct
+  get: (id, opts) =>
+    (@client.getAsync("/products/#{id}", opts)).then @_convertJsonToProduct
 
   # Returns multiple products by their comma separated ids
-  getMany: (ids) =>
-    @_findMany "/products/multi", { ids }
+  getMany: (ids, opts) =>
+    @_findMany { url: "/products/multi", qs: { ids }, opts }
 
   # Find products by code and optionally sku
-  findByCode: (code, sku, $select) =>
-    @_findMany "/products/bycode", { code, sku }, $select
+  findByCode: (code, sku, $select, opts) =>
+    @_findMany { url: "/products/bycode", qs: { code, sku }, $select, opts }
 
   # Find products by integrationId
   findByIntegrationId: (app, integrationId) =>
@@ -26,12 +26,12 @@ class ProductsApi extends ProductecaApi
     .then @_convertJsonToProduct
 
   # Find products by a variation SKU
-  findByVariationSku: (sku, $select) =>
-    @_findMany "/products/bysku", { sku }, $select
+  findByVariationSku: (sku, $select, opts) =>
+    @_findMany { url: "/products/bysku", qs: { sku }, $select, opts }
 
   # Find products by a variation integrationId
-  findByVariationIntegrationId: (integrationId, $select) =>
-    @_findMany "/products/byvariationintegration", {integrationId}, $select
+  findByVariationIntegrationId: (integrationId, $select, opts) =>
+    @_findMany { url: "/products/byvariationintegration", qs: { integrationId }, $select, opts }
 
   # Creates a product
   create: (product, opts) =>
@@ -112,9 +112,10 @@ class ProductsApi extends ProductecaApi
   getWarehouses: =>
     @client.getAsync "/warehouses"
 
-  _findMany: (url, qs = {}, $select) =>
+  _findMany: ({ url, qs = {}, $select, opts = {} }) =>
     _.assign qs, { $select: $select?.join() }
-    (@client.getAsync(url, { qs })).then @_convertJsonToProducts
+    _.assign opts, { qs }
+    (@client.getAsync(url, opts)).then @_convertJsonToProducts
 
   _convertJsonToProducts: (products) =>
     products.map @_convertJsonToProduct
