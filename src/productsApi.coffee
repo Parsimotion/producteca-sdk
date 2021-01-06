@@ -49,9 +49,10 @@ class ProductsApi extends ProductecaApi
     @client.putAsync url, integration, { headers }
 
   # Delete one integration of a product definition
-  deleteIntegration: (productId, integrationId) =>
+  deleteIntegration: (productId, integrationId, ignoreParentIntegrationId) =>
     url = "/products/#{productId}/integrations/#{integrationId}"
-    @client.deleteAsync url
+    ignoreParentIntegrationId ?= false
+    @client.deleteAsync url, { qs: { ignoreParentIntegrationId } }
 
   # Creates one or more variations of a product definition
   createVariations: (productId, variations, appId) =>
