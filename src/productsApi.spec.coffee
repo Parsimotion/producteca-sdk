@@ -197,7 +197,7 @@ describe "ProductsApi", ->
 
     it "should delete integration and all the variations integrations", ->
       req = nockProductecaApi "/products/1/integrations/123456?ignoreParentIntegrationId=true", {}, "delete"
-      api.deleteIntegration(1, 123456, true).then ->
+      api.deleteIntegration(1, 123456, { ignoreParentIntegrationId: true }).then ->
         req.done()
 
   describe "when createVariations is called", ->
