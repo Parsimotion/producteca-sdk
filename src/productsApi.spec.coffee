@@ -189,6 +189,12 @@ describe "ProductsApi", ->
       api.updateIntegration(1, updatedIntegration).then ->
         req.done()
 
+  describe "when deleteIntegration is called", ->
+    it "should delete integration", ->
+      req = nockProductecaApi "/products/1/integrations/123456", {}, "delete"
+      api.deleteIntegration(1, 123456).then ->
+        req.done()
+
   describe "when createVariations is called", ->
     it "should create variations", ->
       req = nockProductecaApi "/products/3/variations", {}, "post", variations
