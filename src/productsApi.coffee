@@ -110,13 +110,17 @@ class ProductsApi extends ProductecaApi
   createWarehouseWithIntegration: (warehouse) =>
     @client.postAsync "/warehouses", warehouse
 
-  # Retrieves all the pricelists
-  getPricelists: =>
-    @client.getAsync "/pricelists"
+  # Gets a warehouse by its integration
+  getWarehouseByIntegration: (integrationId, app) =>
+    @client.getAsync "/warehouses/byIntegration", { qs: { integrationId, app } }
 
   # Retrieves all the warehouses
   getWarehouses: =>
     @client.getAsync "/warehouses"
+
+  # Retrieves all the pricelists
+  getPricelists: =>
+    @client.getAsync "/pricelists"
 
   _findMany: ({ url, qs = {}, $select, opts = {} }) =>
     _.assign qs, { $select: $select?.join() }
