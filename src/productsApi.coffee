@@ -118,6 +118,10 @@ class ProductsApi extends ProductecaApi
   getWarehouses: =>
     @client.getAsync "/warehouses"
 
+  # Retrieves a warehouse by id
+  getWarehouse: (id) =>
+    @client.getAsync "/warehouses/#{id}"
+
   # Retrieves all the pricelists
   getPricelists: =>
     @client.getAsync "/pricelists"

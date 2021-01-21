@@ -266,6 +266,12 @@ describe "ProductsApi", ->
         api.getWarehouseByIntegration("1", 5).then ->
           req.done()
 
+    describe "when getWarehouse is called", ->
+      it "should send a get to /warehouses/${id}", ->
+        req = nockProductecaApi "/warehouses/1"
+        api.getWarehouse(1).then ->
+          req.done()
+
     describe "when createWarehouse is called", ->
       it "should send a post to /warehouses with the name", ->
         req = nockProductecaApi "/warehouses", {}, "post", { name: "piola" }
