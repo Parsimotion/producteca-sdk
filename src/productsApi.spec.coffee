@@ -15,6 +15,7 @@ createProduct = (id, code, variations = []) ->
 
 variations = [ { sku: "b" }, { sku: "c" }, { sku: "d" } ]
 integration = { app: 5, integrationId: 12345, status: "Active" }
+variationIntegration = { app: 5, integrationId: "098765", parentIntegrationId: "12345" }
 
 describe "ProductsApi", ->
   api = new ProductsApi(
@@ -225,6 +226,12 @@ describe "ProductsApi", ->
         pictures = [ { url: "mediaTostada.jpg" } ]
         req = nockProductecaApi "/products/1/pictures", {}, "put", pictures
         api.updateVariationPictures(1, pictures).then ->
+          req.done()
+
+    describe "when createVariationIntegration is called", ->
+      it "should create variation integration", ->
+        req = nockProductecaApi "/products/3/variations/9/integrations", {}, "post", variationIntegration
+        api.createVariationIntegration(3, 9, variationIntegration).then ->
           req.done()
 
     describe "when updatePrices is called", ->
