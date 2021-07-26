@@ -87,9 +87,9 @@ class ProductsApi extends ProductecaApi
     @client.putAsync url, pictures
 
   # Create the variation integration of the correspondent variation
-  createVariationIntegration: (productId, variationId, variationIntegration) =>
+  createVariationIntegration: (productId, variationId, variationIntegration, opts) =>
     url = "/products/#{productId}/variations/#{variationId}/integrations"
-    @client.postAsync url, variationIntegration
+    @client.postAsync url, variationIntegration, opts
 
   # Updates product prices
   updatePrices: (id, update) =>

@@ -234,6 +234,12 @@ describe "ProductsApi", ->
         api.createVariationIntegration(3, 9, variationIntegration).then ->
           req.done()
 
+    describe "when createVariationIntegration is called", ->
+      it "should create variation integration", ->
+        req = nockProductecaApi "/products/3/variations/9/integrations?app=5", {}, "post", variationIntegration
+        api.createVariationIntegration(3, 9, variationIntegration, qs: app: 5).then ->
+          req.done()
+
     describe "when updatePrices is called", ->
       it "should update a prices", ->
         prices = [{ priceList: "Default", amount: 1500, currency: "Local" }]
