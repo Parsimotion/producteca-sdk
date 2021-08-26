@@ -38,53 +38,53 @@ class ProductsApi extends ProductecaApi
     @client.postAsync "/products", product, opts
 
   # Creates one integration of a product definition
-  createIntegration: (productId, integration) =>
+  createIntegration: (productId, integration, opts) =>
     url = "/products/#{productId}/integrations"
-    @client.postAsync url, integration
+    @client.postAsync url, integration, opts
 
   # Updates one integration of a product definition
-  updateIntegration: (productId, integration, appId) =>
+  updateIntegration: (productId, integration, appId, opts) =>
     url = "/products/#{productId}/integrations"
     headers = { "x-app-id" : appId } if appId
-    @client.putAsync url, integration, { headers }
+    @client.putAsync url, integration, _.merge { headers }, opts
 
   # Delete one integration of a product definition
-  deleteIntegration: (productId, integrationId, { ignoreParentIntegrationId } = {}) =>
+  deleteIntegration: (productId, integrationId, { ignoreParentIntegrationId } = {}, opts) =>
     url = "/products/#{productId}/integrations/#{integrationId}"
-    ignoreParentIntegrationId ?= false
-    @client.deleteAsync url, { qs: { ignoreParentIntegrationId } }
+    ignoreParentIntegrationId ?= true
+    @client.deleteAsync url, _.merge { qs: { ignoreParentIntegrationId } }, opts
 
   # Creates one or more variations of a product definition
-  createVariations: (productId, variations, appId) =>
+  createVariations: (productId, variations, appId, opts) =>
     url = "/products/#{productId}/variations"
     headers = { "x-app-id" : appId } if appId
-    @client.postAsync url, variations, { headers }
+    @client.postAsync url, variations, _.merge { headers }, opts
 
   # Deletes one or more variations of a product definition
-  deleteVariations: (productId, variationIds) =>
+  deleteVariations: (productId, variationIds, opts) =>
     url = "/products/#{productId}/variations"
     ids = variationIds.join(",");
-    @client.deleteAsync url, { qs: { ids } }
+    @client.deleteAsync url, _.merge { qs: { ids } }, opts
 
   # Updates one or more variations of a product definition
-  updateVariation: (productId, variations) =>
+  updateVariation: (productId, variations, opts) =>
     url = "/products/#{productId}/variations"
-    @client.putAsync url, variations
+    @client.putAsync url, variations, opts
 
   # Updates the stocks of one or more variations
-  updateVariationStocks: (productId, adjustments) =>
+  updateVariationStocks: (productId, adjustments, opts) =>
     url = "/products/#{productId}/stocks"
-    @client.putAsync url, adjustments
+    @client.putAsync url, adjustments, opts
 
   # Add the pictures of one or more variations
-  addVariationPictures: (productId, pictures) =>
+  addVariationPictures: (productId, pictures, opts) =>
     url = "/products/#{productId}/pictures"
-    @client.postAsync url, pictures
+    @client.postAsync url, pictures, opts
 
   # Updates the pictures of one or more variations
-  updateVariationPictures: (productId, pictures) =>
+  updateVariationPictures: (productId, pictures, opts) =>
     url = "/products/#{productId}/pictures"
-    @client.putAsync url, pictures
+    @client.putAsync url, pictures, opts
 
   # Create the variation integration of the correspondent variation
   createVariationIntegration: (productId, variationId, variationIntegration, opts) =>
@@ -92,28 +92,28 @@ class ProductsApi extends ProductecaApi
     @client.postAsync url, variationIntegration, opts
 
   # Updates product prices
-  updatePrices: (id, update) =>
-    @client.putAsync "/products/#{id}/prices", update
+  updatePrices: (id, update, opts) =>
+    @client.putAsync "/products/#{id}/prices", update, opts
 
   # Updates product attributes
-  updateAttributes: (id, update) =>
-    @client.putAsync "/products/#{id}/attributes", update
+  updateAttributes: (id, update, opts) =>
+    @client.putAsync "/products/#{id}/attributes", update, opts
 
   # Updates product metadata
-  updateMetadata: (id, update) =>
-    @client.putAsync "/products/#{id}/metadata", update
+  updateMetadata: (id, update, opts) =>
+    @client.putAsync "/products/#{id}/metadata", update, opts
 
   # Updates a product
-  update: (id, update) =>
-    @client.putAsync "/products/#{id}", update
+  update: (id, update, opts) =>
+    @client.putAsync "/products/#{id}", update, opts
 
   # Creates a warehouse
-  createWarehouse: (name) =>
-    @client.postAsync "/warehouses", { name }
+  createWarehouse: (name, opts) =>
+    @client.postAsync "/warehouses", { name }, opts
 
   # Creates a full warehouse
-  createWarehouseWithIntegration: (warehouse) =>
-    @client.postAsync "/warehouses", warehouse
+  createWarehouseWithIntegration: (warehouse, opts) =>
+    @client.postAsync "/warehouses", warehouse, opts
 
   # Gets a warehouse by its integration
   getWarehouseByIntegration: (integrationId, app) =>

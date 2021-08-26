@@ -192,7 +192,7 @@ describe "ProductsApi", ->
 
   describe "when deleteIntegration is called", ->
     it "should delete integration ignoring the variations without the same parentIntegrationId", ->
-      req = nockProductecaApi "/products/1/integrations/123456?ignoreParentIntegrationId=false", {}, "delete"
+      req = nockProductecaApi "/products/1/integrations/123456?ignoreParentIntegrationId=true", {}, "delete"
       api.deleteIntegration(1, 123456).then ->
         req.done()
 
