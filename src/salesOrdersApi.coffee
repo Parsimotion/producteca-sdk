@@ -33,28 +33,28 @@ class SalesOrdersApi extends ProductecaApi
           { salesOrder, products }
 
   #Creates a sales order
-  create: (salesOrder) =>
-    @client.postAsync "/salesorders", salesOrder
+  create: (salesOrder, opts) =>
+    @client.postAsync "/salesorders", salesOrder, opts
 
   #Updates a sales order by id
-  update: (id, update) =>
-    @client.putAsync "/salesorders/#{id}", update
+  update: (id, update, opts) =>
+    @client.putAsync "/salesorders/#{id}", update, opts
 
   #Updates an invoice integration by sales order id
-  updateInvoiceIntegration: (id, invoiceIntegration) =>
-    @client.putAsync "/salesorders/#{id}/invoiceIntegration", invoiceIntegration
+  updateInvoiceIntegration: (id, invoiceIntegration, opts) =>
+    @client.putAsync "/salesorders/#{id}/invoiceIntegration", invoiceIntegration, opts
 
   #Cancel sales orders by id
-  cancel: (ids) =>
-    @client.postAsync "/salesorders/cancel?ids=#{ids.join()}"
+  cancel: (ids, opts) =>
+    @client.postAsync "/salesorders/cancel?ids=#{ids.join()}", undefined, opts
     
   #Closes a sales order by id
-  close: (id) =>
-    @client.postAsync "/salesorders/#{id}/close"
+  close: (id, opts) =>
+    @client.postAsync "/salesorders/#{id}/close", undefined, opts
 
   #Closes a sales order's shipments by id
-  closeShipments: (id) =>
-    @client.postAsync "/salesorders/#{id}/shipments/close"
+  closeShipments: (id, opts) =>
+    @client.postAsync "/salesorders/#{id}/shipments/close", undefined, opts
 
   getShipment: (salesOrderId, shipmentId) =>
     @client.getAsync "/salesorders/#{salesOrderId}/shipments/#{shipmentId}"
@@ -62,24 +62,24 @@ class SalesOrdersApi extends ProductecaApi
   getMultipleShipments: (shipmentIds) =>
     @client.getAsync "/shipments?ids=#{shipmentIds}"
 
-  createShipment: (salesOrderId, shipment) =>
-    @client.postAsync "/salesorders/#{salesOrderId}/shipments", shipment
+  createShipment: (salesOrderId, shipment, opts) =>
+    @client.postAsync "/salesorders/#{salesOrderId}/shipments", shipment, opts
 
-  updateShipment: (salesOrderId, shipmentId, shipmentUpdate) =>
-    @client.putAsync "/salesorders/#{salesOrderId}/shipments/#{shipmentId}", shipmentUpdate
+  updateShipment: (salesOrderId, shipmentId, shipmentUpdate, opts) =>
+    @client.putAsync "/salesorders/#{salesOrderId}/shipments/#{shipmentId}", shipmentUpdate, opts
 
-  deleteShipment: (salesOrderId, shipmentId) =>
-    @client.deleteAsync "/salesorders/#{salesOrderId}/shipments/#{shipmentId}"
+  deleteShipment: (salesOrderId, shipmentId, opts) =>
+    @client.deleteAsync "/salesorders/#{salesOrderId}/shipments/#{shipmentId}", opts
 
-  createPayment: (salesOrderId, payment) =>
-    @client.postAsync "/salesorders/#{salesOrderId}/payments", payment
+  createPayment: (salesOrderId, payment, opts) =>
+    @client.postAsync "/salesorders/#{salesOrderId}/payments", payment, opts
 
-  updatePayment: (salesOrderId, paymentId, paymentUpdate) =>
-    @client.putAsync "/salesorders/#{salesOrderId}/payments/#{paymentId}", paymentUpdate
+  updatePayment: (salesOrderId, paymentId, paymentUpdate, opts) =>
+    @client.putAsync "/salesorders/#{salesOrderId}/payments/#{paymentId}", paymentUpdate, opts
 
-  deletePayment: (salesOrderId, paymentId) =>
-    @client.deleteAsync "/salesorders/#{salesOrderId}/payments/#{paymentId}"
+  deletePayment: (salesOrderId, paymentId, opts) =>
+    @client.deleteAsync "/salesorders/#{salesOrderId}/payments/#{paymentId}", undefined, opts
 
-  salesOrderCreated: (salesOrderId) =>
-    @client.postAsync "/salesorders/#{salesOrderId}/created"
+  salesOrderCreated: (salesOrderId, opts) =>
+    @client.postAsync "/salesorders/#{salesOrderId}/created", undefined, opts
 
