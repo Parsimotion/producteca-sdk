@@ -13,3 +13,8 @@
 
 ### 0.x => 1.x
 - The APIs are now divided in different classes (ContactsApi, ProductsApi, SalesOrdersApi).
+
+## Publish instructions
+`npm version [<newversion> | major | minor | patch | ...] [-m <commit message>]`
+
+It would be ideal to write a brief description for the GitHub release after the publication.

@@ -1,12 +1,17 @@
 {
   "name": "producteca-sdk",
+  "version": "8.8.0",
   "description": "SDK for querying the Producteca's API",
+  "main": "build/sdk.js",
   "repository": {
     "type": "git",
     "url": "git://github.com/Parsimotion/producteca-sdk.git"
   },
-  "version": "8.8.0",
-  "main": "build/sdk.js",
+  "author": "Producteca",
+  "bugs": {
+    "url": "https://github.com/Parsimotion/producteca-sdk/issues"
+  },
+  "homepage": "https://github.com/Parsimotion/producteca-sdk#readme",
   "dependencies": {
     "bluebird": "^3.4.1",
     "jwt-simple": "^0.5.1",
@@ -35,6 +40,9 @@
   },
   "scripts": {
     "test": "grunt test",
-    "prepublish": "grunt build"
+    "preversion": "npm test",
+    "version": "git add package.json",
+    "postversion": "git push origin master && git push origin master --tags && npm publish",
+    "prepublishOnly": "grunt build"
   }
 }
