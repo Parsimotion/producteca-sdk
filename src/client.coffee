@@ -1,5 +1,6 @@
 _ = require("lodash")
 Promise = require("bluebird")
+debug = require("debug")("producteca-sdk:client")
 request = require("request-promise")
 
 module.exports =
@@ -29,7 +30,7 @@ class Client
     }
     _.assign options, auth: @authMethod unless _.isEmpty @authMethod
     _.assign options, json: true unless raw
-
+    debug(JSON.stringify(options))
     request(options).promise()
 
   _makeUrl: (path) =>
