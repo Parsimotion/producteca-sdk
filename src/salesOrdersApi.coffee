@@ -83,3 +83,6 @@ class SalesOrdersApi extends ProductecaApi
   salesOrderCreated: (salesOrderId, opts) =>
     @client.postAsync "/salesorders/#{salesOrderId}/created", undefined, opts
 
+  salesOrderDraft: (salesOrderId, opts) =>
+    @client.postAsync "/salesorders/#{salesOrderId}/draft", undefined, opts
+
