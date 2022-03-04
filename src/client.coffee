@@ -2,6 +2,7 @@ _ = require("lodash")
 Promise = require("bluebird")
 debug = require("debug")("producteca-sdk:client")
 debugResponse = require("debug")("producteca-sdk:client:response")
+debugResponseError = require("debug")("producteca-sdk:client:response:error")
 request = require("request-promise")
 
 module.exports =
@@ -33,8 +34,8 @@ class Client
     _.assign options, json: true unless raw
     debug(JSON.stringify(options))
     request(options).promise()
-    .tap((response) => debugResponse(response))
-    .tapCatch((err) => debugResponse(err))
+    .tap((response) => debugResponse(JSON.stringify(response)))
+    .tapCatch((err) => debugResponseError(JSON.stringify(err.message or err.body or err.code or err.error or err)))
 
   _makeUrl: (path) =>
     if path? then @url + path else @url
