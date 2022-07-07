@@ -47,7 +47,7 @@ class SalesOrdersApi extends ProductecaApi
   #Cancel sales orders by id
   cancel: (ids, opts) =>
     @client.postAsync "/salesorders/cancel?ids=#{ids.join()}", undefined, opts
-    
+
   #Closes a sales order by id
   close: (id, opts) =>
     @client.postAsync "/salesorders/#{id}/close", undefined, opts
@@ -79,6 +79,9 @@ class SalesOrdersApi extends ProductecaApi
 
   deletePayment: (salesOrderId, paymentId, opts) =>
     @client.deleteAsync "/salesorders/#{salesOrderId}/payments/#{paymentId}", undefined, opts
+
+  updateContact: (salesOrderId, contactUpdate, opts) =>
+    @client.putAsync "/salesorders/#{salesOrderId}/contact", contactUpdate, opts
 
   salesOrderCreated: (salesOrderId, opts) =>
     @client.postAsync "/salesorders/#{salesOrderId}/created", undefined, opts
