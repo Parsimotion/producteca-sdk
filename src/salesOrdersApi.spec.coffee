@@ -32,13 +32,13 @@ describe "SalesOrders", ->
       nockProductecaApi "/salesorders/byintegration?#{encodeURIComponent "integrationId"}=#{encodeURIComponent 123}", id: 1
       api.getByIntegration({ integrationId: 123, app: 2 }).then (salesOrder) ->
         salesOrder.should.eql id: 1
-    
+
     it "should return the sales order that matches overriding app", ->
       nockProductecaApi "/salesorders/byintegration?integrationId=123&app=2", id: 1
 
       api.getByIntegration({ integrationId: 123, app: 2 },2).then (salesOrder) ->
         salesOrder.should.eql id: 1
-    
+
     it "should throw an error if no sales orders match", (done) ->
       nockProductecaApi "/salesorders/byintegration?integrationId=123", "The salesorder doesn't exist.", "get", undefined, 404
 
@@ -53,7 +53,7 @@ describe "SalesOrders", ->
       api.getByInvoiceIntegration({ invoiceIntegrationId: 8787, app: 8 }).then (salesOrder) ->
         salesOrder.should.eql una_orden: true
 
-    it "should throw an error if no sales orders match", (done) -> 
+    it "should throw an error if no sales orders match", (done) ->
       nockProductecaApi "/salesorders/byinvoiceintegration?integrationId=8787&app=8","The salesorder doesn't exist.", "get", undefined, 404
 
       api.getByInvoiceIntegration({ invoiceIntegrationId: 8787, app: 8 }).catch (error) =>
@@ -145,4 +145,10 @@ describe "SalesOrders", ->
     it "should send a post notification", ->
       req = nockProductecaApi "/salesorders/1/created", {}, "post"
       api.salesOrderCreated(1).then ->
+        req.done()
+
+    describe "when updateContact is called", ->
+    it "should update contact from the salesOrder with id=1", ->
+      req = nockProductecaApi "/salesorders/1/contact", {}, "put", { name: "test update" }
+      api.updateContact(1, { name: "test update" }, { Date: "14/07/2016 11:15:00" }).then ->
         req.done()
