@@ -7,6 +7,7 @@ module.exports =
 #    accessToken: User's token
 #    basicAuth: { companyId, masterToken }
 #    [url]: "Url of the api"
+#    [headers]: object with custom headers, e.g: { "x-custom-message-data": "From NN-api" }
 #  }
 class ProductecaApi
   constructor: (endpoint = {}) ->
@@ -15,8 +16,8 @@ class ProductecaApi
   initializeClients: (endpoint) =>
     endpoint.url = endpoint.url || "https://apps.producteca.com/api"
 
-    @client = new Client(endpoint.url, @_buildAuthMethod(endpoint))
-    @asyncClient = new Client(@_makeUrlAsync endpoint.url, @_buildAuthMethod(endpoint))
+    @client = new Client(endpoint.url, @_buildAuthMethod(endpoint), endpoint.headers)
+    @asyncClient = new Client(@_makeUrlAsync endpoint.url, @_buildAuthMethod(endpoint), endpoint.headers)
 
   respondMany: (promise) =>
     promise.then ({ results }) -> results
