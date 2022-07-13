@@ -8,7 +8,7 @@ request = require("request-promise")
 module.exports =
 
 class Client
-  constructor: (@url, @authMethod) ->
+  constructor: (@url, @authMethod, @customHeaders = {}) ->
 
   getAsync: (path, opts) =>
     @_doRequest { verb: "GET", path }, opts
@@ -28,7 +28,7 @@ class Client
       url: @_makeUrl path
       body
       qs
-      headers
+      headers: _.assign {}, @customHeaders, headers
     }
     _.assign options, auth: @authMethod unless _.isEmpty @authMethod
     _.assign options, json: true unless raw
