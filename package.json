@@ -35,10 +35,6 @@
     "sinon": "^1.17.4",
     "sinon-chai": "^2.5.0"
   },
-  "engines": {
-    "node": "4.4.7",
-    "npm": "3.7.3"
-  },
   "scripts": {
     "test": "grunt test",
     "preversion": "npm test",
