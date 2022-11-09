@@ -131,13 +131,12 @@ class ProductsApi extends ProductecaApi
   getPricelists: =>
     @client.getAsync "/pricelists"
 
-  _findMany: ({ url, qs = {}, $select, opts = {} }) =>
-    _.assign qs, { $select: $select?.join() }
-    _.assign opts, { qs }
-    (@client.getAsync(url, opts)).then @_convertJsonToProducts
-
   _convertJsonToProducts: (products) =>
     products.map @_convertJsonToProduct
+
+  _findMany: (opts) => 
+    super opts
+    .then @_convertJsonToProducts
 
   _convertJsonToProduct: (json) =>
     new Product json
