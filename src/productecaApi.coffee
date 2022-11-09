@@ -1,4 +1,5 @@
 Client = require("./client")
+_ = require("lodash")
 
 module.exports =
 
@@ -41,3 +42,9 @@ class ProductecaApi
       return items if items.length < TOP
       @_getPageByPage(skip + TOP, moreQueryString).then (moreItems) ->
         items.concat moreItems
+
+  _findMany: ({ url, qs = {}, $select, opts = {} }) =>
+    _.assign qs, { $select: $select?.join() }
+    _.assign opts, { qs }
+    (@client.getAsync(url, opts))
+

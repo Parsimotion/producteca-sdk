@@ -13,6 +13,9 @@ class SalesOrdersApi extends ProductecaApi
   get: (id, opts) =>
     @client.getAsync "/salesorders/#{id}", opts
 
+  getMany: (ids, opts) =>
+    @_findMany { url: "/salesorders/multi", qs: { ids }, opts }
+
   #Returns a sales order by integration
   getByIntegration: ({ integrationId, app }, overrideApp, opts) =>
     qs = { integrationId }
@@ -88,4 +91,5 @@ class SalesOrdersApi extends ProductecaApi
 
   salesOrderDraft: (salesOrderId, opts) =>
     @client.postAsync "/salesorders/#{salesOrderId}/draft", undefined, opts
+
 
