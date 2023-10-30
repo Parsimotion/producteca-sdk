@@ -8,8 +8,7 @@ request = require("request-promise")
 module.exports =
 
 class Client
-  constructor: (@url, @authMethod) ->
-
+  constructor: (@url, @authMethod, @logtecaApi) ->
   getAsync: (path, opts) =>
     @_doRequest { verb: "GET", path }, opts
 
@@ -32,10 +31,18 @@ class Client
     }
     _.assign options, auth: @authMethod unless _.isEmpty @authMethod
     _.assign options, json: true unless raw
+
+    __logWithLogtecaApiIfShould = (value) => 
+      if @logtecaApi? && options.method != "GET" then @logtecaApi.log(value)
+
     debug(JSON.stringify(options))
     request(options).promise()
-    .tap((response) => debugResponse(JSON.stringify(response)))
-    .tapCatch((err) => debugResponseError(JSON.stringify(err.message or err.body or err.code or err.error or err)))
+    .tap (response) -> 
+      __logWithLogtecaApiIfShould { requestOptions: options, fulfilled: true, response }
+      debugResponse(JSON.stringify(response))
+    .tapCatch (err) ->
+      __logWithLogtecaApiIfShould { requestOptions: options, fulfilled: false, err }
+      debugResponseError(JSON.stringify(err.message or err.body or err.code or err.error or err))
 
   _makeUrl: (path) =>
     if path? then @url + path else @url
