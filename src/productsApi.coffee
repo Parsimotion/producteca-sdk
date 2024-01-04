@@ -103,6 +103,10 @@ class ProductsApi extends ProductecaApi
   updateMetadata: (id, update, opts) =>
     @client.putAsync "/products/#{id}/metadata", update, opts
 
+  # Updates product metadata
+  updateTags: (id, update, opts) =>
+    @client.putAsync "/products/#{id}/tags", update, opts
+
   # Updates a product
   update: (id, update, opts) =>
     @client.putAsync "/products/#{id}", update, opts
