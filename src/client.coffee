@@ -3,6 +3,7 @@ Promise = require("bluebird")
 debug = require("debug")("producteca-sdk:client")
 debugResponse = require("debug")("producteca-sdk:client:response")
 debugResponseError = require("debug")("producteca-sdk:client:response:error")
+ProductecaRequestError = require('./exceptions/productecaRequestError')
 request = require("request-promise")
 
 module.exports =
@@ -43,6 +44,7 @@ class Client
     .tapCatch (err) ->
       __logWithLogtecaApiIfShould { requestOptions: options, fulfilled: false, err }
       debugResponseError(JSON.stringify(err.message or err.body or err.code or err.error or err))
+    .catch (({ statusCode, name }) -> _.startsWith(statusCode, "5") or name is "RequestError"), (err) -> throw new ProductecaRequestError(err)
 
   _makeUrl: (path) =>
     if path? then @url + path else @url
