@@ -8,6 +8,6 @@ class ProductecaRequestError extends Error
     @statusCode = err?.statusCode or 502
     @body =
       err: err
-      code: "external_request_error",
+      code: "producteca_request_error",
       message: _.get err, "message", "There was an error while making a request to an external server"
       payload: JSON.stringify _.omit err, ["response","options.headers","options.auth"]
