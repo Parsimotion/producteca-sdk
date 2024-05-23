@@ -1,6 +1,6 @@
 {
   "name": "producteca-sdk",
-  "version": "8.15.0",
+  "version": "8.16.0",
   "description": "SDK for querying the Producteca's API",
   "main": "build/sdk.js",
   "repository": {
