@@ -7,6 +7,9 @@ Product = require("./models/product")
 PRODUCTECA_API_URL = "http://api.producteca.com"
 havePropertiesEqual = require("./helpers/havePropertiesEqual")
 nockProductecaApi = require("./helpers/nockProductecaApi")
+ProductecaRequestError = require('./exceptions/productecaRequestError')
+{ StatusCodeError } = require('request-promise/errors')
+PRODUCTECA_API_URL = "http://api.producteca.com"
 
 createProduct = (id, code, variations = []) ->
   id: id
@@ -290,3 +293,19 @@ describe "ProductsApi", ->
         req = nockProductecaApi "/warehouses", {}, "post", { name: "piola" }
         api.createWarehouse("piola").then ->
           req.done()
+
+  describe "when request fails", ->
+    context "with a 5xx code", ->
+      it "should be rejected with a ProductecaRequestException", ->
+        nockProductecaApi "/products/1", productWithOneVariations, "get", undefined, 500
+        api.get(1).should.be.rejectedWith(ProductecaRequestError)
+
+    context "with a connection error", ->
+      it "should be rejected with a ProductecaRequestError", ->
+        nock(PRODUCTECA_API_URL).get("/products/1").replyWithError({ code: 'ETIMEDOUT' })
+        api.get(1).should.be.rejectedWith(ProductecaRequestError)
+
+    context "with a 4xx code", ->
+      it "should be rejected with a StatusCodeError", ->
+        nockProductecaApi "/products/1", productWithOneVariations, "get", undefined, 400
+        api.get(1).should.be.rejectedWith(StatusCodeError)
