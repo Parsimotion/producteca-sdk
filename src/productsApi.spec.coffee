@@ -294,6 +294,12 @@ describe "ProductsApi", ->
         api.createWarehouse("piola").then ->
           req.done()
 
+    describe "when delete is called", ->
+      it "should send a delete to /products/${id}", ->
+        req = nockProductecaApi "/products/1", {}, "delete"
+        api.delete(1).then ->
+          req.done()
+
   describe "when request fails", ->
     context "with a 5xx code", ->
       it "should be rejected with a ProductecaRequestException", ->

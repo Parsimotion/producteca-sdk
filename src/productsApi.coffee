@@ -135,6 +135,10 @@ class ProductsApi extends ProductecaApi
   getPricelists: =>
     @client.getAsync "/pricelists"
 
+  # Deletes a product
+  delete: (productId, opts) =>
+    @client.deleteAsync "/products/#{productId}", opts
+
   _convertJsonToProducts: (products) =>
     products.map @_convertJsonToProduct
 
