@@ -33,6 +33,10 @@ class ProductsApi extends ProductecaApi
   findByVariationIntegrationId: (integrationId, $select, opts) =>
     @_findMany { url: "/products/byvariationintegration", qs: { integrationId }, $select, opts }
 
+  # Find products by a variation's parentIntegrationId
+  findByParentIntegrationId: (integrationId, $select, opts) =>
+    @_findMany { url: "/products/byparentintegration", qs: { integrationId }, $select, opts }
+
   # Creates a product
   create: (product, opts) =>
     @client.postAsync "/products", product, opts
