@@ -34,7 +34,10 @@ class Client
     _.assign options, json: true unless raw
 
     __logWithLogtecaApiIfShould = (value) => 
-      if @logtecaApi? && options.method != "GET" then @logtecaApi.log(value)
+      if @logtecaApi? && options.method != "GET"
+        eventId = _.pick(options.headers, ["x-producteca-event-id"])
+        eventIdHeader = eventId if !_.isEmpty(eventId)
+        @logtecaApi.log(value, eventIdHeader)
 
     debug(JSON.stringify(options))
     request(options).promise()
