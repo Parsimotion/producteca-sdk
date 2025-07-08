@@ -97,7 +97,7 @@ class SalesOrdersApi extends ProductecaApi
   salesOrderDraft: (salesOrderId, opts) =>
     @client.postAsync "/salesorders/#{salesOrderId}/draft", undefined, opts
 
-  _filterBundles({ salesOrder, products }) =>
+  _filterBundles: ({ salesOrder, products }) =>
     { lines } = salesOrder
     productsWithNoBundles = _.reject products, ( { metadata }) => _.includes(metadata, "bundle")
     linesWithNoBundles = _.filter lines, ({ product: { id }}) => _.some(productsWithNoBundles, ({ id: productId }) => id == productId )
