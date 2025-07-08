@@ -38,7 +38,7 @@ class SalesOrdersApi extends ProductecaApi
   #Sames as Full Products but filters bundles
   getWithFullProductsAndNoBundles: (id, opts) =>
     @getWithFullProducts(id, opts)
-      .then salesOrderWithProducts => @_filterBundles salesOrderWithProducts
+      .then (salesOrderWithProducts) => @_filterBundles salesOrderWithProducts
 
   #Creates a sales order
   create: (salesOrder, opts) =>
