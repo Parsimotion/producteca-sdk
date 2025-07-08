@@ -35,6 +35,11 @@ class SalesOrdersApi extends ProductecaApi
         @productsApi.getMany(productIds).then (products) ->
           { salesOrder, products }
 
+  #Sames as Full Products but filters bundles
+  getWithFullProductsAndNoBundles: (id, opts) =>
+    @getWithFullProducts(id, opts)
+      .then salesOrderWithProducts => @_filterBundles salesOrderWithProducts
+
   #Creates a sales order
   create: (salesOrder, opts) =>
     @client.postAsync "/salesorders", salesOrder, opts
@@ -92,4 +97,11 @@ class SalesOrdersApi extends ProductecaApi
   salesOrderDraft: (salesOrderId, opts) =>
     @client.postAsync "/salesorders/#{salesOrderId}/draft", undefined, opts
 
+  _filterBundles({ salesOrder, products }) =>
+    { lines } = salesOrder
+    productsWithNoBundles = _.reject products, ( { metadata }) => _.includes(metadata, "bundle")
+    linesWithNoBundles = _.filter lines, ({ product: { id }}) => _.some(productsWithNoBundles, ({ id: productId }) => id == productId )
+    
+    salesOrder: _.assign {}, salesOrder, { lines: linesWithNoBundles } 
+    products: productsWithNoBundles
 
