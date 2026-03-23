@@ -5,3 +5,7 @@ npm-debug.log
 
 # Ignore build
 build
+
+site.config
+*.env
+*.env.*
