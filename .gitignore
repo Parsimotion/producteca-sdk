@@ -9,3 +9,4 @@ build
 site.config
 *.env
 *.env.*
+*.claude*
