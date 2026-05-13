@@ -3,7 +3,7 @@ module.exports =
 
 class Product
   constructor: (properties) ->
-    _.extend @, properties
+    _.assign @, properties
 
   hasVariations: =>
     _.size(@variations) > 1

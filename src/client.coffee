@@ -4,7 +4,7 @@ debug = require("debug")("producteca-sdk:client")
 debugResponse = require("debug")("producteca-sdk:client:response")
 debugResponseError = require("debug")("producteca-sdk:client:response:error")
 ProductecaRequestError = require('./exceptions/productecaRequestError')
-request = require("request-promise")
+axios = require("axios")
 
 module.exports =
 
@@ -23,28 +23,38 @@ class Client
     @_doRequest { verb: "DELETE", path }, opts
 
   _doRequest: ({ verb, path, body }, { qs, raw = false, headers } = {}) =>
-    options = {
+    options =
       method: verb
       url: @_makeUrl path
-      body
-      qs
-      headers
-    }
-    _.assign options, auth: @authMethod unless _.isEmpty @authMethod
-    _.assign options, json: true unless raw
+      data: body
+      params: qs
+      headers: _.assign {}, headers
 
-    __logWithLogtecaApiIfShould = (value) => 
+    if not _.isEmpty @authMethod
+      if @authMethod.bearer?
+        options.headers["Authorization"] = "Bearer #{@authMethod.bearer}"
+      else
+        options.auth = { username: @authMethod.user, password: @authMethod.pass }
+
+    if raw
+      options.responseType = "text"
+      options.transformResponse = [(data) -> data]
+
+    __logWithLogtecaApiIfShould = (value) =>
       if @logtecaApi? && options.method != "GET" then @logtecaApi.log(value)
 
     debug(JSON.stringify(options))
-    request(options).promise()
-    .tap (response) -> 
+    Promise.resolve(axios(options))
+    .then (res) -> res.data
+    .tap (response) ->
       __logWithLogtecaApiIfShould { requestOptions: options, fulfilled: true, response }
       debugResponse(JSON.stringify(response))
     .tapCatch (err) ->
       __logWithLogtecaApiIfShould { requestOptions: options, fulfilled: false, err }
-      debugResponseError(JSON.stringify(err.message or err.body or err.code or err.error or err))
-    .catch (({ statusCode, name }) -> _.startsWith(statusCode, "5") or name is "RequestError"), (err) -> throw new ProductecaRequestError(err)
+      debugResponseError(JSON.stringify(err.message or err.response?.data or err.code or err))
+    .catch ((err) -> err.response?.status >= 500 or not err.response?), (err) ->
+      err.statusCode ?= err.response?.status
+      throw new ProductecaRequestError(err)
 
   _makeUrl: (path) =>
     if path? then @url + path else @url

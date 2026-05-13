@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node -e ' *)",
+      "Bash(grep -n 'encodeURIComponent\\\\|%2C\\\\|%20\\\\|$select\\\\|%24' /home/ubuntu/documents/producteca-sdk/src/salesOrdersApi.spec.coffee /home/ubuntu/documents/producteca-sdk/src/brandsApi.spec.coffee /home/ubuntu/documents/producteca-sdk/src/contactsApi.spec.coffee)",
+      "Bash(bun install *)",
+      "Bash(bun update *)",
+      "Read(//home/ubuntu/.npm/_logs/**)"
+    ]
+  }
+}

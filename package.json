@@ -13,33 +13,34 @@
   },
   "homepage": "https://github.com/Parsimotion/producteca-sdk#readme",
   "dependencies": {
+    "axios": "^1.7.0",
     "bluebird": "^3.4.1",
     "debug": "^4.3.2",
     "jwt-simple": "^0.5.1",
-    "lodash": "^4.13.1",
-    "q": "~1.0.1",
-    "request": "^2.83.0",
-    "request-promise": "^4.2.2"
+    "lodash": "^4.18.1"
   },
+  
   "devDependencies": {
+    "@babel/cli": "^7.24.0",
+    "@babel/core": "^7.24.0",
+    "@babel/preset-env": "^7.24.0",
     "chai": "^2.1.2",
     "chai-as-promised": "^5.2.0",
-    "coffee-script": "^1.12.4",
     "coffeescript": "^2.5.1",
-    "grunt": "^1.4.1",
-    "grunt-bump": "^0.3.1",
-    "grunt-contrib-clean": "~0.5.0",
-    "grunt-contrib-coffee": "^1.0.0",
-    "grunt-mocha-test": "~0.10.2",
-    "nock": "^8.0.0",
+    "mocha": "^10.4.0",
+    "nock": "^14.0.15",
     "sinon": "^1.17.4",
     "sinon-chai": "^2.5.0"
   },
+  "overrides": {
+    "serialize-javascript": "^7.0.5"
+  },
   "scripts": {
-    "test": "grunt test",
+    "build": "rm -rf build && coffee --compile --output build src && babel build --out-dir build && find build -name '*.spec.js' -delete",
+    "test": "mocha --require coffeescript/register 'src/**/*.spec.coffee'",
     "preversion": "npm test",
     "version": "git add package.json",
     "postversion": "git push origin master && git push origin master --tags && npm publish",
-    "prepublishOnly": "grunt build"
+    "prepublishOnly": "npm run build"
   }
 }

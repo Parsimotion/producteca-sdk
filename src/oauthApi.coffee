@@ -1,14 +1,16 @@
 Promise = require("bluebird")
-request = Promise.promisifyAll require("request")
+axios = require("axios")
 
 class OAuthApi
   constructor: ({ @accessToken, @url }) ->
   me: =>
-    request.getAsync
+    Promise.resolve axios
       url: @url
-      json: true
-      auth: bearer: @accessToken
-    .tap (res) -> throw new Error(res.body) if res.statusCode > 400
-    .then ({ body }) -> body
+      method: "GET"
+      validateStatus: -> true
+      headers:
+        "Authorization": "Bearer #{@accessToken}"
+    .tap (res) -> throw new Error(res.data) if res.status > 400
+    .then ({ data }) -> data
 
 module.exports = OAuthApi
