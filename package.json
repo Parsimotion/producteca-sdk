@@ -36,10 +36,6 @@
   },
   "scripts": {
     "build": "rm -rf build && coffee --compile --output build src && babel build --out-dir build && find build -name '*.spec.js' -delete",
-    "test": "mocha --require coffeescript/register 'src/**/*.spec.coffee'",
-    "preversion": "npm test",
-    "version": "git add package.json",
-    "postversion": "git push origin master && git push origin master --tags && npm publish",
-    "prepublishOnly": "npm run build"
+    "test": "mocha --require coffeescript/register 'src/**/*.spec.coffee'"
   }
 }
