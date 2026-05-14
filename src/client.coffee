@@ -55,6 +55,10 @@ class Client
     .catch ((err) -> err.response?.status >= 500 or not err.response?), (err) ->
       err.statusCode ?= err.response?.status
       throw new ProductecaRequestError(err)
+    .catch ((err) -> err.response?), (err) ->
+      err.statusCode = err.response.status
+      err.body = err.response.data
+      throw err
 
   _makeUrl: (path) =>
     if path? then @url + path else @url
