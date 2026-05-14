@@ -17,11 +17,10 @@ describe "OAuthAPI :", ->
       .get "/scopes"
       .reply 200, mockedScopes
 
-  it "me() should return statusCode=200 and scopes", (done) ->
+  it "me() should return statusCode=200 and scopes", ->
     api.me().then (scopes) ->
       havePropertiesEqual scopes, mockedScopes
       authNock.isDone()
-      done()
 
 mockedScopes =
   id: 1234

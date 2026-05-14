@@ -39,12 +39,11 @@ describe "SalesOrders", ->
       api.getByIntegration({ integrationId: 123, app: 2 },2).then (salesOrder) ->
         salesOrder.should.eql id: 1
 
-    it "should throw an error if no sales orders match", (done) ->
+    it "should throw an error if no sales orders match", ->
       nockProductecaApi "/salesorders/byintegration?integrationId=123", "The salesorder doesn't exist.", "get", undefined, 404
 
-      api.getByIntegration({ integrationId: 123, app: 2 }).catch (error) =>
-        error.statusCode.should.eql 404
-        done()
+      api.getByIntegration({ integrationId: 123, app: 2 }).catch (error) ->
+        error.response.status.should.eql 404
 
   describe "when getByInvoiceIntegration is called", ->
     it "should return the sales order that matches", ->
@@ -53,12 +52,11 @@ describe "SalesOrders", ->
       api.getByInvoiceIntegration({ invoiceIntegrationId: 8787, app: 8 }).then (salesOrder) ->
         salesOrder.should.eql una_orden: true
 
-    it "should throw an error if no sales orders match", (done) ->
+    it "should throw an error if no sales orders match", ->
       nockProductecaApi "/salesorders/byinvoiceintegration?integrationId=8787&app=8","The salesorder doesn't exist.", "get", undefined, 404
 
-      api.getByInvoiceIntegration({ invoiceIntegrationId: 8787, app: 8 }).catch (error) =>
-        error.message.should.eql "404 - \"The salesorder doesn't exist.\""
-        done()
+      api.getByInvoiceIntegration({ invoiceIntegrationId: 8787, app: 8 }).catch (error) ->
+        error.response.data.should.eql "The salesorder doesn't exist."
 
   describe "when getWithFullProducts is called", ->
     it "should return the salesOrder and all its products", ->
@@ -69,7 +67,7 @@ describe "SalesOrders", ->
         lines: [ { product: product31 }, { product: product32 } ]
 
       nockProductecaApi "/salesorders/1", salesOrder
-      nockProductecaApi "/products/multi?ids=#{encodeURIComponent "31,32"}", products
+      nockProductecaApi "/products/multi?ids=31,32", products
 
       api.getWithFullProducts(1).then (salesOrderWithProducts) ->
         havePropertiesEqual salesOrderWithProducts, { salesOrder, products }

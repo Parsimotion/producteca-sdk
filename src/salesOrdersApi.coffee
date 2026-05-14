@@ -5,9 +5,9 @@ module.exports =
 
 class SalesOrdersApi extends ProductecaApi
   constructor: (endpoint) ->
+    super endpoint
     @resource = "salesorders"
     @productsApi = new ProductsApi(endpoint)
-    super endpoint
 
   #Returns a sales order by id
   get: (id, opts) =>

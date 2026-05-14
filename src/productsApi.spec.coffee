@@ -8,7 +8,7 @@ PRODUCTECA_API_URL = "http://api.producteca.com"
 havePropertiesEqual = require("./helpers/havePropertiesEqual")
 nockProductecaApi = require("./helpers/nockProductecaApi")
 ProductecaRequestError = require('./exceptions/productecaRequestError')
-{ StatusCodeError } = require('request-promise/errors')
+{ AxiosError } = require('axios')
 PRODUCTECA_API_URL = "http://api.producteca.com"
 
 createProduct = (id, code, variations = []) ->
@@ -43,7 +43,7 @@ describe "ProductsApi", ->
   describe "when getMany is called", ->
     it "should send a GET to the api with the given string of ids", ->
       products = [ productWithMoreThanOneVariations, productWithoutVariations, anotherProductWithoutVariations ]
-      nockProductecaApi "/products/multi?ids=#{encodeURIComponent "2,3,4"}", products
+      nockProductecaApi "/products/multi?ids=2,3,4", products
       get = api.getMany("2,3,4").then ->
         get.done()
 
@@ -120,7 +120,7 @@ describe "ProductsApi", ->
 
       describe "and $select is passed as an array of properties", ->
         beforeEach ->
-          nockProductecaApi "/products/bysku?sku=c&#{encodeURIComponent("$select")}=#{encodeURIComponent("code,sku,stocks")}", [productWithMoreThanOneVariations]
+          nockProductecaApi "/products/bysku?sku=c&$select=code,sku,stocks", [productWithMoreThanOneVariations]
           get = api.findByVariationSku("c", ["code","sku","stocks"]).then (result) ->
             products = result
 
@@ -134,7 +134,7 @@ describe "ProductsApi", ->
         api.findByVariationSku("c").then (products) -> products.should.be.eql []
 
     it "should send a GET to the api urlEncoding the SKU", ->
-      nockProductecaApi "/products/bysku?sku=with%20spaces", [productWithMoreThanOneVariations]
+      nockProductecaApi "/products/bysku?sku=with+spaces", [productWithMoreThanOneVariations]
       get = api.findByVariationSku("with spaces").then (result) ->
         products = result
 
@@ -161,7 +161,7 @@ describe "ProductsApi", ->
 
       describe "and $select is passed as an array of properties", ->
         beforeEach ->
-          nockProductecaApi "/products/byvariationintegration?integrationId=c&#{encodeURIComponent("$select")}=#{encodeURIComponent("code,sku,stocks")}", [productWithMoreThanOneVariations]
+          nockProductecaApi "/products/byvariationintegration?integrationId=c&$select=code,sku,stocks", [productWithMoreThanOneVariations]
           get = api.findByVariationIntegrationId("c", ["code","sku","stocks"]).then (result) ->
             products = result
 
@@ -308,10 +308,10 @@ describe "ProductsApi", ->
 
     context "with a connection error", ->
       it "should be rejected with a ProductecaRequestError", ->
-        nock(PRODUCTECA_API_URL).get("/products/1").replyWithError({ code: 'ETIMEDOUT' })
+        nock(PRODUCTECA_API_URL).get("/products/1").replyWithError("ETIMEDOUT")
         api.get(1).should.be.rejectedWith(ProductecaRequestError)
 
     context "with a 4xx code", ->
       it "should be rejected with a StatusCodeError", ->
         nockProductecaApi "/products/1", productWithOneVariations, "get", undefined, 400
-        api.get(1).should.be.rejectedWith(StatusCodeError)
+        api.get(1).should.be.rejectedWith(AxiosError)

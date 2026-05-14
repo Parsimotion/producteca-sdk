@@ -5,8 +5,8 @@ module.exports =
 
 class ProductsApi extends ProductecaApi
   constructor: (endpoint) ->
-    @resource = "products"
     super endpoint
+    @resource = "products"
 
   # Returns a product by id
   get: (id, opts) =>
