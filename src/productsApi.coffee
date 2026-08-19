@@ -51,6 +51,12 @@ class ProductsApi extends ProductecaApi
     url = "/products/#{productId}/integrations"
     headers = { "x-app-id" : appId } if appId
     @client.putAsync url, integration, _.merge { headers }, opts
+  
+  # Updates one variation integration of a variation
+  updateVariationIntegration: (variationId, integration, appId, opts) =>
+    url = "/variationintegration/#{variationId}"
+    headers = { "x-app-id" : appId } if appId
+    @client.putAsync url, integration, _.merge { headers }, opts
 
   # Delete one integration of a product definition
   deleteIntegration: (productId, integrationId, { ignoreParentIntegrationId } = {}, opts) =>
