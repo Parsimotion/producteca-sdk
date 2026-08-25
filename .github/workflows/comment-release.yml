@@ -21,7 +21,7 @@ jobs:
 
       - name: Get next version to release
         id: pre-version
-        uses: Parsimotion/public-workflows/.github/actions/analyze-release@main
+        uses: Parsimotion/public-workflows/.github/actions/analyze-release@ci/sync-from-private-workflows
         env:
           NPM_TOKEN: ${{ secrets.NPM_PUBLISH_TOKEN }}
 
