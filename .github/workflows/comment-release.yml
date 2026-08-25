@@ -1,0 +1,45 @@
+name: Preview Release Version
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches:
+      - main
+      - master
+
+jobs:
+  preview-release:
+    runs-on: ubuntu-22.04
+    permissions:
+      pull-requests: write
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Get next version to release
+        id: pre-version
+        uses: Parsimotion/public-workflows/.github/actions/analyze-release@main
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_PUBLISH_TOKEN }}
+
+      - name: Comment on PR with bump info
+        if: steps.pre-version.outputs.bump != ''
+        uses: thollander/actions-comment-pull-request@v3
+        with:
+          message: |
+            🚀 **Próximo bump**: `${{ steps.pre-version.outputs.bump }}`
+            🚀 **Nueva versión**: `${{ steps.pre-version.outputs.next_version }}`
+            _(Basado en commits desde el tag `${{ steps.pre-version.outputs.last_tag }}`)_
+          comment-tag: release-bump-preview
+
+      - name: Comment on PR with bump info
+        if: steps.pre-version.outputs.bump == ''
+        uses: thollander/actions-comment-pull-request@v3
+        with:
+          message: |
+            🚀 **Próximo bump**: `❌ No Release ❌`
+            _(Basado en commits desde el tag `${{ steps.pre-version.outputs.last_tag }}`)_
+          comment-tag: release-bump-preview

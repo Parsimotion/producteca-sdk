@@ -22,6 +22,8 @@
     "request-promise": "^4.2.2"
   },
   "devDependencies": {
+    "@producteca/linterteca": "^1.3.2",
+    "husky": "^9.1.7",
     "chai": "^2.1.2",
     "chai-as-promised": "^5.2.0",
     "coffee-script": "^1.12.4",
@@ -37,9 +39,10 @@
   },
   "scripts": {
     "test": "grunt test",
-    "preversion": "npm test",
-    "version": "git add package.json",
-    "postversion": "git push origin master && git push origin master --tags && npm publish",
-    "prepublishOnly": "grunt build"
+    "build": "grunt build",
+    "prepare": "husky"
+  },
+  "engines": {
+    "node": ">=20"
   }
 }

@@ -1,2 +1,11 @@
 src
 Gruntfile.coffee
+
+# GitHub
+.github/
+
+# Node
+node_modules/
+
+# Release
+CHANGELOG.md
