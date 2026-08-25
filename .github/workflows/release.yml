@@ -18,7 +18,7 @@ jobs:
     uses: Parsimotion/workflows/.github/workflows/release.yml@main
     with:
       prereleaseTag: ${{ inputs.prereleaseTag }}
-      node-version: "18"
+      node-version: "20"
       build-output-dir: "build"
     secrets:
       NPM_PUBLISH_TOKEN: ${{ secrets.NPM_PUBLISH_TOKEN }}
