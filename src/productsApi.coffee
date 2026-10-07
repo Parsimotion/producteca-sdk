@@ -101,6 +101,12 @@ class ProductsApi extends ProductecaApi
     url = "/products/#{productId}/variations/#{variationId}/integrations"
     @client.postAsync url, variationIntegration, opts
 
+  # Creates the variation integration, or replaces the one the variation already has for the app (even with a different integrationId)
+  upsertVariationIntegration: (productId, variationId, variationIntegration, appId, opts) =>
+    url = "/products/#{productId}/variations/#{variationId}/integrations"
+    headers = { "x-app-id" : appId } if appId
+    @client.postAsync url, variationIntegration, _.merge { headers, qs: { shouldUpdateVariationIntegrationId: true } }, opts
+
   # Updates product prices
   updatePrices: (id, update, opts) =>
     @client.putAsync "/products/#{id}/prices", update, opts
