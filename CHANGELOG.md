@@ -1,3 +1,10 @@
+# [8.21.0](https://github.com/Parsimotion/producteca-sdk/compare/v8.20.0...v8.21.0) (2026-10-08)
+
+
+### Features
+
+* upsert variation integration method ([adf8e0d](https://github.com/Parsimotion/producteca-sdk/commit/adf8e0d1fd64884baaeb07cd9008f7c6695c0f2a))
+
 # [8.20.0](https://github.com/Parsimotion/producteca-sdk/compare/v8.19.0...v8.20.0) (2026-08-25)
 
 
