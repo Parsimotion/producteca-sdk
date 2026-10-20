@@ -37,8 +37,8 @@ class Client
       if @logtecaApi? && options.method != "GET" then @logtecaApi.log(value)
 
     debug(JSON.stringify(options))
-    request(options).promise()
-    .tap (response) -> 
+    Promise.resolve(request(options).promise())
+    .tap (response) ->
       __logWithLogtecaApiIfShould { requestOptions: options, fulfilled: true, response }
       debugResponse(JSON.stringify(response))
     .tapCatch (err) ->

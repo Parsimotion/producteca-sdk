@@ -1,6 +1,7 @@
 chai = require("chai")
 should = chai.should()
 chai.use(require("chai-as-promised"))
+Promise = require("bluebird")
 nock = require("nock")
 ProductsApi = require("./productsApi")
 Product = require("./models/product")
@@ -39,6 +40,12 @@ describe "ProductsApi", ->
       get = nockProductecaApi "/products/1", productWithOneVariations
       api.get(1).then ->
         get.done()
+
+    it "should return a promise of the app's bluebird so its handlers keep the request context", ->
+      nockProductecaApi "/products/1", productWithOneVariations
+      $product = api.get(1)
+      $product.should.be.an.instanceof(Promise)
+      $product
 
   describe "when getMany is called", ->
     it "should send a GET to the api with the given string of ids", ->
