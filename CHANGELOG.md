@@ -1,3 +1,10 @@
+## [8.21.1](https://github.com/Parsimotion/producteca-sdk/compare/v8.21.0...v8.21.1) (2026-10-21)
+
+
+### Bug Fixes
+
+* resolve requests with the sdk bluebird to keep the cls context ([f4d769d](https://github.com/Parsimotion/producteca-sdk/commit/f4d769d38f84e41e151b4fdf4fa2edb353114f28))
+
 # [8.21.0](https://github.com/Parsimotion/producteca-sdk/compare/v8.20.0...v8.21.0) (2026-10-08)
 
 
