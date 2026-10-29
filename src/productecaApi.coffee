@@ -14,7 +14,7 @@ class ProductecaApi
     @initializeClients endpoint
 
   initializeClients: (endpoint) =>
-    endpoint.url = endpoint.url || "https://apps.producteca.com/api"
+    endpoint.url = endpoint.url || "http://api-server.default.svc.cluster.local:8080"
     @client = new Client(endpoint.url, @_buildAuthMethod(endpoint), endpoint.logtecaApi)
     @asyncClient = new Client(@_makeUrlAsync endpoint.url, @_buildAuthMethod(endpoint), endpoint.logtecaApi)
 
