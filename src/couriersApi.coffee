@@ -1,3 +1,4 @@
+Promise = require "bluebird"
 Client = require "./client"
 jwt = require "jwt-simple"
 
@@ -17,3 +18,8 @@ class CouriersApi
 
   getZplOf: (order, shipment) =>
     @client.getAsync @getDownloadLink(order, shipment, "zpl2"), raw: true
+
+  getLabelsUrl: (salesOrderId, { type = "pdf", shipmentId } = {}) =>
+    url = "#{@url}/couriers/salesorders/#{salesOrderId}/labels?access_token=#{@productecaToken}&raw=true&type=#{type}"
+    url += "&shipmentId=#{shipmentId}" if shipmentId?
+    Promise.resolve url
